@@ -63,7 +63,7 @@ footer{padding:14px 18px;color:var(--muted);border-top:1px solid var(--border);d
 <header>
   <div class="brand">
     <img id="logoImg" alt="Logo PASSE TEMPS VEGA">
-    <h1>PASSE TEMPS VEGA <span class="ver-badge" id="appVer">v1.3</span></h1>
+    <h1>PASSE TEMPS VEGA <span class="ver-badge" id="appVer"></span></h1>
   </div>
   <nav class="tabs">
     <button class="tab active" data-tab="dash">Dashboard</button>
@@ -269,6 +269,15 @@ footer{padding:14px 18px;color:var(--muted);border-top:1px solid var(--border);d
   <!-- PARAMÈTRES -->
   <section id="param" class="card" hidden>
     <h2>Paramètres & Données</h2>
+<!-- Option SKU -->
+<div class="card">
+  <h3>Produits — Options</h3>
+  <label style="display:flex;align-items:center;gap:.5rem">
+    <input type="checkbox" id="cfgNoSKU">
+    <span>Désactiver l’obligation de SKU (autoriser produits sans SKU)</span>
+  </label>
+  <p class="muted small">Si activé : les nouveaux produits sans SKU recevront un identifiant auto-généré.</p>
+</div>
     <div class="grid cols-2">
       <div>
         <h3>Logo</h3>
@@ -321,13 +330,13 @@ footer{padding:14px 18px;color:var(--muted);border-top:1px solid var(--border);d
 </main>
 
 <footer>
-  <div>© PASSE TEMPS VEGA — <span id="appVerFoot">v1.3</span> • © Pierre Charlier 2025</div>
+  <div>© PASSE TEMPS VEGA — <span id="appVerFoot"></span> • © Pierre Charlier 2025</div>
   <div><small class="muted">Données locales (aucun serveur)</small></div>
 </footer>
 
 <script>
 /* ================= Version ================= */
-const APP_VERSION='v1.3';
+const APP_VERSION='v1.4';
 
 /* ================= Constantes & Helpers ================= */
 const DBKEY='ptv_petshop_v3';
@@ -550,6 +559,7 @@ document.getElementById('btnSaveProduct').onclick=()=>{
   const nom=(document.getElementById('p_nom').value||'').trim();
   if(nom && !DB.lists.designations.includes(nom)) DB.lists.designations.unshift(nom); // enrichit auto la liste
   const p={sku,famille:document.getElementById('p_famille').value, marque:document.getElementById('p_marque').value, nom, prixTTC:+(document.getElementById('p_prix').value||0), coutHT:+(document.getElementById('p_cost').value||0), tva:+(document.getElementById('p_tva').value||20), stock:+(document.getElementById('p_stock').value||0), stockMin:+(document.getElementById('p_min').value||0), archived:prev?!!prev.archived:false};
+ensureSKU(p);
   const i=DB.produits.findIndex(x=>x.sku===sku); if(i>=0) DB.produits[i]=p; else DB.produits.push(p);
   saveDB(); clearProductForm();
 };
@@ -735,6 +745,118 @@ function renderAll(){
 }
 renderAll();
 document.getElementById('appVer').textContent=APP_VERSION; document.getElementById('appVerFoot').textContent=APP_VERSION; loadLogo();
+</script>
+<footer style="text-align:center;margin-top:30px;color:#6b7280;">
+  Passe Temps Vega — Version 1.4
+</footer>
+<!-- Changelog -->
+<div id="changelogModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:9999">
+  <div style="max-width:640px;margin:8vh auto;background:#fff;border-radius:14px;overflow:hidden;border:1px solid #e5e7eb">
+    <div style="padding:14px 16px;border-bottom:1px solid #e5e7eb;display:flex;justify-content:space-between;align-items:center">
+      <strong>Quoi de neuf — v<span id="chVer"></span></strong>
+      <button id="chClose" style="border:0;background:#f3f4f6;padding:6px 10px;border-radius:8px;cursor:pointer">Fermer</button>
+    </div>
+    <div id="chBody" style="padding:14px 16px"></div>
+  </div>
+</div>
+<script>
+// === CONFIG + CHANGELOG ===
+const CFG_KEY = 'ptv_config';
+const DEFAULT_CFG = { requireSKU: true, version: '1.4' };
+const APP_VERSION = '1.4';
+const CHANGELOG = {
+  '1.4': [
+    'Option Paramètres : désactiver l’obligation de SKU.',
+    'Assignation automatique d’ID pour produits sans SKU.',
+    'Fenêtre « Historique des versions » accessible depuis Paramètres.'
+  ],
+  '1.3': [
+    'Manuel intégré, impression/PDF.',
+    'Améliorations Clients (anniversaires visibles, champs optionnels).'
+  ],
+  '1.2': [
+    'Catalogue : filtre “Archivés”',
+    'Export/Import JSON stabilisés'
+  ]
+};
+const LAST_SEEN_KEY = 'ptv_last_seen_version';
+
+// === CONFIGURATION ===
+function loadCfg() {
+  try { return Object.assign({}, DEFAULT_CFG, JSON.parse(localStorage.getItem(CFG_KEY)||'{}')); }
+  catch(e){ return {...DEFAULT_CFG}; }
+}
+function saveCfg(cfg){ localStorage.setItem(CFG_KEY, JSON.stringify(cfg)); }
+
+let CFG = loadCfg();
+
+// === GESTION SKU ===
+function autoIdSKU(){ return 'P' + Math.random().toString(36).slice(2,8).toUpperCase(); }
+function skuExists(sku, currentId=null){ return PRODUCTS?.some(p => p.sku && p.sku === sku && p.id !== currentId); }
+
+function ensureSKU(product){
+  if (CFG.requireSKU) {
+    if(!product.sku || !product.sku.trim()) throw new Error('Le SKU est obligatoire pour ce produit.');
+    if (skuExists(product.sku, product.id)) throw new Error('Ce SKU existe déjà.');
+  } else {
+    if(!product.sku || !product.sku.trim()){
+      let tentative; let tries=0;
+      do { tentative = autoIdSKU(); tries++; } while(skuExists(tentative, product.id) && tries<5);
+      product.sku = tentative;
+      product._sku_auto = true;
+    }
+  }
+}
+
+function migrateMissingSKU(){
+  let changed = 0;
+  for (const p of PRODUCTS || []){
+    if(!p.sku || !p.sku.trim()){
+      let tentative; let tries=0;
+      do { tentative = autoIdSKU(); tries++; } while(skuExists(tentative, p.id) && tries<5);
+      p.sku = tentative;
+      p._sku_auto = true;
+      changed++;
+    }
+  }
+  if(changed>0){
+    localStorage.setItem("products", JSON.stringify(PRODUCTS));
+    alert(`${changed} produit(s) mis à jour avec un SKU automatique.`);
+  }
+}
+
+// === CHANGELOG ===
+function renderChangelog(ver){
+  const body = document.getElementById('chBody');
+  const list = CHANGELOG[ver] || [];
+  document.getElementById('chVer').textContent = ver;
+  body.innerHTML = list.length
+    ? '<ul style="margin:0 0 0 18px">'+list.map(x=>`<li>${x}</li>`).join('')+'</ul>'
+    : '<p>Aucun changement consigné pour cette version.</p>';
+  document.getElementById('changelogModal').style.display = 'block';
+}
+
+// === INIT AU CHARGEMENT ===
+document.addEventListener('DOMContentLoaded', ()=>{
+  const chk = document.getElementById('cfgNoSKU');
+  if(chk){
+    chk.checked = !CFG.requireSKU;
+    chk.addEventListener('change', ()=>{
+      const newRequire = !chk.checked;
+      if(newRequire){ migrateMissingSKU(); }
+      CFG.requireSKU = newRequire;
+      saveCfg(CFG);
+    });
+  }
+
+  const last = localStorage.getItem(LAST_SEEN_KEY);
+  if(last !== APP_VERSION){
+    renderChangelog(APP_VERSION);
+    localStorage.setItem(LAST_SEEN_KEY, APP_VERSION);
+  }
+  document.getElementById('btnChangelog')?.addEventListener('click', ()=>renderChangelog(APP_VERSION));
+  document.getElementById('chClose')?.addEventListener('click', ()=>document.getElementById('changelogModal').style.display='none');
+});
 </script>
 </body>
 </html>
