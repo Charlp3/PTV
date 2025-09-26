@@ -1,0 +1,740 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>PASSE TEMPS VEGA – PetShop Manager</title>
+<style>
+:root{
+  --bg:#e5e7eb; --card:#e0e0e0; --elev:#d5d5d5; --border:#b0b3b8;
+  --text:#111827; --muted:#374151;
+  --pri:#22c55e; --pri2:#16a34a; --grad:linear-gradient(180deg,#22c55e,#16a34a);
+  --radius:14px; --shadow:0 6px 16px rgba(0,0,0,.15), inset 0 1px 0 rgba(255,255,255,.25);
+}
+*{box-sizing:border-box} html,body{height:100%}
+body{margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;color:var(--text);background:var(--bg)}
+header{display:flex;align-items:center;gap:14px;padding:12px 14px;position:sticky;top:0;z-index:10;background:var(--card);border-bottom:1px solid var(--border)}
+.brand{display:flex;align-items:center;gap:10px}
+.brand h1{font-size:18px;margin:0;letter-spacing:.3px;display:flex;align-items:center;gap:8px}
+.brand img{width:44px;height:44px;border-radius:8px;object-fit:cover;background:#f3f4f6;border:1px solid var(--border);box-shadow:var(--shadow)}
+.ver-badge{display:inline-block;padding:2px 8px;font-size:11px;font-weight:700;letter-spacing:.3px;color:#0f1a22;background:#c8e9d2;border:1px solid #9fc9ad;border-radius:999px}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin-left:auto}
+.tab{border:1px solid var(--border);background:var(--card);color:var(--text);padding:8px 12px;border-radius:10px;cursor:pointer;transition:all .15s}
+.tab:hover{transform:translateY(-1px);border-color:#94c3a6}
+.tab.active{background:var(--grad);color:#fff;border-color:transparent;font-weight:700}
+main{padding:16px;display:grid;gap:16px;max-width:1200px;margin:0 auto}
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:14px;box-shadow:var(--shadow)}
+.card h2{margin:0 0 12px 0;font-size:18px}
+.grid{display:grid;gap:12px}
+.cols-2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.cols-3{grid-template-columns:repeat(3,minmax(0,1fr))}
+@media(max-width:980px){.cols-3,.cols-2{grid-template-columns:1fr}}
+label{font-size:12px;color:var(--muted);display:block;margin-bottom:6px}
+input,select,textarea,button{width:100%;padding:11px 12px;border-radius:12px;border:1px solid var(--border);background:#fff;color:var(--text);transition:border .15s,box-shadow .15s}
+input:focus,select:focus,textarea:focus{outline:none;border-color:#22c55e;box-shadow:0 0 0 3px rgba(34,197,94,.20)}
+textarea{resize:vertical;min-height:84px}
+button{cursor:pointer;background:var(--grad);color:#fff;font-weight:700;border:none}
+button.secondary{background:var(--elev);color:var(--text);border:1px solid var(--border)}
+button.ghost{background:transparent;border:1px dashed var(--border);color:var(--muted)}
+small.muted{color:var(--muted)}
+hr.sep{border:0;border-top:1px dashed var(--border);margin:10px 0}
+.table{width:100%;border-collapse:collapse;overflow:hidden;border-radius:12px}
+.table th,.table td{border-bottom:1px solid var(--border);padding:10px;text-align:left}
+.table thead th{font-size:12px;color:var(--muted);background:var(--elev)}
+.table tbody tr:hover{background:rgba(0,0,0,.05)}
+.kpi{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.kpi .item{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:12px}
+.kpi .item h3{margin:0;font-size:12px;color:var(--muted)}
+.kpi .item div{font-size:22px;font-weight:800;margin-top:6px}
+.badge{display:inline-block;padding:2px 8px;border-radius:999px;font-size:12px}
+.badge.warn{background:#332a14;color:#ffd479}
+aside.panel{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px}
+footer{padding:14px 18px;color:var(--muted);border-top:1px solid var(--border);display:flex;justify-content:space-between;background:var(--card)}
+/* chips d’édition de listes */
+.listEditor{display:flex;flex-wrap:wrap;gap:6px}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;background:#fff;border:1px solid var(--border)}
+.chip input{width:auto;border:none;padding:0 4px}
+.chip .x{cursor:pointer;color:#a00;font-weight:700}
+.drag{cursor:grab}
+.red{color:#b91c1c;font-weight:800}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">
+    <img id="logoImg" alt="Logo PASSE TEMPS VEGA">
+    <h1>PASSE TEMPS VEGA <span class="ver-badge" id="appVer">v1.3</span></h1>
+  </div>
+  <nav class="tabs">
+    <button class="tab active" data-tab="dash">Dashboard</button>
+    <button class="tab" data-tab="clients">Clients</button>
+    <button class="tab" data-tab="produits">Produits</button>
+    <button class="tab" data-tab="ventes">Ventes</button>
+    <button class="tab" data-tab="param">Paramètres</button>
+  </nav>
+</header>
+
+<main>
+  <!-- DASHBOARD -->
+  <section id="dash" class="card">
+    <h2>Vue d’ensemble</h2>
+    <div class="kpi">
+      <div class="item"><h3>CA (30j)</h3><div id="kpiCA">€0</div></div>
+      <div class="item"><h3>Panier moyen (30j)</h3><div id="kpiPanier">€0</div></div>
+      <div class="item"><h3>Marge estimée</h3><div id="kpiMarge">€0</div></div>
+      <div class="item"><h3>Clients actifs (90j)</h3><div id="kpiActifs">0</div></div>
+    </div>
+    <hr class="sep">
+    <div class="grid cols-2">
+      <div>
+        <h3>Top produits</h3>
+        <table class="table" id="tblTopProd"><thead><tr><th>Produit</th><th>Qté</th><th>€</th></tr></thead><tbody></tbody></table>
+      </div>
+      <div>
+        <h3>Top clients</h3>
+        <table class="table" id="tblTopCli"><thead><tr><th>Client</th><th>Achats</th><th>€</th></tr></thead><tbody></tbody></table>
+      </div>
+    </div>
+  </section>
+
+  <!-- CLIENTS -->
+  <section id="clients" class="card" hidden>
+    <h2>Clients</h2>
+    <div class="grid cols-2">
+      <div>
+        <h3>Ajouter / Éditer</h3>
+        <div class="grid cols-2">
+          <div><label>Nom du propriétaire</label><input id="c_nom" placeholder="Nom Prénom"></div>
+          <div><label>Téléphone (BE)</label><input id="c_tel" type="tel" inputmode="numeric" maxlength="10" pattern="^0\\d{8,9}$" placeholder="0470123456" title="Commence par 0, 9–10 chiffres"></div>
+          <div><label>Email</label><input id="c_email" placeholder="a@b.com"></div>
+          <div><label>Adresse (optionnelle)</label><input id="c_addr" placeholder="Rue, n°, CP Ville"></div>
+        </div>
+        <hr class="sep">
+        <div class="grid cols-3">
+          <div>
+            <label>Espèce</label>
+            <select id="a_espece"><option>Chien</option><option>Chat</option></select>
+          </div>
+          <div>
+            <label>Nom de l’animal</label>
+            <input id="a_name" placeholder="Fidji">
+          </div>
+          <div>
+            <label>Race</label>
+            <select id="a_race"></select>
+          </div>
+          <div>
+            <label>Naissance</label>
+            <input id="a_dob" type="date">
+          </div>
+          <div>
+            <label>Allergies</label>
+            <input id="a_allergies" placeholder="poulet, céréales...">
+          </div>
+          <div>
+            <label>Aliment préféré – Marque</label>
+            <select id="a_foodBrand"></select>
+          </div>
+          <div style="grid-column:1/-1">
+            <label>Détails aliment (goût/produit)</label>
+            <input id="a_foodNote" placeholder="Sterilized Saumon 3kg, etc.">
+          </div>
+        </div>
+        <div class="grid cols-3" style="margin-top:8px">
+          <button id="btnSaveClient">Enregistrer</button>
+          <button class="secondary" id="btnNewClient">Nouveau</button>
+          <button class="ghost" id="btnDeleteClient" disabled>Supprimer</button>
+        </div>
+      </div>
+
+      <div class="grid">
+        <div>
+          <h3>Liste</h3>
+          <input id="searchClient" placeholder="Recherche nom / email / tel / animal...">
+          <table class="table" id="tblClients">
+            <thead><tr><th>Propriétaire</th><th>Animal</th><th>Tél</th><th>Email</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <aside class="panel">
+          <h3 id="cliStatsTitle">Statistiques client</h3>
+          <div id="cliStats">Sélectionnez un client…</div>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRODUITS -->
+  <section id="produits" class="card" hidden>
+    <h2>Produits & Stock</h2>
+    <div class="grid cols-2">
+      <div>
+        <h3>Ajouter / éditer produit</h3>
+        <div class="grid cols-3">
+          <div><label>SKU</label><input id="p_sku" placeholder="CR-CH-CPF-12KG-PL-01"></div>
+          <div><label>Famille</label><select id="p_famille"></select></div>
+          <div><label>Marque</label><select id="p_marque"></select></div>
+          <div><label>Désignation</label>
+            <input id="p_nom" list="dl_designations" placeholder="Adult Poulet 12kg">
+            <datalist id="dl_designations"></datalist>
+          </div>
+          <div><label>Prix TTC (€)</label><input id="p_prix" type="number" step="0.01"></div>
+          <div><label>Prix achat HT (€)</label><input id="p_cost" type="number" step="0.01"></div>
+          <div><label>TVA %</label><input id="p_tva" type="number" value="20"></div>
+          <div><label>Stock</label><input id="p_stock" type="number" value="0"></div>
+          <div><label>Stock mini</label><input id="p_min" type="number" value="1"></div>
+        </div>
+        <div class="grid cols-2">
+          <button id="btnSaveProduct">Enregistrer produit</button>
+          <div class="grid cols-2">
+            <button class="secondary" id="btnClearProduct">Nouveau</button>
+            <button class="ghost" id="btnDeleteProduct" disabled>Supprimer / Archiver</button>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <h3>Catalogue</h3>
+        <div class="grid cols-2">
+          <input id="searchProduit" placeholder="Recherche SKU / nom / famille / marque...">
+          <label style="display:flex;align-items:center;gap:8px;"><input type="checkbox" id="showArchived"> Afficher archivés</label>
+        </div>
+        <table class="table" id="tblProduits"><thead><tr><th>SKU</th><th>Nom</th><th>Famille</th><th>Marque</th><th>Prix</th><th>Stock</th><th>Statut</th></tr></thead><tbody></tbody></table>
+
+        <hr class="sep">
+        <h3>Éditer les listes</h3>
+        <div class="grid cols-3">
+          <div>
+            <label>Familles</label>
+            <div id="editFamilies" class="listEditor"></div>
+            <button class="secondary" data-add="families">+ Ajouter</button>
+          </div>
+          <div>
+            <label>Marques</label>
+            <div id="editBrands" class="listEditor"></div>
+            <button class="secondary" data-add="brands">+ Ajouter</button>
+          </div>
+          <div>
+            <label>Désignations suggérées</label>
+            <div id="editDesignations" class="listEditor"></div>
+            <button class="secondary" data-add="designations">+ Ajouter</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- VENTES -->
+  <section id="ventes" class="card" hidden>
+    <h2>Enregistrer une vente</h2>
+    <div class="grid cols-2">
+      <div>
+        <div class="grid cols-3">
+          <div><label>Client</label><select id="v_client"></select></div>
+          <div><label>Moyen de paiement</label><select id="v_pay"><option>CB</option><option>Espèces</option></select></div>
+          <div>
+            <label>Fidélité</label>
+            <div id="v_loyalty" class="chip" style="justify-content:space-between">
+              <span>—</span>
+              <label style="display:flex;align-items:center;gap:8px;margin:0">
+                <input type="checkbox" id="useFree"> Utiliser 1 gratuité (max config)
+              </label>
+            </div>
+          </div>
+        </div>
+        <hr class="sep">
+        <div class="grid cols-3">
+          <div><label>Produit (SKU)</label><input id="v_sku" placeholder="CR-CH-CPF-12KG-PL-01"></div>
+          <div><label>Quantité</label><input id="v_qty" type="number" value="1" min="1"></div>
+          <div><label>Remise (€)</label><input id="v_disc" type="number" value="0" step="0.01"></div>
+        </div>
+        <div class="grid cols-2">
+          <button id="btnAddLine">Ajouter ligne</button>
+          <button class="secondary" id="btnClearLines">Vider</button>
+        </div>
+        <table class="table" id="tblLines"><thead><tr><th>SKU</th><th>Nom</th><th>Qté</th><th>PU</th><th>Remise</th><th>Total</th><th></th></tr></thead><tbody></tbody></table>
+        <div style="text-align:right;margin-top:8px"><strong>Total : <span id="v_total">€0.00</span></strong></div>
+        <div class="grid cols-2" style="margin-top:8px">
+          <button id="btnSaveSale">Valider vente</button>
+          <button class="secondary" id="btnCancelSale">Annuler</button>
+        </div>
+      </div>
+      <div>
+        <h3>Historique récent</h3>
+        <table class="table" id="tblSales"><thead><tr><th>Date</th><th>Client</th><th>Montant</th></tr></thead><tbody></tbody></table>
+      </div>
+    </div>
+  </section>
+
+  <!-- PARAMÈTRES -->
+  <section id="param" class="card" hidden>
+    <h2>Paramètres & Données</h2>
+    <div class="grid cols-2">
+      <div>
+        <h3>Logo</h3>
+        <div class="listEditor">
+          <img id="logoPreview" class="previewLogo" alt="Aperçu logo" style="width:56px;height:56px;border-radius:10px;border:1px solid var(--border);background:#fff;object-fit:cover">
+          <input type="file" id="logoFile" accept="image/*">
+          <button id="btnSaveLogo" class="secondary">Enregistrer le logo</button>
+          <button id="btnClearLogo" class="ghost">Supprimer logo</button>
+        </div>
+        <div class="grid cols-2" style="margin-top:8px">
+          <button id="btnEmbedHTML">Exporter HTML avec logo intégré</button>
+          <button id="btnResetLogo" class="ghost">Logo par défaut</button>
+        </div>
+      </div>
+      <div>
+        <h3>Fidélité (config)</h3>
+        <div class="grid cols-3">
+          <div><label>Famille éligible</label><input id="loy_family" placeholder="Croquettes"></div>
+          <div><label>Tampons pour 1 gratuité</label><input id="loy_need" type="number" value="5" min="1"></div>
+          <div><label>Max gratuités/vente</label><input id="loy_maxfree" type="number" value="1" min="1"></div>
+        </div>
+        <div class="grid cols-2" style="margin-top:8px">
+          <button id="btnSaveLoyalty">Sauver config fidélité</button>
+          <button id="btnDemo" class="ghost">Charger jeux d’essai</button>
+        </div>
+      </div>
+    </div>
+    <hr class="sep">
+    <div class="grid cols-2">
+      <div>
+        <h3>Export / Import</h3>
+        <div class="grid cols-2">
+          <button id="btnExport" class="secondary">Exporter JSON</button>
+          <button id="btnImport">Importer</button>
+        </div>
+        <textarea id="importArea" rows="8" placeholder='{"clients":[],"produits":[],"ventes":[]}'></textarea>
+        <pre id="exportArea" style="max-height:240px;overflow:auto;background:#fff;border:1px solid var(--border);padding:8px;border-radius:8px"></pre>
+      </div>
+      <div>
+        <h3>Réinitialisation</h3>
+        <button id="btnResetData" class="ghost">Réinitialiser TOUT (⚠️)</button>
+        <p class="muted">Les données restent sur cet appareil (localStorage).</p>
+      </div>
+    </div>
+    <div>
+      <h3>À propos</h3>
+      <p><strong>PASSE TEMPS VEGA</strong> — gestion Clients / Produits / Ventes • Thème gris & vert.</p>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div>© PASSE TEMPS VEGA — <span id="appVerFoot">v1.3</span> • © Pierre Charlier 2025</div>
+  <div><small class="muted">Données locales (aucun serveur)</small></div>
+</footer>
+
+<script>
+/* ================= Version ================= */
+const APP_VERSION='v1.3';
+
+/* ================= Constantes & Helpers ================= */
+const DBKEY='ptv_petshop_v3';
+const LOGO_KEY='ptv_logo_dataurl_v1';
+const DEFAULT_LOGO_SVG=`<svg xmlns='http://www.w3.org/2000/svg' width='256' height='256' viewBox='0 0 256 256'>
+<defs><linearGradient id='g' x1='0' y1='0' x2='0' y2='1'><stop offset='0' stop-color='#34d399'/><stop offset='1' stop-color='#16a34a'/></linearGradient></defs>
+<rect rx='24' width='256' height='256' fill='url(#g)'/><text x='50%' y='58%' text-anchor='middle' font-size='116' font-weight='800' font-family='Inter,Arial' fill='#fff'>PTV</text>
+</svg>`;
+const DEFAULT_LOGO_DATAURL='data:image/svg+xml;base64,'+btoa(DEFAULT_LOGO_SVG);
+const now=()=>new Date(); const days=(d)=>d*24*3600*1000; const fmtEur=(n)=>'€'+(n||0).toFixed(2);
+function el(tag,attrs={},children=[]){const n=document.createElement(tag);Object.entries(attrs).forEach(([k,v])=> (k==='class')?n.className=v:n.setAttribute(k,v)); children.forEach(c=>n.appendChild(typeof c==='string'?document.createTextNode(c):c)); return n;}
+function toast(msg){ alert(msg); }
+
+/* ================= DB ================= */
+function loadDB(){
+  const raw=localStorage.getItem(DBKEY);
+  if(raw){ try{ return JSON.parse(raw) }catch(e){} }
+  return {
+    clients:[], produits:[], ventes:[],
+    lists:{
+      families:["Croquettes chiens","Croquettes chats","Laisses & colliers","Jouets"],
+      brands:["C Pro Food","Hill’s","Royal Canin","Purina","Autre"],
+      designations:["Adult Poulet 12kg","Sterilized Saumon 3kg","Balle caoutchouc","Collier néoprène M"]
+    },
+    loyalty:{familyKey:"Croquettes", stampsPerFree:5, maxFreePerSale:1, stamps:{}}
+  };
+}
+let DB=loadDB();
+function saveDB(){ localStorage.setItem(DBKEY, JSON.stringify(DB)); renderAll(); }
+
+/* ================= Navigation ================= */
+document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>{
+  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active')); t.classList.add('active');
+  document.querySelectorAll('main section').forEach(s=>s.hidden=true);
+  document.getElementById(t.dataset.tab).hidden=false;
+}));
+
+/* ================= Logo ================= */
+function loadLogo(){ const data=localStorage.getItem(LOGO_KEY)||DEFAULT_LOGO_DATAURL; const img=document.getElementById('logoImg'), prev=document.getElementById('logoPreview'); if(img) img.src=data; if(prev) prev.src=data; }
+function setLogoFromFile(file){ const r=new FileReader(); r.onload=()=>{ localStorage.setItem(LOGO_KEY,r.result); loadLogo(); toast('Logo enregistré 👍'); }; r.readAsDataURL(file); }
+document.getElementById('logoFile')?.addEventListener('change',e=>{const f=e.target.files?.[0]; if(f) setLogoFromFile(f);});
+document.getElementById('btnSaveLogo')?.addEventListener('click',()=>{const f=document.getElementById('logoFile').files?.[0]; if(!f) return toast('Choisis une image.'); setLogoFromFile(f);});
+document.getElementById('btnClearLogo')?.addEventListener('click',()=>{localStorage.removeItem(LOGO_KEY); loadLogo(); toast('Logo supprimé.');});
+document.getElementById('btnResetLogo')?.addEventListener('click',()=>{localStorage.setItem(LOGO_KEY,DEFAULT_LOGO_DATAURL); loadLogo(); toast('Logo par défaut.');});
+/* Export HTML avec logo intégré */
+function download(filename,content){ const blob=new Blob([content],{type:'text/html;charset=utf-8'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=filename; document.body.appendChild(a); a.click(); setTimeout(()=>{URL.revokeObjectURL(a.href); a.remove();},0); }
+document.getElementById('btnEmbedHTML')?.addEventListener('click',()=>{
+  const logoData=localStorage.getItem(LOGO_KEY)||DEFAULT_LOGO_DATAURL;
+  const doc=document.documentElement.cloneNode(true);
+  doc.querySelector('#logoImg')?.setAttribute('src',logoData);
+  const html='<!doctype html>\n'+doc.outerHTML.replace(/const LOGO_KEY[\\s\\S]*?DEFAULT_LOGO_DATAURL[^;]*;/,'const LOGO_KEY=""; const DEFAULT_LOGO_DATAURL="";').replace(/loadLogo\\(\\);/g,'');
+  download('index.html',html); toast('HTML exporté avec logo intégré ✅');
+});
+
+/* ================= Listes (familles / marques / designations) ================= */
+function renderSelectFromLists(){
+  const famSel=document.getElementById('p_famille'), brandSel=document.getElementById('p_marque'), dl=document.getElementById('dl_designations');
+  famSel.innerHTML=''; brandSel.innerHTML=''; dl.innerHTML='';
+  DB.lists.families.forEach(v=>{const o=el('option',{value:v}); o.textContent=v; famSel.appendChild(o);});
+  DB.lists.brands.forEach(v=>{const o=el('option',{value:v}); o.textContent=v; brandSel.appendChild(o);});
+  DB.lists.designations.forEach(v=>{const o=el('option'); o.value=v; dl.appendChild(o);});
+  // Aliment préféré (client)
+  const cBrand=document.getElementById('a_foodBrand'); cBrand.innerHTML='';
+  DB.lists.brands.forEach(v=>{const o=el('option'); o.textContent=v; cBrand.appendChild(o);});
+}
+function renderListEditors(){
+  buildEditor('families','editFamilies');
+  buildEditor('brands','editBrands');
+  buildEditor('designations','editDesignations',true);
+}
+function buildEditor(key,containerId){
+  const cont=document.getElementById(containerId); cont.innerHTML='';
+  DB.lists[key].forEach((val,idx)=>{
+    const chip=el('div',{class:'chip drag',draggable:'true'});
+    const inp=el('input',{value:val});
+    inp.addEventListener('change',()=>{ DB.lists[key][idx]=(inp.value||'').trim(); saveDB(); renderSelectFromLists(); });
+    const del=el('span',{class:'x',title:'Supprimer'},['×']);
+    del.onclick=()=>{ DB.lists[key].splice(idx,1); saveDB(); renderListEditors(); renderSelectFromLists(); };
+    chip.append(inp,del); cont.appendChild(chip);
+    chip.addEventListener('dragstart',e=>{e.dataTransfer.setData('text/plain',idx);});
+    cont.addEventListener('dragover',e=>e.preventDefault());
+    cont.addEventListener('drop',e=>{e.preventDefault(); const from=+e.dataTransfer.getData('text/plain'); const to=idx; const arr=DB.lists[key]; arr.splice(to,0,arr.splice(from,1)[0]); saveDB(); renderListEditors(); renderSelectFromLists();});
+  });
+}
+document.querySelectorAll('button[data-add]').forEach(b=>{
+  b.addEventListener('click',()=>{
+    const key=b.getAttribute('data-add');
+    const v=prompt('Nouvelle entrée :'); if(v==null) return;
+    DB.lists[key].push((v||'').trim()); saveDB(); renderListEditors(); renderSelectFromLists();
+  });
+});
+
+/* ================= Races (fixe) ================= */
+const DOG_BREEDS=["Affenpinscher","Airedale Terrier","Akita Inu","Alaskan Malamute","American Bully","American Staffordshire Terrier","Barbet","Barzoï","Basenji","Basset Hound","Beagle","Bearded Collie","Beauceron","Berger Allemand","Berger Australien","Berger Belge Malinois","Berger Blanc Suisse","Border Collie","Bouledogue Français","Boxer","Braque Allemand","Braque de Weimar","Bull Terrier","Cane Corso","Cavalier King Charles Spaniel","Chihuahua","Chow-Chow","Cocker Spaniel Anglais","Colley Rough","Dalmatien","Dobermann","Dogue Allemand","Dogue de Bordeaux","Épagneul Breton","Golden Retriever","Husky Sibérien","Jack Russell Terrier","Labrador Retriever","Lévrier Afghan","Leonberger","Lhassa Apso","Pinscher Nain","Rottweiler","Saint-Bernard","Samoyède","Setter Anglais","Setter Irlandais","Shar-Pei","Shiba Inu","Shih Tzu","Spitz Nain (Pomeranian)","Springer Spaniel Anglais","Staffordshire Bull Terrier","Teckel","Welsh Corgi Pembroke","Whippet","Yorkshire Terrier"];
+const CAT_BREEDS=["Abyssin","American Curl","American Shorthair","Angora Turc","Balinais","Bengal","Birman","Bleu Russe","British Shorthair","Chartreux","Cornish Rex","Devon Rex","Européen (DSH)","Exotic Shorthair","Maine Coon","Norvégien","Oriental","Persan","Ragdoll","Scottish Fold","Selkirk Rex","Siamois","Sibérien","Sphynx","Toyger"];
+const selEspece=document.getElementById('a_espece'); const selRace=document.getElementById('a_race');
+function populateRaces(){ const list=(selEspece.value==='Chien')?DOG_BREEDS:CAT_BREEDS; selRace.innerHTML=''; list.forEach(r=>selRace.appendChild(el('option',{value:r},[r]))); }
+selEspece.addEventListener('change',populateRaces);
+
+/* ================= Clients ================= */
+document.getElementById('c_tel').addEventListener('input',e=>{e.target.value=e.target.value.replace(/\D+/g,'').slice(0,10);});
+let editingClientId=null;
+function clearClientForm(){
+  ['c_nom','c_tel','c_email','c_addr','a_name','a_dob','a_allergies','a_foodNote'].forEach(id=>{const el=document.getElementById(id); if(el) el.value='';});
+  selEspece.value='Chien'; populateRaces(); selRace.value='Border Collie';
+  const cBrand=document.getElementById('a_foodBrand'); if(cBrand.options.length) cBrand.value=cBrand.options[0].value;
+  editingClientId=null; document.getElementById('btnDeleteClient').disabled=true;
+  document.getElementById('cliStats').textContent='Sélectionnez un client…'; document.getElementById('cliStatsTitle').textContent='Statistiques client';
+}
+function fillClientForm(c){
+  editingClientId=c.id;
+  c.animaux=c.animaux||[{}]; const a=c.animaux[0]||{};
+  document.getElementById('c_nom').value=c.nom||''; document.getElementById('c_tel').value=c.tel||''; document.getElementById('c_email').value=c.email||''; document.getElementById('c_addr').value=c.addr||'';
+  document.getElementById('a_name').value=a.name||''; selEspece.value=a.espece||'Chien'; populateRaces(); selRace.value=a.race||'';
+  document.getElementById('a_dob').value=a.dob? new Date(a.dob).toISOString().slice(0,10):''; document.getElementById('a_allergies').value=a.allergies||'';
+  document.getElementById('a_foodBrand').value=a.foodBrand||document.getElementById('a_foodBrand').options[0]?.value||''; document.getElementById('a_foodNote').value=a.foodNote||'';
+  document.getElementById('btnDeleteClient').disabled=false; renderClientStats(c.id);
+}
+document.getElementById('btnNewClient').onclick=clearClientForm;
+
+document.getElementById('btnSaveClient').onclick=()=>{
+  const tel=(document.getElementById('c_tel').value||'').trim();
+  if(tel && !/^0\d{8,9}$/.test(tel)){ return toast('Téléphone BE invalide : commence par 0 et comporte 9–10 chiffres (ou laissez vide).');}
+  const id=editingClientId||Date.now();
+  const cli={
+    id,
+    nom:(document.getElementById('c_nom').value||'').trim(),
+    tel, email:(document.getElementById('c_email').value||'').trim(),
+    addr:(document.getElementById('c_addr').value||'').trim(),
+    animaux:[{
+      name:(document.getElementById('a_name').value||'').trim(),
+      espece:document.getElementById('a_espece').value,
+      race:document.getElementById('a_race').value,
+      dob:document.getElementById('a_dob').value? new Date(document.getElementById('a_dob').value).getTime():null,
+      allergies:(document.getElementById('a_allergies').value||'').trim(),
+      foodBrand:document.getElementById('a_foodBrand').value,
+      foodNote:(document.getElementById('a_foodNote').value||'').trim()
+    }]
+  };
+  const idx=DB.clients.findIndex(x=>x.id===id); if(idx>=0) DB.clients[idx]=cli; else DB.clients.push(cli);
+  saveDB(); clearClientForm();
+};
+document.getElementById('btnDeleteClient').onclick=()=>{
+  if(!editingClientId) return; if(!confirm('Supprimer ce client ?')) return;
+  DB.clients=DB.clients.filter(c=>c.id!==editingClientId); DB.ventes=DB.ventes.filter(v=>v.clientId!==editingClientId);
+  delete DB.loyalty.stamps[editingClientId]; saveDB(); clearClientForm();
+};
+
+/* ---- Anniversaire : calcul robuste ---- */
+function nextBirthdayInfo(ts){
+  if(!ts) return {days:null, isSoon:false};
+  const b=new Date(ts); // date de naissance
+  const today=new Date(); const y=today.getFullYear();
+  // On calcule l’occurrence pour cette année
+  let next=new Date(y, b.getMonth(), b.getDate());
+  // Si déjà passé aujourd’hui (après minuit inclus), prendre l’année suivante
+  const todayMid=new Date(y, today.getMonth(), today.getDate());
+  if(next < todayMid) next = new Date(y+1, b.getMonth(), b.getDate());
+  // Différence en jours
+  const diffDays = Math.round((next - todayMid)/days(1));
+  // Rouge si entre 0 et 7 (inclus)
+  return {days:diffDays, isSoon: diffDays>=0 && diffDays<=7};
+}
+
+function renderClients(){
+  const q=(document.getElementById('searchClient').value||'').toLowerCase();
+  const tb=document.querySelector('#tblClients tbody'); tb.innerHTML='';
+  DB.clients.filter(c=>{
+    const a=c.animaux?.[0]||{};
+    const hay=(c.nom+' '+(c.email||'')+' '+(c.tel||'')+' '+(a.name||'')+' '+(a.race||'')).toLowerCase();
+    return hay.includes(q);
+  }).forEach(c=>{
+    const a=c.animaux?.[0]||{}; const binfo=nextBirthdayInfo(a.dob);
+    const nameCell=`<span class="${binfo.isSoon?'red':''}">${c.nom||'—'}</span>`;
+    const petCell=`<span class="${binfo.isSoon?'red':''}">${a.name||'—'}</span> ${a.espece?('• '+a.espece):''} ${a.race?('('+a.race+')'):''}`;
+    const tr=el('tr'); tr.innerHTML=`<td>${nameCell}</td><td>${petCell}</td><td>${c.tel||'—'}</td><td>${c.email||'—'}</td>`;
+    tr.addEventListener('click',()=>{ fillClientForm(c); document.querySelector('[data-tab="clients"]').click();});
+    tb.appendChild(tr);
+  });
+  const sel=document.getElementById('v_client'); sel.innerHTML='';
+  DB.clients.forEach(c=>{ const o=el('option',{value:c.id},[c.nom||('Client '+c.id)]); sel.appendChild(o); });
+}
+
+/* ===== Stats client ===== */
+function renderClientStats(clientId){
+  const c=DB.clients.find(x=>x.id===clientId); if(!c){document.getElementById('cliStats').textContent='Sélectionnez un client…'; return;}
+  const a=c.animaux?.[0]||{}; const t90=Date.now()-days(90);
+  const vv=DB.ventes.filter(v=>v.clientId===clientId); const vv90=vv.filter(v=>v.date>=t90);
+  const total=vv.reduce((s,v)=>s+v.total,0); const freq=vv90.length; const last=vv.length? new Date(vv[vv.length-1].date).toLocaleDateString():'—';
+  const panier=vv.length?total/vv.length:0;
+  const binfo=nextBirthdayInfo(a.dob);
+  const btxt=a.dob? (binfo.days===0?'AUJOURD’HUI 🎉': `dans ${binfo.days} j`) :'—';
+  const stamps=DB.loyalty.stamps[c.id]||0; const need=DB.loyalty.stampsPerFree; const free=Math.floor(stamps/need);
+  const html=`
+    <div class="grid cols-3">
+      <div class="card"><h2 style="font-size:12px;margin:0;color:var(--muted)">Total dépensé</h2><div style="font-size:20px;font-weight:800">${fmtEur(total)}</div></div>
+      <div class="card"><h2 style="font-size:12px;margin:0;color:var(--muted)">Fréquence (90j)</h2><div style="font-size:20px;font-weight:800">${freq}</div></div>
+      <div class="card"><h2 style="font-size:12px;margin:0;color:var(--muted)">Panier moyen</h2><div style="font-size:20px;font-weight:800">${fmtEur(panier)}</div></div>
+    </div>
+    <hr class="sep">
+    <div>Anniversaire ${a.name?('de <strong>'+a.name+'</strong> '):''}: <strong>${btxt}</strong></div>
+    <div style="margin-top:6px">Fidélité : <strong>${stamps%need}/${need} tampons</strong> • Gratuités dispo : <strong>${free}</strong></div>
+  `;
+  document.getElementById('cliStatsTitle').textContent='Statistiques • '+(c.nom||('Client '+c.id)); document.getElementById('cliStats').innerHTML=html;
+}
+
+/* ================= Produits ================= */
+let editingSku=null;
+function clearProductForm(){ ['p_sku','p_nom','p_prix','p_cost','p_tva','p_stock','p_min'].forEach(id=>document.getElementById(id).value=''); document.getElementById('p_famille').value=DB.lists.families[0]||''; document.getElementById('p_marque').value=DB.lists.brands[0]||''; editingSku=null; document.getElementById('btnDeleteProduct').disabled=true; }
+function fillProductForm(p){
+  document.getElementById('p_sku').value=p.sku; document.getElementById('p_famille').value=p.famille;
+  document.getElementById('p_marque').value=p.marque||''; document.getElementById('p_nom').value=p.nom||'';
+  document.getElementById('p_prix').value=p.prixTTC||0; document.getElementById('p_cost').value=p.coutHT||0; document.getElementById('p_tva').value=p.tva||20; document.getElementById('p_stock').value=p.stock||0; document.getElementById('p_min').value=p.stockMin||0;
+  editingSku=p.sku; document.getElementById('btnDeleteProduct').disabled=false;
+}
+document.getElementById('btnClearProduct').onclick=clearProductForm;
+document.getElementById('btnSaveProduct').onclick=()=>{
+  const sku=(document.getElementById('p_sku').value||'').trim(); if(!sku) return toast('SKU requis (le reste peut être vide)');
+  const prev=DB.produits.find(p=>p.sku===sku);
+  const nom=(document.getElementById('p_nom').value||'').trim();
+  if(nom && !DB.lists.designations.includes(nom)) DB.lists.designations.unshift(nom); // enrichit auto la liste
+  const p={sku,famille:document.getElementById('p_famille').value, marque:document.getElementById('p_marque').value, nom, prixTTC:+(document.getElementById('p_prix').value||0), coutHT:+(document.getElementById('p_cost').value||0), tva:+(document.getElementById('p_tva').value||20), stock:+(document.getElementById('p_stock').value||0), stockMin:+(document.getElementById('p_min').value||0), archived:prev?!!prev.archived:false};
+  const i=DB.produits.findIndex(x=>x.sku===sku); if(i>=0) DB.produits[i]=p; else DB.produits.push(p);
+  saveDB(); clearProductForm();
+};
+document.getElementById('btnDeleteProduct').onclick=()=>{
+  if(!editingSku) return toast('Sélectionnez un produit'); const sku=editingSku;
+  const used=DB.ventes.some(v=>(v.lignes||[]).some(L=>L.sku===sku));
+  if(used){ if(!confirm("Déjà vendu. L'ARCHIVER ?")) return; const p=DB.produits.find(x=>x.sku===sku); if(p){p.archived=true; saveDB(); toast('Archivé.');} }
+  else{ if(!confirm('Supprimer définitivement ?')) return; DB.produits=DB.produits.filter(p=>p.sku!==sku); saveDB(); toast('Supprimé.'); }
+  clearProductForm(); renderProduits();
+};
+function renderProduits(){
+  renderSelectFromLists();
+  const showArchived=document.getElementById('showArchived')?.checked;
+  const q=(document.getElementById('searchProduit')?.value||'').toLowerCase();
+  const tb=document.querySelector('#tblProduits tbody'); tb.innerHTML='';
+  DB.produits.filter(p=>showArchived||!p.archived).filter(p=>{const hay=(p.sku+' '+p.nom+' '+p.famille+' '+(p.marque||'')).toLowerCase(); return hay.includes(q);})
+  .forEach(p=>{
+    const tr=el('tr'); const statut=p.archived?'<span class="badge warn">Archivé</span>':'';
+    tr.innerHTML=`<td>${p.sku}</td><td>${p.nom||'—'}</td><td>${p.famille||'—'}</td><td>${p.marque||''}</td><td>${fmtEur(p.prixTTC||0)}</td><td>${p.stock||0}</td><td>${statut}</td>`;
+    tr.addEventListener('click',()=>fillProductForm(p)); tb.appendChild(tr);
+  });
+}
+document.getElementById('searchProduit').addEventListener('input',renderProduits);
+document.getElementById('showArchived').addEventListener('change',renderProduits);
+
+/* ================= Ventes + Fidélité ================= */
+const lines=[];
+function loyaltySummaryText(clientId){
+  const stamps=DB.loyalty.stamps[clientId]||0, need=DB.loyalty.stampsPerFree;
+  const free=Math.floor(stamps/need);
+  return `${stamps%need}/${need} tampons • Gratuités dispo : ${free}`;
+}
+function refreshLoyaltyUI(){
+  const cid=+document.getElementById('v_client').value||0;
+  document.querySelector('#v_loyalty span').textContent = cid? loyaltySummaryText(cid) : '—';
+  const freeAvailable = Math.floor((DB.loyalty.stamps[cid]||0)/DB.loyalty.stampsPerFree) > 0;
+  const cb=document.getElementById('useFree');
+  cb.disabled = !freeAvailable;
+  if(!freeAvailable) cb.checked=false;
+}
+document.getElementById('v_client').addEventListener('change',()=>{refreshLoyaltyUI();});
+
+function refreshLines(){
+  const tb=document.querySelector('#tblLines tbody'); tb.innerHTML=''; let total=0;
+  lines.forEach((L,i)=>{ total+=L.total; const tr=el('tr'); tr.innerHTML=`<td>${L.sku}</td><td>${L.nom}</td><td>${L.qty}</td><td>${fmtEur(L.pu)}</td><td>${fmtEur(L.remise)}</td><td>${fmtEur(L.total)}</td><td><button class="secondary" onclick="lines.splice(${i},1);refreshLines()">X</button></td>`; tb.appendChild(tr);});
+  document.getElementById('v_total').textContent=fmtEur(total);
+}
+document.getElementById('btnAddLine').onclick=()=>{
+  const sku=(document.getElementById('v_sku').value||'').trim(); const qty=parseInt(document.getElementById('v_qty').value||'1'); const remise=parseFloat(document.getElementById('v_disc').value||'0');
+  const p=DB.produits.find(x=>x.sku===sku); if(!p) return toast('Produit introuvable'); if(p.archived) return toast('Produit archivé.');
+  const pu=p.prixTTC||0; const total=Math.max(0, pu*qty - remise);
+  lines.push({sku,nom:p.nom||sku,qty,pu,remise,total,famille:p.famille||''}); refreshLines();
+};
+document.getElementById('btnClearLines').onclick=()=>{lines.length=0;refreshLines();};
+
+function estimateMargin(ls){ let m=0; for(const L of ls){ const p=DB.produits.find(x=>x.sku===L.sku); if(!p) continue; const coutTTC=(p.coutHT||0)*(1+((p.tva||20)/100)); m+=Math.max(0,(p.prixTTC||0)-coutTTC)*L.qty - L.remise; } return Math.max(0,m); }
+
+/* Applique jusqu’à N gratuités sur les lignes éligibles (moins cher d’abord) */
+function applyFreebiesOnLines(familyKey, maxFree){
+  const key=familyKey.toLowerCase();
+  // Construire une liste d'unités éligibles triées du PU le moins cher au plus cher
+  const units=[];
+  lines.forEach((L,idx)=>{
+    if((L.famille||'').toLowerCase().includes(key)){
+      for(let k=0;k<L.qty;k++){ units.push({idx, pu:L.pu}); }
+    }
+  });
+  units.sort((a,b)=>a.pu-b.pu);
+  let applied=0;
+  for(const u of units){
+    if(applied>=maxFree) break;
+    const L=lines[u.idx];
+    // on rend gratuit 1 unité : on ajoute une remise = pu
+    L.remise += L.pu;
+    L.total = Math.max(0, L.pu*L.qty - L.remise);
+    applied++;
+  }
+  if(applied>0) refreshLines();
+  return applied;
+}
+
+document.getElementById('btnSaveSale').onclick=()=>{
+  if(!lines.length) return toast('Ajoutez des lignes');
+  const clientId=+document.getElementById('v_client').value; if(!clientId) return toast('Choisissez un client');
+
+  // Fidélité : calcule la demande de gratuités
+  let usedFree=0;
+  const cb=document.getElementById('useFree');
+  if(cb.checked){
+    const stamps=DB.loyalty.stamps[clientId]||0, need=DB.loyalty.stampsPerFree||5;
+    const availFree=Math.floor(stamps/need);
+    if(availFree<=0){ toast("Pas de gratuité disponible."); cb.checked=false; }
+    else{
+      const maxPerSale=DB.loyalty.maxFreePerSale||1;
+      const toApply=Math.min(availFree, maxPerSale);
+      usedFree = applyFreebiesOnLines(DB.loyalty.familyKey||'Croquettes', toApply);
+    }
+  }
+
+  const total=lines.reduce((s,L)=>s+L.total,0);
+  const vente={id:Date.now(), date:Date.now(), clientId, total, pay:document.getElementById('v_pay').value, lignes:[...lines], margeEstimee:estimateMargin(lines)};
+  // stock -
+  for(const L of lines){ const p=DB.produits.find(x=>x.sku===L.sku); if(p) p.stock=(p.stock||0)-L.qty; }
+
+  // fidélité : +1 tampon par unité vendue dans la famille, -need par gratuité utilisée
+  const famKey=(DB.loyalty.familyKey||'Croquettes').toLowerCase();
+  const stampsAdd = lines.filter(L=>(L.famille||'').toLowerCase().includes(famKey)).reduce((s,L)=>s+L.qty,0);
+  const need=DB.loyalty.stampsPerFree||5;
+  const prev = DB.loyalty.stamps[clientId]||0;
+  let newStamps = prev + stampsAdd - (usedFree*need);
+  DB.loyalty.stamps[clientId] = Math.max(0, newStamps);
+
+  DB.ventes.push(vente); lines.length=0; saveDB(); toast('Vente enregistrée.');
+  refreshLoyaltyUI();
+};
+document.getElementById('btnCancelSale').onclick=()=>{lines.length=0;refreshLines();};
+
+function renderSales(){
+  const tb=document.querySelector('#tblSales tbody'); tb.innerHTML='';
+  [...DB.ventes].sort((a,b)=>b.date-a.date).slice(0,20).forEach(v=>{
+    const c=DB.clients.find(x=>x.id===v.clientId); const tr=el('tr'); tr.innerHTML=`<td>${new Date(v.date).toLocaleString()}</td><td>${c?(c.nom||'—'):'—'}</td><td>${fmtEur(v.total)}</td>`; tb.appendChild(tr);
+  });
+}
+
+/* ================= Dashboard ================= */
+function renderDashboard(){
+  const t30=Date.now()-days(30), t90=Date.now()-days(90);
+  const ventes30=DB.ventes.filter(v=>v.date>=t30);
+  const ca=ventes30.reduce((s,v)=>s+v.total,0);
+  const paniers=ventes30.length? ca/ventes30.length:0;
+  const marge=ventes30.reduce((s,v)=>s+v.margeEstimee,0);
+  const actifs=new Set(DB.ventes.filter(v=>v.date>=t90).map(v=>v.clientId)).size;
+  document.getElementById('kpiCA').textContent=fmtEur(ca);
+  document.getElementById('kpiPanier').textContent=fmtEur(paniers);
+  document.getElementById('kpiMarge').textContent=fmtEur(marge);
+  document.getElementById('kpiActifs').textContent=actifs;
+
+  const bySku={}; DB.ventes.forEach(v=>v.lignes.forEach(L=>{bySku[L.sku]=bySku[L.sku]||{nom:L.nom,q:0,e:0}; bySku[L.sku].q+=L.qty; bySku[L.sku].e+=L.total;}));
+  const tbp=document.querySelector('#tblTopProd tbody'); tbp.innerHTML='';
+  Object.values(bySku).sort((a,b)=>b.e-a.e).slice(0,10).forEach(x=>{const tr=el('tr'); tr.innerHTML=`<td>${x.nom}</td><td>${x.q}</td><td>${fmtEur(x.e)}</td>`; tbp.appendChild(tr);});
+  const byClient={}; DB.ventes.forEach(v=>{const c=DB.clients.find(x=>x.id===v.clientId); const key=c?(c.nom||('#'+v.clientId)):'#'+v.clientId; byClient[key]=byClient[key]||{nom:key,n:0,e:0}; byClient[key].n++; byClient[key].e+=v.total;});
+  const tbc=document.querySelector('#tblTopCli tbody'); tbc.innerHTML='';
+  Object.values(byClient).sort((a,b)=>b.e-a.e).slice(0,10).forEach(x=>{const tr=el('tr'); tr.innerHTML=`<td>${x.nom}</td><td>${x.n}</td><td>${fmtEur(x.e)}</td>`; tbc.appendChild(tr);});
+}
+
+/* ================= Paramètres (fidélité + export/import) ================= */
+document.getElementById('btnSaveLoyalty').onclick=()=>{
+  DB.loyalty.familyKey=document.getElementById('loy_family').value||'Croquettes';
+  DB.loyalty.stampsPerFree=+document.getElementById('loy_need').value||5;
+  DB.loyalty.maxFreePerSale=+document.getElementById('loy_maxfree').value||1;
+  saveDB(); toast('Config fidélité enregistrée');
+};
+document.getElementById('btnExport').onclick=()=>{ document.getElementById('exportArea').textContent=JSON.stringify(DB,null,2); };
+document.getElementById('btnImport').onclick=()=>{ try{ DB=JSON.parse(document.getElementById('importArea').value); saveDB(); toast('Import OK'); }catch(e){ toast('JSON invalide'); } };
+document.getElementById('btnDemo').onclick=()=>{
+  DB.clients=[
+    {id:1, nom:'Alice Martin', tel:'', email:'', addr:'', animaux:[{name:'Rex',espece:'Chien',race:'Border Collie',dob:new Date().setMonth(new Date().getMonth(), new Date().getDate()+5),allergies:'',foodBrand:'C Pro Food',foodNote:'Adult Poulet 12kg'}]},
+    {id:2, nom:'Bruno Leroy',  tel:'', email:'', addr:'', animaux:[{name:'Moka',espece:'Chat',race:'Maine Coon',dob:null,allergies:'',foodBrand:'Hill’s',foodNote:'Sterilized Saumon 3kg'}]},
+  ];
+  DB.produits=[
+    {sku:'CR-CH-CPF-12KG-PL-01',famille:'Croquettes chiens',marque:'C Pro Food',nom:'Adult Poulet 12kg',prixTTC:54.9,coutHT:30,tva:20,stock:6,stockMin:2},
+    {sku:'CR-CT-HIL-3KG-SA-01',famille:'Croquettes chats',marque:'Hill’s',nom:'Sterilized Saumon 3kg',prixTTC:22.9,coutHT:12,tva:20,stock:10,stockMin:3},
+    {sku:'LC-NEO-M-01',famille:'Laisses & colliers',marque:'WalkPro',nom:'Collier néoprène M',prixTTC:14.9,coutHT:6,tva:20,stock:8,stockMin:2},
+  ];
+  DB.lists.families=["Croquettes chiens","Croquettes chats","Laisses & colliers","Jouets"];
+  DB.lists.brands=["C Pro Food","Hill’s","Royal Canin","Purina","Autre"];
+  DB.lists.designations=["Adult Poulet 12kg","Sterilized Saumon 3kg","Balle caoutchouc","Collier néoprène M"];
+  DB.loyalty.stamps={1:5,2:0}; // Alice a déjà 1 gratuité disponible
+  DB.ventes=[]; saveDB();
+};
+document.getElementById('btnResetData').onclick=()=>{ if(confirm('Effacer toutes les données ?')){ localStorage.removeItem(DBKEY); DB=loadDB(); renderAll(); } };
+
+/* ================= Rendu global ================= */
+document.getElementById('searchClient').oninput=renderClients;
+function renderAll(){
+  renderSelectFromLists(); renderListEditors(); populateRaces();
+  renderClients(); renderProduits(); renderSales(); renderDashboard();
+  // fidélité config -> UI
+  document.getElementById('loy_family').value=DB.loyalty.familyKey||'Croquettes';
+  document.getElementById('loy_need').value=DB.loyalty.stampsPerFree||5;
+  document.getElementById('loy_maxfree').value=DB.loyalty.maxFreePerSale||1;
+  refreshLoyaltyUI();
+}
+renderAll();
+document.getElementById('appVer').textContent=APP_VERSION; document.getElementById('appVerFoot').textContent=APP_VERSION; loadLogo();
+</script>
+</body>
+</html>
