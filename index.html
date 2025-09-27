@@ -11,7 +11,7 @@
   --text:#111827; --muted:#374151;
   --pri:#22c55e; --pri2:#16a34a; --grad:linear-gradient(180deg,#22c55e,#16a34a);
   --radius:14px; --shadow:0 6px 16px rgba(0,0,0,.15), inset 0 1px 0 rgba(255,255,255,.25);
-  --warn:#f59e0b; --danger:#b91c1c;
+  --danger:#b91c1c;
 }
 *{box-sizing:border-box} html,body{height:100%}
 body{margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;color:var(--text);background:var(--bg)}
@@ -49,8 +49,6 @@ hr.sep{border:0;border-top:1px dashed var(--border);margin:10px 0}
 .kpi .item h3{margin:0;font-size:12px;color:var(--muted)}
 .kpi .item div{font-size:22px;font-weight:800;margin-top:6px}
 .badge{display:inline-block;padding:2px 8px;border-radius:999px;font-size:12px}
-.badge.warn{background:#332a14;color:#ffd479}
-.badge.ok{background:#073b1a;color:#a7f3d0}
 aside.panel{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px}
 footer{padding:14px 18px;color:var(--muted);border-top:1px solid var(--border);display:flex;justify-content:space-between;background:var(--card)}
 .listEditor{display:flex;flex-wrap:wrap;gap:6px}
@@ -61,30 +59,25 @@ footer{padding:14px 18px;color:var(--muted);border-top:1px solid var(--border);d
 .red{color:var(--danger);font-weight:800}
 .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
 
-/* Bandeau nouvelle version */
-#newVersionBanner{
-  display:none; align-items:center; gap:12px; background:#fff7ed; border:1px solid #fed7aa;
-  color:#7c2d12; padding:10px 12px; border-radius:10px; box-shadow:var(--shadow); margin:0 16px 0 16px;
-}
+/* Bannière version (conservée) */
+#newVersionBanner{display:none;align-items:center;gap:12px;background:#fff7ed;border:1px solid #fed7aa;color:#7c2d12;padding:10px 12px;border-radius:10px;box-shadow:var(--shadow);margin:0 16px}
 #newVersionBanner .btn{padding:6px 10px;border-radius:8px;border:1px solid #f59e0b;background:#fef3c7;color:#7c2d12;cursor:pointer}
 #newVersionBanner .btn:hover{background:#fde68a}
 
-/* Modal */
+/* Modal changelog */
 .modal{position:fixed;inset:0;background:rgba(0,0,0,.35);display:none;align-items:center;justify-content:center;z-index:50}
 .modal .dialog{background:#fff;border-radius:14px;max-width:720px;width:92%;border:1px solid var(--border);box-shadow:var(--shadow)}
 .modal header{position:static;background:#fff;border-bottom:1px solid var(--border);border-radius:14px 14px 0 0}
 .modal .body{padding:14px}
 .modal .footer{display:flex;justify-content:flex-end;gap:8px;padding:12px;border-top:1px solid var(--border)}
 .modal .footer button{padding:10px 14px;border-radius:10px}
-.changelog h3{margin:8px 0 4px}
-.changelog pre{background:#0b1020;color:#e6edf3;padding:12px;border-radius:10px;overflow:auto;border:1px solid #11182722}
 </style>
 </head>
 <body>
 <header>
   <div class="brand">
     <img id="logoImg" alt="Logo PASSE TEMPS VEGA">
-    <h1>PASSE TEMPS VEGA <span class="ver-badge" id="appVer">v1.5</span></h1>
+    <h1>PASSE TEMPS VEGA <span class="ver-badge" id="appVer">v1.6</span></h1>
   </div>
   <nav class="tabs">
     <button class="tab active" data-tab="dash">Dashboard</button>
@@ -95,7 +88,7 @@ footer{padding:14px 18px;color:var(--muted);border-top:1px solid var(--border);d
   </nav>
 </header>
 
-<!-- Bandeau "Nouvelle version" -->
+<!-- Bannière version -->
 <div id="newVersionBanner" role="status" aria-live="polite" style="margin-top:12px">
   <strong>Nouvelle version disponible :</strong>
   <span id="versOld">—</span> → <span id="versNew">—</span>
@@ -190,7 +183,7 @@ footer{padding:14px 18px;color:var(--muted);border-top:1px solid var(--border);d
           <div><label>Stock</label><input id="p_stock" type="number" value="0"></div>
           <div><label>Stock mini</label><input id="p_min" type="number" value="1"></div>
         </div>
-        <input type="hidden" id="p_id"> <!-- ID interne produit -->
+        <input type="hidden" id="p_id">
         <div class="grid cols-2">
           <button id="btnSaveProduct">Enregistrer produit</button>
           <div class="grid cols-2">
@@ -319,8 +312,48 @@ footer{padding:14px 18px;color:var(--muted);border-top:1px solid var(--border);d
         </div>
       </div>
     </div>
+
     <hr class="sep">
+
     <div class="grid cols-2">
+      <div>
+        <h3>Éditer les listes</h3>
+        <div class="grid cols-2">
+          <div>
+            <label>Familles</label>
+            <div id="editFamilies" class="listEditor"></div>
+            <button class="secondary" data-add="families">+ Ajouter</button>
+          </div>
+          <div>
+            <label>Marques</label>
+            <div id="editBrands" class="listEditor"></div>
+            <button class="secondary" data-add="brands">+ Ajouter</button>
+          </div>
+          <div style="grid-column:1/-1">
+            <label>Désignations suggérées</label>
+            <div id="editDesignations" class="listEditor"></div>
+            <button class="secondary" data-add="designations">+ Ajouter</button>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <h3>Listes de races (éditables)</h3>
+        <div class="grid cols-2">
+          <div>
+            <label>Races de chiens</label>
+            <div id="editBreedsDog" class="listEditor"></div>
+            <button class="secondary" data-add="breedsDog">+ Ajouter</button>
+          </div>
+          <div>
+            <label>Races de chats</label>
+            <div id="editBreedsCat" class="listEditor"></div>
+            <button class="secondary" data-add="breedsCat">+ Ajouter</button>
+          </div>
+        </div>
+        <small class="muted">Ces listes alimentent les menus “Race” des animaux (Clients).</small>
+      </div>
+
       <div>
         <h3>Export / Import</h3>
         <div class="grid cols-2">
@@ -330,30 +363,33 @@ footer{padding:14px 18px;color:var(--muted);border-top:1px solid var(--border);d
         <textarea id="importArea" rows="8" placeholder='{"clients":[],"produits":[],"ventes":[]}'></textarea>
         <pre id="exportArea" style="max-height:240px;overflow:auto;background:#fff;border:1px solid var(--border);padding:8px;border-radius:8px"></pre>
       </div>
+
       <div>
         <h3>Changelog & Version</h3>
-        <div class="chip">Version actuelle : <strong id="verNow" style="margin-left:6px">v1.5</strong></div>
+        <div class="chip">Version actuelle : <strong id="verNow" style="margin-left:6px">v1.6</strong></div>
         <div class="grid cols-2" style="margin-top:6px">
           <button id="btnShowChangelog2" class="secondary">Afficher le changelog</button>
           <button id="btnResetSeen" class="ghost">Réafficher alerte nouvelle version</button>
         </div>
       </div>
+
       <div>
         <h3>Réinitialisation</h3>
         <button id="btnResetData" class="ghost">Réinitialiser TOUT (⚠️)</button>
         <p class="muted">Les données restent sur cet appareil (localStorage).</p>
       </div>
     </div>
+
     <div>
       <h3>À propos</h3>
       <p><strong>PASSE TEMPS VEGA</strong> — gestion Clients / Produits / Ventes • Thème gris & vert.</p>
-      <p>© PASSE TEMPS VEGA — v1.5 • © Pierre Charlier 2025</p>
+      <p>© PASSE TEMPS VEGA — v1.6 • © Pierre Charlier 2025</p>
     </div>
   </section>
 </main>
 
 <footer>
-  <div>© PASSE TEMPS VEGA — <span id="appVerFoot">v1.5</span> • © Pierre Charlier 2025</div>
+  <div>© PASSE TEMPS VEGA — <span id="appVerFoot">v1.6</span> • © Pierre Charlier 2025</div>
   <div><small class="muted">Données locales (aucun serveur)</small></div>
 </footer>
 
@@ -362,10 +398,10 @@ footer{padding:14px 18px;color:var(--muted);border-top:1px solid var(--border);d
   <div class="dialog">
     <header style="display:flex;align-items:center;gap:10px;padding:10px 12px">
       <strong>Changelog</strong>
-      <span class="ver-badge" id="chgVer">v1.5</span>
+      <span class="ver-badge" id="chgVer">v1.6</span>
       <button id="btnCloseModal" class="secondary" style="margin-left:auto;padding:6px 10px;border-radius:8px">Fermer</button>
     </header>
-    <div class="body changelog" id="chgBody"></div>
+    <div class="body" id="chgBody"></div>
     <div class="footer">
       <button id="btnDontShow" class="ghost">Ne plus afficher pour cette version</button>
       <button id="btnOkModal">OK</button>
@@ -375,111 +411,66 @@ footer{padding:14px 18px;color:var(--muted);border-top:1px solid var(--border);d
 
 <script>
 /* ================= Version & Changelog ================= */
-const APP_VERSION='v1.5';
+const APP_VERSION='v1.6';
 const CHANGELOG = [
+  {ver:'v1.6', items:[
+    "Listes de races CHIENS et CHATS désormais ÉDITABLES dans Paramètres.",
+    "Anniversaire: seule la ligne de l'animal concerné passe en rouge (plus le propriétaire)."
+  ]},
   {ver:'v1.5', items:[
-    "NOUVEAU • Notification de nouvelle version avec aperçu du changelog et mémorisation 'vu'.",
-    "NOUVEAU • Multi-animaux par propriétaire (ajout/suppression/édition).",
-    "ANNIVERSAIRES • Alerte rouge J-7 à J pour tout animal du foyer.",
-    "VENTES • Sélection produit sans SKU, recherche intégrée.",
-    "DIVERS • Améliorations UI et stabilité (lists éditables, export/import)."
+    "Alerte nouvelle version + modal changelog.",
+    "Multi-animaux par propriétaire.",
+    "Suppression totale de SKU (IDs internes)."
   ]},
-  {ver:'v1.4', items:[
-    "SUPPRESSION TOTALE DE SKU • Identifiants internes transparents.",
-    "VENTES • Sélection du produit via liste filtrable.",
-    "MIGRATION AUTO depuis v1.3 (SKU -> ID interne)."
-  ]},
-  {ver:'v1.3', items:[
-    "Correctif anniversaires (calcul du prochain anniversaire).",
-    "Tous les champs client optionnels.",
-    "Fidélité : case 'Utiliser 1 gratuité' fonctionnelle (moins cher d'abord)."
+  {ver:'v1.3–v1.4', items:[
+    "Correctifs anniversaires, champs optionnels, fidélité 5+1."
   ]}
 ];
 const VERSION_KEY='ptv_seen_version_v1';
 
 /* ================= Constantes & Helpers ================= */
-const DBKEY='ptv_petshop_v4';        // bump db key (structure multi-animaux)
+const DBKEY='ptv_petshop_v5';        // bump db key (nouveaux champs: races éditables)
 const LOGO_KEY='ptv_logo_dataurl_v1';
 const DEFAULT_LOGO_SVG=`<svg xmlns='http://www.w3.org/2000/svg' width='256' height='256' viewBox='0 0 256 256'>
 <defs><linearGradient id='g' x1='0' y1='0' x2='0' y2='1'><stop offset='0' stop-color='#34d399'/><stop offset='1' stop-color='#16a34a'/></linearGradient></defs>
 <rect rx='24' width='256' height='256' fill='url(#g)'/><text x='50%' y='58%' text-anchor='middle' font-size='116' font-weight='800' font-family='Inter,Arial' fill='#fff'>PTV</text>
 </svg>`;
 const DEFAULT_LOGO_DATAURL='data:image/svg+xml;base64,'+btoa(DEFAULT_LOGO_SVG);
-const now=()=>new Date(); const days=(d)=>d*24*3600*1000; const fmtEur=(n)=>'€'+(n||0).toFixed(2);
+const days=(d)=>d*24*3600*1000; const fmtEur=(n)=>'€'+(n||0).toFixed(2);
 function el(tag,attrs={},children=[]){const n=document.createElement(tag);Object.entries(attrs).forEach(([k,v])=> (k==='class')?n.className=v:n.setAttribute(k,v)); children.forEach(c=>n.appendChild(typeof c==='string'?document.createTextNode(c):c)); return n;}
 function toast(msg){ alert(msg); }
 
 /* ================= DB Load/Save + Migration ================= */
+const DEFAULT_DOGS=["Berger Allemand","Berger Australien","Border Collie","Bouledogue Français","Cavalier King Charles Spaniel","Chihuahua","Cocker Spaniel Anglais","Dalmatien","Golden Retriever","Husky Sibérien","Jack Russell Terrier","Labrador Retriever","Rottweiler","Shiba Inu","Shih Tzu","Teckel","Yorkshire Terrier"];
+const DEFAULT_CATS=["Abyssin","Bengal","Birman","Bleu Russe","British Shorthair","Chartreux","Maine Coon","Norvégien","Persan","Ragdoll","Siamois","Sphynx","Européen (DSH)"];
+
 function loadDB(){
-  // Essayez nouvelle clé
-  let raw=localStorage.getItem(DBKEY);
+  const raw=localStorage.getItem(DBKEY);
   if(raw){ try{ return JSON.parse(raw) }catch(e){} }
-  // Migration depuis anciennes clés
-  const prevKeys=['ptv_petshop_v3','ptv_petshop_v2','ptv_petshop_v1'];
-  for(const k of prevKeys){
-    const r=localStorage.getItem(k);
-    if(r){
-      try{
-        const db=JSON.parse(r);
-        // v1.4 supprimait SKU -> convertir produits (ajoute id interne si manquant)
-        if(db && Array.isArray(db.produits)){
-          db.produits.forEach(p=>{ if(!p.id){ p.id = (p.id || Date.now()+Math.random())|0; } });
-        }
-        // v1.5 multi-animaux : si un seul animal planqué comme a.*, transformer
-        if(db && Array.isArray(db.clients)){
-          db.clients.forEach(c=>{
-            if(!Array.isArray(c.animaux)) c.animaux=[];
-            // si ancien schéma : fields animal au premier niveau ?
-            if(c.animaux.length===0){
-              const guess = {};
-              if(c.a_name||c.a_dob||c.a_race||c.a_allergies||c.a_foodBrand||c.a_foodNote||c.a_espece){
-                guess.name=c.a_name||'';
-                guess.espece=c.a_espece||'Chien';
-                guess.race=c.a_race||'';
-                guess.dob=c.a_dob||null;
-                guess.allergies=c.a_allergies||'';
-                guess.foodBrand=c.a_foodBrand||'';
-                guess.foodNote=c.a_foodNote||'';
-                c.animaux=[guess];
-              }
-            }
-          });
-        }
-        const migrated={
-          clients:db.clients||[],
-          produits:db.produits||[],
-          ventes:(db.ventes||[]).map(v=>{
-            // v.lignes pouvaient contenir sku -> on tente de retrouver id produit par nom
-            if(v && Array.isArray(v.lignes)){
-              v.lignes=v.lignes.map(L=>{
-                if(L && L.sku && !L.productId){
-                  const match=(db.produits||[]).find(p=>p.sku===L.sku || p.nom===L.nom);
-                  if(match){ L.productId=match.id; }
-                }
-                return L;
-              });
-            }
-            return v;
-          }),
-          lists: db.lists || {
-            families:["Croquettes chiens","Croquettes chats","Laisses & colliers","Jouets"],
-            brands:["C Pro Food","Hill’s","Royal Canin","Purina","Autre"],
-            designations:["Adult Poulet 12kg","Sterilized Saumon 3kg","Balle caoutchouc","Collier néoprène M"]
-          },
-          loyalty: db.loyalty || {familyKey:"Croquettes", stampsPerFree:5, maxFreePerSale:1, stamps:{}}
-        };
-        localStorage.setItem(DBKEY, JSON.stringify(migrated));
-        return migrated;
-      }catch(e){}
-    }
+
+  // Migrer depuis v1.5 si présent
+  const prev=localStorage.getItem('ptv_petshop_v4') || localStorage.getItem('ptv_petshop_v3');
+  if(prev){
+    try{
+      const db=JSON.parse(prev);
+      db.lists=db.lists||{};
+      // injecter nouvelles listes si absentes
+      if(!Array.isArray(db.lists.breedsDog)) db.lists.breedsDog=[...DEFAULT_DOGS];
+      if(!Array.isArray(db.lists.breedsCat)) db.lists.breedsCat=[...DEFAULT_CATS];
+      localStorage.setItem(DBKEY, JSON.stringify(db));
+      return db;
+    }catch(e){}
   }
-  // DB neuve
+
+  // Base neuve
   return {
     clients:[], produits:[], ventes:[],
     lists:{
       families:["Croquettes chiens","Croquettes chats","Laisses & colliers","Jouets"],
       brands:["C Pro Food","Hill’s","Royal Canin","Purina","Autre"],
-      designations:["Adult Poulet 12kg","Sterilized Saumon 3kg","Balle caoutchouc","Collier néoprène M"]
+      designations:["Adult Poulet 12kg","Sterilized Saumon 3kg","Balle caoutchouc","Collier néoprène M"],
+      breedsDog:[...DEFAULT_DOGS],
+      breedsCat:[...DEFAULT_CATS]
     },
     loyalty:{familyKey:"Croquettes", stampsPerFree:5, maxFreePerSale:1, stamps:{}}
   };
@@ -501,7 +492,6 @@ document.getElementById('logoFile')?.addEventListener('change',e=>{const f=e.tar
 document.getElementById('btnSaveLogo')?.addEventListener('click',()=>{const f=document.getElementById('logoFile').files?.[0]; if(!f) return toast('Choisis une image.'); setLogoFromFile(f);});
 document.getElementById('btnClearLogo')?.addEventListener('click',()=>{localStorage.removeItem(LOGO_KEY); loadLogo(); toast('Logo supprimé.');});
 document.getElementById('btnResetLogo')?.addEventListener('click',()=>{localStorage.setItem(LOGO_KEY,DEFAULT_LOGO_DATAURL); loadLogo(); toast('Logo par défaut.');});
-/* Export HTML avec logo intégré */
 function download(filename,content){ const blob=new Blob([content],{type:'text/html;charset=utf-8'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=filename; document.body.appendChild(a); a.click(); setTimeout(()=>{URL.revokeObjectURL(a.href); a.remove();},0); }
 document.getElementById('btnEmbedHTML')?.addEventListener('click',()=>{
   const logoData=localStorage.getItem(LOGO_KEY)||DEFAULT_LOGO_DATAURL;
@@ -511,22 +501,17 @@ document.getElementById('btnEmbedHTML')?.addEventListener('click',()=>{
   download('index.html',html); toast('HTML exporté avec logo intégré ✅');
 });
 
-/* ================= Listes (familles / marques / designations) ================= */
+/* ================= Listes (familles / marques / designations / races) ================= */
 function renderSelectFromLists(){
   const famSel=document.getElementById('p_famille'), brandSel=document.getElementById('p_marque'), dl=document.getElementById('dl_designations');
   famSel.innerHTML=''; brandSel.innerHTML=''; dl.innerHTML='';
   DB.lists.families.forEach(v=>{const o=el('option',{value:v}); o.textContent=v; famSel.appendChild(o);});
   DB.lists.brands.forEach(v=>{const o=el('option',{value:v}); o.textContent=v; brandSel.appendChild(o);});
   DB.lists.designations.forEach(v=>{const o=el('option'); o.value=v; dl.appendChild(o);});
-  // Aliment préféré (client) — reprendre marques
+  // Aliment préféré (client)
   document.querySelectorAll('.pet-brand').forEach(sel=>{
     sel.innerHTML=''; DB.lists.brands.forEach(v=>{const o=el('option'); o.textContent=v; sel.appendChild(o);});
   });
-}
-function renderListEditors(){
-  buildEditor('families','editFamilies');
-  buildEditor('brands','editBrands');
-  buildEditor('designations','editDesignations');
 }
 function buildEditor(key,containerId){
   const cont=document.getElementById(containerId); cont.innerHTML='';
@@ -542,22 +527,40 @@ function buildEditor(key,containerId){
     cont.addEventListener('drop',e=>{e.preventDefault(); const from=+e.dataTransfer.getData('text/plain'); const to=idx; const arr=DB.lists[key]; arr.splice(to,0,arr.splice(from,1)[0]); saveDB(); renderListEditors(); renderSelectFromLists();});
   });
 }
+function renderListEditors(){
+  buildEditor('families','editFamilies');
+  buildEditor('brands','editBrands');
+  buildEditor('designations','editDesignations');
+  buildEditor('breedsDog','editBreedsDog');
+  buildEditor('breedsCat','editBreedsCat');
+}
 document.querySelectorAll('button[data-add]').forEach(b=>{
   b.addEventListener('click',()=>{
     const key=b.getAttribute('data-add');
     const v=prompt('Nouvelle entrée :'); if(v==null) return;
-    DB.lists[key].push((v||'').trim()); saveDB(); renderListEditors(); renderSelectFromLists();
+    DB.lists[key].push((v||'').trim()); saveDB(); renderListEditors(); renderSelectFromLists(); // + menus marques
+    // Si on ajoute une race, mettre à jour les selects Race visibles
+    if(key==='breedsDog' || key==='breedsCat'){ refreshAllPetRaceSelects(); }
   });
 });
 
-/* ================= Races (fixe) ================= */
-const DOG_BREEDS=["Affenpinscher","Airedale Terrier","Akita Inu","Alaskan Malamute","American Bully","American Staffordshire Terrier","Barbet","Barzoï","Basenji","Basset Hound","Beagle","Bearded Collie","Beauceron","Berger Allemand","Berger Australien","Berger Belge Malinois","Berger Blanc Suisse","Border Collie","Bouledogue Français","Boxer","Braque Allemand","Braque de Weimar","Bull Terrier","Cane Corso","Cavalier King Charles Spaniel","Chihuahua","Chow-Chow","Cocker Spaniel Anglais","Colley Rough","Dalmatien","Dobermann","Dogue Allemand","Dogue de Bordeaux","Épagneul Breton","Golden Retriever","Husky Sibérien","Jack Russell Terrier","Labrador Retriever","Lévrier Afghan","Leonberger","Lhassa Apso","Pinscher Nain","Rottweiler","Saint-Bernard","Samoyède","Setter Anglais","Setter Irlandais","Shar-Pei","Shiba Inu","Shih Tzu","Spitz Nain (Pomeranian)","Springer Spaniel Anglais","Staffordshire Bull Terrier","Teckel","Welsh Corgi Pembroke","Whippet","Yorkshire Terrier"];
-const CAT_BREEDS=["Abyssin","American Curl","American Shorthair","Angora Turc","Balinais","Bengal","Birman","Bleu Russe","British Shorthair","Chartreux","Cornish Rex","Devon Rex","Européen (DSH)","Exotic Shorthair","Maine Coon","Norvégien","Oriental","Persan","Ragdoll","Scottish Fold","Selkirk Rex","Siamois","Sibérien","Sphynx","Toyger"];
+/* ================= Races (éditables) ================= */
+function getBreedsFor(espece){
+  return (espece==='Chien') ? (DB.lists.breedsDog||[]) : (DB.lists.breedsCat||[]);
+}
+function refreshAllPetRaceSelects(){
+  document.querySelectorAll('.pet-espece').forEach((espSel,i)=>{
+    const raceSel=espSel.closest('.card').querySelector('.pet-race');
+    const current=raceSel.value;
+    const list=getBreedsFor(espSel.value);
+    raceSel.innerHTML=''; list.forEach(r=>raceSel.appendChild(el('option',{value:r},[r])));
+    if(list.includes(current)) raceSel.value=current;
+  });
+}
 
 /* ================= Clients (multi-animaux) ================= */
 const petsContainer = document.getElementById('petsContainer');
-function petCard(pet={}, idx=null){
-  const id = idx!==null ? idx : Date.now();
+function petCard(pet={}){
   const card = el('div',{class:'card',style:'padding:10px'});
   const topGrid = el('div',{class:'grid cols-3'});
   const especeSel = el('select',{class:'pet-espece'});
@@ -565,7 +568,7 @@ function petCard(pet={}, idx=null){
   especeSel.value = pet.espece||'Chien';
 
   const raceSel = el('select',{class:'pet-race'});
-  function populateRace(){ const list=(especeSel.value==='Chien')?DOG_BREEDS:CAT_BREEDS; raceSel.innerHTML=''; list.forEach(r=>raceSel.appendChild(el('option',{value:r},[r]))); raceSel.value = pet.race||list[0]; }
+  function populateRace(){ const list=getBreedsFor(especeSel.value); raceSel.innerHTML=''; list.forEach(r=>raceSel.appendChild(el('option',{value:r},[r]))); raceSel.value = pet.race && getBreedsFor(especeSel.value).includes(pet.race)?pet.race:list[0]||''; }
   populateRace(); especeSel.addEventListener('change',populateRace);
 
   const nameInp = el('input',{class:'pet-name',placeholder:'Nom de l’animal',value:pet.name||''});
@@ -594,8 +597,7 @@ document.getElementById('c_tel').addEventListener('input',e=>{e.target.value=e.t
 let editingClientId=null;
 function clearClientForm(){
   ['c_nom','c_tel','c_email','c_addr'].forEach(id=>{const elx=document.getElementById(id); if(elx) elx.value='';});
-  petsContainer.innerHTML=''; // pas d’animal par défaut
-  editingClientId=null; document.getElementById('btnDeleteClient').disabled=true;
+  petsContainer.innerHTML=''; editingClientId=null; document.getElementById('btnDeleteClient').disabled=true;
   document.getElementById('cliStats').textContent='Sélectionnez un client…'; document.getElementById('cliStatsTitle').textContent='Statistiques client';
 }
 function readPetsFromUI(){
@@ -616,7 +618,6 @@ function fillPetsUI(arr=[]){
   petsContainer.innerHTML='';
   (arr.length?arr:[{}]).forEach(p=>petsContainer.appendChild(petCard(p)));
   renderSelectFromLists();
-  // Pré-sélection marques si vides
   petsContainer.querySelectorAll('.pet-brand').forEach(sel=>{ if(!sel.value && sel.options[0]) sel.value=sel.options[0].value; });
 }
 function fillClientForm(c){
@@ -631,8 +632,7 @@ document.getElementById('btnSaveClient').onclick=()=>{
   const tel=(document.getElementById('c_tel').value||'').trim();
   if(tel && !/^0\d{8,9}$/.test(tel)){ return toast('Téléphone BE invalide : commence par 0 et comporte 9–10 chiffres (ou laissez vide).');}
   const id=editingClientId||Date.now();
-  const cli={
-    id,
+  const cli={ id,
     nom:(document.getElementById('c_nom').value||'').trim(),
     tel, email:(document.getElementById('c_email').value||'').trim(),
     addr:(document.getElementById('c_addr').value||'').trim(),
@@ -658,18 +658,6 @@ function nextBirthdayInfo(ts){
   const diffDays = Math.round((next - todayMid)/days(1));
   return {days:diffDays, isSoon: diffDays>=0 && diffDays<=7};
 }
-function clientHasSoonBirthday(c){
-  return (c.animaux||[]).some(a=> nextBirthdayInfo(a.dob).isSoon );
-}
-function upcomingBirthdaysText(c){
-  const list=(c.animaux||[]).map(a=>{
-    const info=nextBirthdayInfo(a.dob);
-    if(a.dob==null) return null;
-    return `${a.name||'—'}: ${info.days===0?'AUJOURD’HUI 🎉': 'dans '+info.days+' j'}`;
-  }).filter(Boolean);
-  return list.join(' • ');
-}
-
 function renderClients(){
   const q=(document.getElementById('searchClient').value||'').toLowerCase();
   const tb=document.querySelector('#tblClients tbody'); tb.innerHTML='';
@@ -677,9 +665,13 @@ function renderClients(){
     const hay=(c.nom+' '+(c.email||'')+' '+(c.tel||'')+' '+(c.animaux||[]).map(a=>(a.name||'')+' '+(a.race||'')).join(' ')).toLowerCase();
     return hay.includes(q);
   }).forEach(c=>{
-    const soon=clientHasSoonBirthday(c);
-    const animals=c.animaux&&c.animaux.length? c.animaux.map(a=>a.name||'—').join(', ') : '—';
-    const tr=el('tr'); tr.innerHTML=`<td><span class="${soon?'red':''}">${c.nom||'—'}</span></td><td><span class="${soon?'red':''}">${animals}</span></td><td>${c.tel||'—'}</td><td>${c.email||'—'}</td>`;
+    // Construire la cellule animaux avec coloration SEULEMENT pour ceux en J-7..J
+    const animals=(c.animaux&&c.animaux.length? c.animaux : [{name:'—'}]).map(a=>{
+      const info=nextBirthdayInfo(a.dob);
+      const cls=info.isSoon?'red':'';
+      return `<span class="${cls}">${a.name||'—'}</span>`;
+    }).join(', ');
+    const tr=el('tr'); tr.innerHTML=`<td>${c.nom||'—'}</td><td>${animals}</td><td>${c.tel||'—'}</td><td>${c.email||'—'}</td>`;
     tr.addEventListener('click',()=>{ fillClientForm(c); document.querySelector('[data-tab="clients"]').click();});
     tb.appendChild(tr);
   });
@@ -687,13 +679,13 @@ function renderClients(){
   DB.clients.forEach(c=>{ const o=el('option',{value:c.id},[c.nom||('Client '+c.id)]); sel.appendChild(o); });
 }
 
-/* ===== Stats client ===== */
+/* ===== Stats client (inchangé, texte explicite) ===== */
 function renderClientStats(clientId){
   const c=DB.clients.find(x=>x.id===clientId); if(!c){document.getElementById('cliStats').textContent='Sélectionnez un client…'; return;}
   const t90=Date.now()-days(90);
   const vv=DB.ventes.filter(v=>v.clientId===clientId); const vv90=vv.filter(v=>v.date>=t90);
   const total=vv.reduce((s,v)=>s+v.total,0); const freq=vv90.length; const panier=vv.length?total/vv.length:0;
-  const birthdays = upcomingBirthdaysText(c) || '—';
+  const btxt=(c.animaux||[]).map(a=>{ const i=nextBirthdayInfo(a.dob); if(a.dob==null) return null; return `${a.name||'—'}: ${i.days===0?'AUJOURD’HUI 🎉':'dans '+i.days+' j'}`; }).filter(Boolean).join(' • ') || '—';
   const stamps=DB.loyalty.stamps[c.id]||0; const need=DB.loyalty.stampsPerFree; const free=Math.floor(stamps/need);
   const html=`
     <div class="grid cols-3">
@@ -702,13 +694,13 @@ function renderClientStats(clientId){
       <div class="card"><h2 style="font-size:12px;margin:0;color:var(--muted)">Panier moyen</h2><div style="font-size:20px;font-weight:800">${fmtEur(panier)}</div></div>
     </div>
     <hr class="sep">
-    <div>Anniversaires à venir : <strong>${birthdays}</strong></div>
+    <div>Anniversaires à venir : <strong>${btxt}</strong></div>
     <div style="margin-top:6px">Fidélité : <strong>${stamps%need}/${need} tampons</strong> • Gratuités dispo : <strong>${free}</strong></div>
   `;
   document.getElementById('cliStatsTitle').textContent='Statistiques • '+(c.nom||('Client '+c.id)); document.getElementById('cliStats').innerHTML=html;
 }
 
-/* ================= Produits ================= */
+/* ================= Produits, Ventes, Dashboard (identiques v1.5) ================= */
 let editingProductId=null;
 function clearProductForm(){ ['p_nom','p_prix','p_cost','p_tva','p_stock','p_min'].forEach(id=>document.getElementById(id).value=''); document.getElementById('p_famille').value=DB.lists.families[0]||''; document.getElementById('p_marque').value=DB.lists.brands[0]||''; editingProductId=null; document.getElementById('btnDeleteProduct').disabled=true; document.getElementById('p_id').value=''; }
 function fillProductForm(p){
@@ -740,7 +732,7 @@ function renderProduits(){
   const tb=document.querySelector('#tblProduits tbody'); tb.innerHTML='';
   DB.produits.filter(p=>showArchived||!p.archived).filter(p=>{const hay=((p.nom||'')+' '+(p.famille||'')+' '+(p.marque||'')).toLowerCase(); return hay.includes(q);})
   .forEach(p=>{
-    const statut=p.archived?'<span class="badge warn">Archivé</span>': ( (p.stock||0)<=0 ? '<span class="badge" style="background:#fee2e2;color:#7f1d1d">Stock épuisé</span>' : '<span class="badge ok">Actif</span>' );
+    const statut=p.archived?'<span class="badge" style="background:#fff7ed;border:1px solid #fed7aa;color:#7c2d12">Archivé</span>': ( (p.stock||0)<=0 ? '<span class="badge" style="background:#fee2e2;color:#7f1d1d;border:1px solid #fecaca">Stock épuisé</span>' : '<span class="badge" style="background:#ecfdf5;color:#065f46;border:1px solid #a7f3d0">Actif</span>' );
     const tr=el('tr'); tr.innerHTML=`<td>${p.nom||'—'}</td><td>${p.famille||'—'}</td><td>${p.marque||''}</td><td>${fmtEur(p.prixTTC||0)}</td><td>${p.stock||0}</td><td>${statut}</td>`;
     tr.addEventListener('click',()=>fillProductForm(p)); tb.appendChild(tr);
   });
@@ -791,7 +783,7 @@ document.getElementById('btnClearLines').onclick=()=>{lines.length=0;refreshLine
 
 function estimateMargin(ls){ let m=0; for(const L of ls){ const p=DB.produits.find(x=>x.id==L.productId); if(!p) continue; const coutTTC=(p.coutHT||0)*(1+((p.tva||20)/100)); m+=Math.max(0,(p.prixTTC||0)-coutTTC)*L.qty - L.remise; } return Math.max(0,m); }
 
-/* Applique jusqu’à N gratuités sur les lignes éligibles (moins cher d’abord) */
+/* Gratuités sur moins cher */
 function applyFreebiesOnLines(familyKey, maxFree){
   const key=familyKey.toLowerCase();
   const units=[];
@@ -817,18 +809,16 @@ document.getElementById('btnSaveSale').onclick=()=>{
   if(!lines.length) return toast('Ajoutez des lignes');
   const clientId=+document.getElementById('v_client').value; if(!clientId) return toast('Choisissez un client');
 
-  // Fidélité : calcule la demande de gratuités
   let usedFree=0;
   const cb=document.getElementById('useFree');
   if(cb.checked){
     const stamps=DB.loyalty.stamps[clientId]||0, need=DB.loyalty.stampsPerFree||5;
     const availFree=Math.floor(stamps/need);
-    if(availFree<=0){ cb.checked=false; }
-    else{
+    if(availFree>0){
       const maxPerSale=DB.loyalty.maxFreePerSale||1;
       const toApply=Math.min(availFree, maxPerSale);
       usedFree = applyFreebiesOnLines(DB.loyalty.familyKey||'Croquettes', toApply);
-    }
+    } else cb.checked=false;
   }
 
   const total=lines.reduce((s,L)=>s+L.total,0);
@@ -875,7 +865,7 @@ function renderDashboard(){
   Object.values(byClient).sort((a,b)=>b.e-a.e).slice(0,10).forEach(x=>{const tr=el('tr'); tr.innerHTML=`<td>${x.nom}</td><td>${x.n}</td><td>${fmtEur(x.e)}</td>`; tbc.appendChild(tr);});
 }
 
-/* ================= Paramètres (fidélité + export/import) ================= */
+/* ================= Paramètres (fidélité + export/import + changelog) ================= */
 document.getElementById('btnSaveLoyalty').onclick=()=>{
   DB.loyalty.familyKey=document.getElementById('loy_family').value||'Croquettes';
   DB.loyalty.stampsPerFree=+document.getElementById('loy_need').value||5;
@@ -887,7 +877,7 @@ document.getElementById('btnImport').onclick=()=>{ try{ DB=JSON.parse(document.g
 document.getElementById('btnDemo').onclick=()=>{
   DB.clients=[
     {id:1, nom:'Alice Martin', tel:'', email:'', addr:'', animaux:[
-      {name:'Rex',espece:'Chien',race:'Border Collie',dob:new Date().getTime()+days(5),allergies:'',foodBrand:'C Pro Food',foodNote:'Adult Poulet 12kg'},
+      {name:'Rex',espece:'Chien',race:'Border Collie',dob:Date.now()+days(5),allergies:'',foodBrand:'C Pro Food',foodNote:'Adult Poulet 12kg'},
       {name:'Misty',espece:'Chat',race:'Maine Coon',dob:null,allergies:'',foodBrand:'Hill’s',foodNote:'Sterilized Saumon 3kg'}
     ]},
     {id:2, nom:'Bruno Leroy',  tel:'', email:'', addr:'', animaux:[
@@ -899,15 +889,14 @@ document.getElementById('btnDemo').onclick=()=>{
     {id:102,famille:'Croquettes chats',marque:'Hill’s',nom:'Sterilized Saumon 3kg',prixTTC:22.9,coutHT:12,tva:20,stock:10,stockMin:3},
     {id:103,famille:'Laisses & colliers',marque:'WalkPro',nom:'Collier néoprène M',prixTTC:14.9,coutHT:6,tva:20,stock:8,stockMin:2},
   ];
-  DB.lists.families=["Croquettes chiens","Croquettes chats","Laisses & colliers","Jouets"];
-  DB.lists.brands=["C Pro Food","Hill’s","Royal Canin","Purina","Autre"];
-  DB.lists.designations=["Adult Poulet 12kg","Sterilized Saumon 3kg","Balle caoutchouc","Collier néoprène M"];
+  DB.lists.breedsDog=[...DEFAULT_DOGS];
+  DB.lists.breedsCat=[...DEFAULT_CATS];
   DB.loyalty.stamps={1:5,2:0};
   DB.ventes=[]; saveDB();
 };
 document.getElementById('btnResetData').onclick=()=>{ if(confirm('Effacer toutes les données ?')){ localStorage.removeItem(DBKEY); DB=loadDB(); renderAll(); } };
 
-/* ================= Nouvelle version: bandeau + modal ================= */
+/* ===== Changelog ===== */
 function renderChangelogHTML(){
   const wrap=document.createElement('div');
   CHANGELOG.forEach(block=>{
@@ -947,17 +936,15 @@ document.getElementById('searchClient').oninput=renderClients;
 function renderAll(){
   renderSelectFromLists(); renderListEditors();
   renderClients(); renderProduits(); renderSales(); renderDashboard();
-  // fidélité config -> UI
   document.getElementById('loy_family').value=DB.loyalty.familyKey||'Croquettes';
   document.getElementById('loy_need').value=DB.loyalty.stampsPerFree||5;
   document.getElementById('loy_maxfree').value=DB.loyalty.maxFreePerSale||1;
+  refreshAllPetRaceSelects();
   refreshLoyaltyUI();
 }
 renderAll();
 document.getElementById('appVer').textContent=APP_VERSION; document.getElementById('appVerFoot').textContent=APP_VERSION; document.getElementById('verNow').textContent=APP_VERSION; loadLogo();
 showBannerIfNew();
-
-/* ================= End ================= */
 </script>
 </body>
 </html>
