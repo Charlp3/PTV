@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>PASSE TEMPS VEGA — v1.8</title>
+<title>PASSE TEMPS VEGA — v1.8.2</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
 <style>
 :root{
@@ -16,7 +16,6 @@
 *{box-sizing:border-box}
 html,body{height:100%}
 body{margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--text)}
-
 /* Header */
 header{display:flex;align-items:center;gap:12px;padding:12px;border-bottom:1px solid var(--border);background:var(--card);position:sticky;top:0;z-index:10}
 .logo{width:50px;height:50px;min-width:50px;min-height:50px;border-radius:12px;border:1px solid var(--border);background:#fff;display:grid;place-items:center;overflow:hidden;flex-shrink:0}
@@ -27,7 +26,6 @@ header{display:flex;align-items:center;gap:12px;padding:12px;border-bottom:1px s
 .tab{background:var(--card);border:1px solid var(--border);padding:8px 12px;border-radius:10px;cursor:pointer;color:var(--text);font-weight:700}
 .tab.active{background:linear-gradient(180deg,#FACC15,#F59E0B);color:#111;border-color:transparent}
 a.link{color:#7c2d12;text-decoration:underline;cursor:pointer;margin-left:10px}
-
 /* Layout & components */
 main{max-width:1200px;margin:0 auto;padding:16px;display:grid;gap:16px}
 .card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:14px}
@@ -47,31 +45,26 @@ button.ghost{background:transparent;border:1px dashed var(--border);color:var(--
 .table{width:100%;border-collapse:collapse;border-radius:12px;overflow:hidden}
 .table th,.table td{padding:10px;border-bottom:1px solid var(--border);text-align:left}
 .table thead th{background:var(--elev);font-size:12px;color:#374151}
-
 /* KPI */
 .kpi{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
 .kpi .item{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px}
 .kpi .item h3{margin:0;color:#6b7280;font-size:12px}
 .kpi .item div{margin-top:6px;font-size:22px;font-weight:800}
-
-/* Gift icon (blink) — s’affiche seulement dans les balises .gift attachées à chaque animal */
+/* Gift icon */
 .gift{display:inline-flex;align-items:center;gap:6px}
 .gift i{display:inline-block}
 @keyframes blink{0%,60%,100%{opacity:1}30%{opacity:.15}}
 .gift .icon{animation:blink 1.2s infinite}
 .gift .icon::after{content:"🎁"}
-
 /* Chips lettres */
 .chips{display:flex;flex-wrap:wrap;gap:6px}
 .chip{border:1px solid var(--border);background:#fff;padding:6px 10px;border-radius:999px;font-weight:700;cursor:pointer}
 .chip.active{background:#fef3c7;border-color:#f59e0b}
-
 /* Stocks */
 .stock-low{color:var(--danger);font-weight:800}
 small.muted{color:var(--muted)}
 hr.sep{border:0;border-top:1px dashed var(--border);margin:10px 0}
 footer{padding:14px;border-top:1px solid var(--border);display:flex;justify-content:space-between;background:var(--card);color:#374151}
-
 /* Popup changelog */
 #versionPopup{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;z-index:2000}
 #versionPopup .box{background:#fff;border-radius:12px;max-width:700px;width:92%;padding:20px;box-shadow:0 10px 30px rgba(0,0,0,.4);max-height:90%;overflow:auto}
@@ -82,7 +75,7 @@ footer{padding:14px;border-top:1px solid var(--border);display:flex;justify-cont
 <body>
 <header>
   <div class="logo" title="Logo"><img id="logoImg" alt="Logo PASSE TEMPS VEGA"></div>
-  <div class="brand"><h1>PASSE TEMPS VEGA <span class="badge" id="verBadge">v1.8</span><a class="link" id="btnShowWhatsNew">Nouveautés</a></h1></div>
+  <div class="brand"><h1>PASSE TEMPS VEGA <span class="badge">v1.8.2</span><a class="link" id="btnShowWhatsNew">Nouveautés</a></h1></div>
   <nav class="tabs">
     <button class="tab active" data-tab="dash">Dashboard</button>
     <button class="tab" data-tab="clients">Clients</button>
@@ -194,7 +187,6 @@ footer{padding:14px;border-top:1px solid var(--border);display:flex;justify-cont
         <select id="v_client"></select>
       </div>
       <div style="grid-column:1/-1">
-        <!-- FIX v1.8 : plus d’icône globale ici -->
         <div id="v_client_info" style="display:none"><span id="v_client_animals"></span></div>
       </div>
       <div style="grid-column:1/-1"><label>Produit</label><select id="v_prod"></select></div>
@@ -220,7 +212,7 @@ footer{padding:14px;border-top:1px solid var(--border);display:flex;justify-cont
           <button class="secondary" id="btnSaveLogo">Enregistrer le logo</button>
           <button class="ghost" id="btnClearLogo">Supprimer logo</button>
         </div>
-        <small class="muted">Le logo est stocké localement dans le navigateur.</small>
+        <small class="muted">Logo par défaut intégré • téléversable et remplaçable localement.</small>
       </div>
 
       <div>
@@ -244,13 +236,14 @@ footer{padding:14px;border-top:1px solid var(--border);display:flex;justify-cont
         <h3>Sauvegarde / Restauration</h3>
         <div class="grid cols-3">
           <button id="btnExportChoose" class="secondary">Sauvegarder (choisir l’emplacement)</button>
+          <button id="btnExportShare" class="secondary">Sauvegarder (iPhone/iPad)</button>
           <label class="secondary" style="display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer">
             <input type="file" id="fileImport" accept=".txt,text/plain,application/json" style="display:none">
             Importer (choisir un fichier)
           </label>
           <button id="btnExportJSON" class="ghost">Afficher JSON</button>
         </div>
-        <small class="muted">Sur iPhone/Safari, après sauvegarde un onglet s’ouvre : fais <em>Partager → Enregistrer dans Fichiers</em> pour choisir le dossier.</small>
+        <small class="muted">Sur iPhone/iPad : « Sauvegarder (iPhone/iPad) » → Partager → Enregistrer dans Fichiers (choisir le dossier).</small>
         <pre id="exportArea" style="max-height:220px;overflow:auto;background:#fff;border:1px solid var(--border);padding:8px;border-radius:8px;margin-top:8px"></pre>
       </div>
 
@@ -261,12 +254,12 @@ footer{padding:14px;border-top:1px solid var(--border);display:flex;justify-cont
       </div>
     </div>
     <hr class="sep">
-    <div>© PASSE TEMPS VEGA — v1.8 • © Pierre Charlier 2025 • Données locales (aucun serveur)</div>
+    <div>© PASSE TEMPS VEGA — v1.8.2 • © Pierre Charlier 2025 • Données locales</div>
   </section>
 </main>
 
 <footer>
-  <div>© PASSE TEMPS VEGA — v1.8 • © Pierre Charlier 2025</div>
+  <div>© PASSE TEMPS VEGA — v1.8.2 • © Pierre Charlier 2025</div>
   <div><small class="muted">Sauvegarde .txt (choix dossier) • Logo intégré</small></div>
 </footer>
 
@@ -281,23 +274,16 @@ footer{padding:14px;border-top:1px solid var(--border);display:flex;justify-cont
 
 <script>
 /* ================== Version & Changelog ================== */
-const APP_VERSION="v1.8";
+const APP_VERSION="v1.8.2";
 const STORAGE_VERSION_SEEN="ptv_version_seen";
 const CHANGELOG={
-  "v1.6":[
-    "Listes de races éditables",
-    "Export/Import JSON (copier-coller)",
-    "Notification nouvelle version"
-  ],
-  "v1.7":[
-    "Palette jaune/ocre lisible, logo intégré",
-    "Sauvegarde & import via fichier .txt",
-    "Anniversaires J-30 (🎁) • Produits/Ventes simplifiés"
-  ],
   "v1.8":[
-    "Sauvegarde : choix d’emplacement (File System Access si dispo) ; fallback iPhone/Safari avec partage",
-    "Restauration : choix de fichier (picker natif ou fichier .txt)",
-    "Correctif : icône 🎁 en page Ventes n’apparaît que pour les animaux concernés"
+    "Sauvegarde : choix d’emplacement (File System Access) + fallback iOS",
+    "Restauration : choix de fichier",
+    "Correctif icône 🎁 en Ventes"
+  ],
+  "v1.8.2":[
+    "Logo par défaut intégré (SVG) — aucun fichier externe requis"
   ]
 };
 function renderChangelog(){
@@ -321,7 +307,7 @@ document.getElementById("btnShowWhatsNew").onclick=()=>showVersionPopup(true);
 document.getElementById("btnShowPopup").onclick=()=>showVersionPopup(true);
 
 /* ================== Données & helpers ================== */
-const DBKEY='ptv_simple_v18_txt';
+const DBKEY='ptv_simple_v182_txt';
 const LOGO_KEY='ptv_logo_dataurl_v2';
 
 const DEFAULT_DOGS=["Barbet","Beagle","Berger Allemand","Berger Australien","Border Collie","Boxer","Bouledogue Français","Cavalier King Charles","Chihuahua","Cocker","Dalmatien","Golden Retriever","Husky","Jack Russell","Labrador","Rottweiler","Shiba Inu","Shih Tzu","Teckel","Yorkshire Terrier"].sort((a,b)=>a.localeCompare(b,'fr'));
@@ -336,8 +322,8 @@ function loadDB(){
   if(raw){ try{return JSON.parse(raw)}catch(e){} }
   return {
     clients:[],
-    produits:[],   // {id, nom, stock, min}
-    ventes:[],     // {id,date,clientId?, lignes:[{productId,qty}]}
+    produits:[],
+    ventes:[],
     lists:{breedsDog:[...DEFAULT_DOGS],breedsCat:[...DEFAULT_CATS]}
   };
 }
@@ -352,15 +338,29 @@ document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>{
 }));
 
 /* ================== Logo ================== */
-function defaultLogoDataUrl(){
-  const svg=`<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 128 128'>
-    <rect rx='16' width='128' height='128' fill='#333'/>
-    <text x='50%' y='54%' text-anchor='middle' font-family='Inter,Arial' font-weight='800' font-size='40' fill='#fff'>PTV</text>
+/* Logo intégré (dessin chien & chat blanc sur fond gris arrondi) en SVG encodé */
+function embeddedLogo(){
+  const svg=`<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'>
+    <rect x='16' y='16' width='480' height='480' rx='80' fill='#3a3a3a'/>
+    <g fill='none' stroke='#fff' stroke-width='18' stroke-linecap='round' stroke-linejoin='round'>
+      <!-- Tête chien -->
+      <path d='M150 220c-40 20-90 110-60 150 15 20 40 22 58 15 0 70 62 102 122 86 48-13 60-56 56-98 12-8 18-24 18-40 0-40-30-90-56-110-18 10-24 28-24 28-26-42-60-56-114-31z' fill='#fff'/>
+      <circle cx='220' cy='260' r='8' fill='#3a3a3a'/>
+      <circle cx='260' cy='260' r='8' fill='#3a3a3a'/>
+      <path d='M232 318c16 6 32 6 48 0 12 20-4 38-24 38s-36-18-24-38z' fill='#3a3a3a'/>
+      <path d='M256 356v20'/>
+      <!-- Tête chat -->
+      <path d='M372 180c-20 20-28 80-28 100 30-6 62-6 92 0 10-24 36-60 64-80 14 22 10 90 4 116 16 22 24 66 0 98-40 54-144 54-192 0-36-40-18-120 16-164 0-28 16-58 44-70z' fill='#fff'/>
+      <circle cx='364' cy='284' r='10' fill='#3a3a3a'/>
+      <circle cx='424' cy='284' r='10' fill='#3a3a3a'/>
+      <path d='M394 312c0 8 8 16 16 16s16-8 16-16' />
+      <path d='M350 308h88M350 328h88' />
+    </g>
   </svg>`;
   return 'data:image/svg+xml;utf8,'+encodeURIComponent(svg);
 }
 function loadLogo(){
-  const data=localStorage.getItem(LOGO_KEY) || defaultLogoDataUrl();
+  const data=localStorage.getItem(LOGO_KEY) || embeddedLogo();
   document.getElementById('logoImg').src=data;
   document.getElementById('logoPreview').src=data;
 }
@@ -375,11 +375,9 @@ document.getElementById('logoFile').addEventListener('change',e=>{
 document.getElementById('btnSaveLogo').addEventListener('click',()=>{
   const f=document.getElementById('logoFile').files?.[0]; if(!f) return toast('Choisis une image'); setLogoFromFile(f);
 });
-document.getElementById('btnClearLogo').addEventListener('click',()=>{
-  localStorage.removeItem(LOGO_KEY); loadLogo(); toast('Logo supprimé (logo par défaut rétabli).');
-});
+document.getElementById('btnClearLogo').addEventListener('click',()=>{ localStorage.removeItem(LOGO_KEY); loadLogo(); toast('Logo par défaut rétabli.'); });
 
-/* ================== Anniversaire J-30 ================== */
+/* ================== Anniversaires J-30 ================== */
 function nextBirthdayInfo(ts){
   if(!ts) return {within:false,days:null};
   const d=new Date(ts), today=new Date(), y=today.getFullYear();
@@ -534,7 +532,8 @@ function renderProduits(){
     });
 
   // Ventes: produits
-  const sel=document.getElementById('v_prod'); sel.innerHTML=''; DB.produits.forEach(p=> sel.appendChild(el('option',{value:p.id},[p.nom])) );
+  const sel=document.getElementById('v_prod'); sel.innerHTML='';
+  DB.produits.forEach(p=> sel.appendChild(el('option',{value:p.id},[p.nom])) );
 }
 document.getElementById('searchProduit').oninput=renderProduits;
 
@@ -562,7 +561,7 @@ document.getElementById('btnSaveSale').onclick=()=>{
 };
 document.getElementById('btnCancelSale').onclick=()=>{ document.getElementById('v_qty').value=1; };
 
-/* ================== Paramètres : Races (A→Z) ================== */
+/* ================== Races (éditeur A→Z) ================== */
 function renderBreedEditor(key, containerId){
   const cont=document.getElementById(containerId); cont.innerHTML='';
   const arr=[...(DB.lists[key]||[])].sort((a,b)=>a.localeCompare(b,'fr',{sensitivity:'base'})); DB.lists[key]=arr;
@@ -587,16 +586,15 @@ function refreshAllPetRaceSelects(){
   });
 }
 
-/* ================== Sauvegarde / Restauration — choix d’emplacement ================== */
+/* ================== Sauvegarde/Restauration ================== */
 function fileNameWithDate(){
   const d=new Date(); const y=d.getFullYear(), m=String(d.getMonth()+1).padStart(2,'0'), dd=String(d.getDate()).padStart(2,'0');
   return `ptv_sauvegarde_${y}-${m}-${dd}.txt`;
 }
+// Desktop (Chrome/Edge) : Enregistrer sous…
 async function exportChoosePath(){
   const data=JSON.stringify(DB,null,2);
   const name=fileNameWithDate();
-
-  // 1) Navigateurs compatibles (Chrome/Edge desktop) : showSaveFilePicker
   if ('showSaveFilePicker' in window) {
     try{
       const handle=await window.showSaveFilePicker({
@@ -610,23 +608,41 @@ async function exportChoosePath(){
       return;
     }catch(e){ if(e?.name!=='AbortError') alert('Échec sauvegarde: '+e); }
   }
-
-  // 2) Fallback tous navigateurs : téléchargement + ouverture dans un onglet (utile sur iPhone Safari)
+  // Fallback téléchargement
   const blob=new Blob([data],{type:'text/plain;charset=utf-8'});
   const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=name;
   document.body.appendChild(a); a.click(); setTimeout(()=>{URL.revokeObjectURL(a.href); a.remove();},0);
-
-  // iOS Safari : ouvrir aussi le contenu pour « Partager → Enregistrer dans Fichiers »
-  const url=URL.createObjectURL(blob);
-  window.open(url,'_blank');
 }
+// iOS : feuille de partage → Enregistrer dans Fichiers
+async function exportShareIOS(){
+  const data = JSON.stringify(DB, null, 2);
+  const name = fileNameWithDate();
+  const file = new File([data], name, { type: 'text/plain' });
+  if (navigator.canShare && navigator.canShare({ files: [file] })) {
+    try {
+      await navigator.share({
+        files: [file],
+        title: 'Sauvegarde PASSE TEMPS VEGA',
+        text: 'Choisissez « Enregistrer dans Fichiers » puis le dossier de votre choix.'
+      });
+      toast('Partage lancé ✅ (choisissez votre dossier dans Fichiers).');
+    } catch (e) {
+      if (e?.name !== 'AbortError') alert('Partage annulé/indisponible.');
+    }
+  } else {
+    const blob = new Blob([data], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    window.open(url, '_blank'); // puis Partager → Enregistrer dans Fichiers
+    toast('iOS : utilise Partager → Enregistrer dans Fichiers.');
+  }
+}
+// Import
 async function importChooseFile(){
-  // 1) Navigateurs compatibles
   if ('showOpenFilePicker' in window){
     try{
       const [handle]=await window.showOpenFilePicker({
         multiple:false,
-        types:[{description:'Sauvegarde PTV (.txt)', accept:{'text/plain':['.txt'],'application/json':['.json']}}]
+        types:[{description:'Sauvegarde PTV', accept:{'text/plain':['.txt'],'application/json':['.json']}}]
       });
       const file=await handle.getFile();
       const text=await file.text();
@@ -635,10 +651,10 @@ async function importChooseFile(){
       return;
     }catch(e){ if(e?.name!=='AbortError') alert('Échec import: '+e); return; }
   }
-  // 2) Fallback : input file
   document.getElementById('fileImport').click();
 }
 document.getElementById('btnExportChoose').addEventListener('click',exportChoosePath);
+document.getElementById('btnExportShare').addEventListener('click',exportShareIOS);
 document.getElementById('fileImport').addEventListener('change',e=>{
   const f=e.target.files?.[0]; if(!f) return;
   const r=new FileReader();
@@ -677,7 +693,7 @@ function renderAll(){
 document.addEventListener("DOMContentLoaded",()=>{
   renderChangelog();
   renderAll();
-  showVersionPopup(); // affiche nouveautés v1.8 une fois
+  showVersionPopup(); // nouveautés v1.8.2
 });
 </script>
 </body>
