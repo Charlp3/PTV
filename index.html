@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>PASSE TEMPS VEGA — v1.8.3</title>
+<title>PASSE TEMPS VEGA — v1.8.4</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
 <style>
 :root{
@@ -50,7 +50,7 @@ button.ghost{background:transparent;border:1px dashed var(--border);color:var(--
 .kpi .item{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px}
 .kpi .item h3{margin:0;color:#6b7280;font-size:12px}
 .kpi .item div{margin-top:6px;font-size:22px;font-weight:800}
-/* Gift icon (only where .gift is used) */
+/* Gift icon */
 .gift{display:inline-flex;align-items:center;gap:6px}
 .gift i{display:inline-block}
 @keyframes blink{0%,60%,100%{opacity:1}30%{opacity:.15}}
@@ -75,7 +75,7 @@ footer{padding:14px;border-top:1px solid var(--border);display:flex;justify-cont
 <body>
 <header>
   <div class="logo" title="Logo"><img id="logoImg" alt="Logo PASSE TEMPS VEGA"></div>
-  <div class="brand"><h1>PASSE TEMPS VEGA <span class="badge">v1.8.3</span><a class="link" id="btnShowWhatsNew">Nouveautés</a></h1></div>
+  <div class="brand"><h1>PASSE TEMPS VEGA <span class="badge">v1.8.4</span><a class="link" id="btnShowWhatsNew">Nouveautés</a></h1></div>
   <nav class="tabs">
     <button class="tab active" data-tab="dash">Dashboard</button>
     <button class="tab" data-tab="clients">Clients</button>
@@ -139,9 +139,14 @@ footer{padding:14px;border-top:1px solid var(--border);display:flex;justify-cont
         <table class="table" id="tblClients">
           <thead><tr><th>Propriétaire</th><th>Animaux</th><th>Tél</th><th>Email</th></tr></thead><tbody></tbody>
         </table>
+
         <aside style="margin-top:10px">
-          <h3>Statistiques</h3>
+          <h3>Statistiques & Achats</h3>
           <div id="cliStats">Sélectionnez un client…</div>
+          <table class="table" id="tblCliPurch" style="margin-top:8px;display:none">
+            <thead><tr><th>Date</th><th>Produit</th><th>Qté</th></tr></thead><tbody></tbody>
+          </table>
+          <small id="cliPurchEmpty" class="muted" style="display:none">Aucun achat sur les 12 derniers mois.</small>
         </aside>
       </div>
     </div>
@@ -196,6 +201,15 @@ footer{padding:14px;border-top:1px solid var(--border);display:flex;justify-cont
       <button id="btnSaveSale">Valider vente</button>
       <button class="secondary" id="btnCancelSale">Annuler</button>
     </div>
+
+    <hr class="sep">
+    <h3>Historique des ventes</h3>
+    <input id="searchSales" placeholder="Recherche date/produit/client…">
+    <table class="table" id="tblSales">
+      <thead><tr><th>Date</th><th>Client</th><th>Produit</th><th>Qté</th></tr></thead>
+      <tbody></tbody>
+    </table>
+    <small class="muted">Ordre antéchronologique (vente la plus récente en haut).</small>
   </section>
 
   <!-- PARAMÈTRES -->
@@ -254,12 +268,12 @@ footer{padding:14px;border-top:1px solid var(--border);display:flex;justify-cont
       </div>
     </div>
     <hr class="sep">
-    <div>© PASSE TEMPS VEGA — v1.8.3 • © Pierre Charlier 2025 • Données locales</div>
+    <div>© PASSE TEMPS VEGA — v1.8.4 • © Pierre Charlier 2025 • Données locales</div>
   </section>
 </main>
 
 <footer>
-  <div>© PASSE TEMPS VEGA — v1.8.3 • © Pierre Charlier 2025</div>
+  <div>© PASSE TEMPS VEGA — v1.8.4 • © Pierre Charlier 2025</div>
   <div><small class="muted">Sauvegarde .txt (choix dossier) • Logo intégré</small></div>
 </footer>
 
@@ -274,7 +288,7 @@ footer{padding:14px;border-top:1px solid var(--border);display:flex;justify-cont
 
 <script>
 /* ================== Version & Changelog ================== */
-const APP_VERSION="v1.8.3";
+const APP_VERSION="v1.8.4";
 const STORAGE_VERSION_SEEN="ptv_version_seen";
 const CHANGELOG={
   "v1.8":[
@@ -283,8 +297,11 @@ const CHANGELOG={
     "Correctif icône 🎁 en Ventes"
   ],
   "v1.8.3":[
-    "Export sauvegarde = snapshot depuis localStorage (clients, ventes, produits, races, logo)",
-    "Bouton iPhone/iPad via feuille de partage • Import avec sélecteur de fichier"
+    "Export = snapshot localStorage (clients, ventes, produits, races, logo)"
+  ],
+  "v1.8.4":[
+    "Historique global des ventes (tableau)",
+    "Fiche client : tableau des achats (12 derniers mois)"
   ]
 };
 function renderChangelog(){
@@ -305,7 +322,7 @@ document.getElementById("btnShowWhatsNew").onclick=()=>showVersionPopup(true);
 document.getElementById("btnShowPopup").onclick=()=>showVersionPopup(true);
 
 /* ================== Données & helpers ================== */
-const DBKEY='ptv_simple_v183_txt';
+const DBKEY='ptv_simple_v184_txt';
 const LOGO_KEY='ptv_logo_dataurl_v2';
 
 const DEFAULT_DOGS=["Barbet","Beagle","Berger Allemand","Berger Australien","Border Collie","Boxer","Bouledogue Français","Cavalier King Charles","Chihuahua","Cocker","Dalmatien","Golden Retriever","Husky","Jack Russell","Labrador","Rottweiler","Shiba Inu","Shih Tzu","Teckel","Yorkshire Terrier"].sort((a,b)=>a.localeCompare(b,'fr'));
@@ -314,32 +331,26 @@ const DEFAULT_CATS=["Abyssin","Bengal","Birman","Bleu Russe","British Shorthair"
 function days(n){return n*24*3600*1000}
 function el(t,a={},c=[]){const n=document.createElement(t);for(const k in a){(k==='class')?n.className=a[k]:n.setAttribute(k,a[k])}c.forEach(x=>n.append(typeof x==='string'?document.createTextNode(x):x));return n;}
 function toast(m){alert(m)}
+function formatDate(ts){ const d=new Date(ts); return d.toLocaleDateString('fr-BE',{year:'2-digit',month:'2-digit',day:'2-digit'}); }
 
 /* ---------- Persistance ---------- */
 function loadDB(){
   const raw=localStorage.getItem(DBKEY);
   if(raw){ try{return JSON.parse(raw)}catch(e){} }
   return {
-    clients:[],          // {id, nom, tel, email, addr, animaux:[{espece,race,name,dob}]}
-    produits:[],         // {id, nom, stock, min}
-    ventes:[],           // {id,date,clientId?,lignes:[{productId,qty}]}
+    clients:[], produits:[], ventes:[],
     lists:{breedsDog:[...DEFAULT_DOGS],breedsCat:[...DEFAULT_CATS]},
-    // on stocke aussi le logo
     _logo: localStorage.getItem(LOGO_KEY) || embeddedLogo()
   };
 }
 let DB=loadDB();
 function saveDB(){ localStorage.setItem(DBKEY, JSON.stringify(DB)); renderAll(); }
 
-/* ---------- Snapshot pour export : TOUTES les données ---------- */
+/* ---------- Snapshot export ---------- */
 function getSnapshot(){
-  // Relecture du JSON persistant (source de vérité)
   const raw=localStorage.getItem(DBKEY);
-  let snap = null;
-  try { snap = raw ? JSON.parse(raw) : null; } catch {}
+  let snap=null; try{ snap = raw ? JSON.parse(raw) : null; }catch{}
   if(!snap) snap = DB;
-
-  // S'assurer que le logo courant est présent
   const currLogo = localStorage.getItem(LOGO_KEY);
   if(currLogo) snap._logo = currLogo;
   return snap;
@@ -419,7 +430,7 @@ function petCard(p={}){
 document.getElementById('btnAddPet').onclick=()=>{ petsContainer.appendChild(petCard()); };
 
 let editingClientId=null;
-function clearClientForm(){ ['c_nom','c_tel','c_email','c_addr'].forEach(id=>document.getElementById(id).value=''); petsContainer.innerHTML=''; editingClientId=null; document.getElementById('btnDeleteClient').disabled=true; document.getElementById('cliStats').textContent='Sélectionnez un client…'; }
+function clearClientForm(){ ['c_nom','c_tel','c_email','c_addr'].forEach(id=>document.getElementById(id).value=''); petsContainer.innerHTML=''; editingClientId=null; document.getElementById('btnDeleteClient').disabled=true; document.getElementById('cliStats').textContent='Sélectionnez un client…'; hideClientPurch(); }
 document.getElementById('btnNewClient').onclick=clearClientForm;
 
 function readPetsFromUI(){
@@ -431,7 +442,7 @@ function readPetsFromUI(){
   }));
 }
 function fillPetsUI(arr=[]){ petsContainer.innerHTML=''; (arr.length?arr:[{}]).forEach(p=>petsContainer.appendChild(petCard(p))); }
-function fillClientForm(c){ editingClientId=c.id; document.getElementById('c_nom').value=c.nom||''; document.getElementById('c_tel').value=c.tel||''; document.getElementById('c_email').value=c.email||''; document.getElementById('c_addr').value=c.addr||''; fillPetsUI(c.animaux||[{}]); document.getElementById('btnDeleteClient').disabled=false; renderClientStats(c.id); }
+function fillClientForm(c){ editingClientId=c.id; document.getElementById('c_nom').value=c.nom||''; document.getElementById('c_tel').value=c.tel||''; document.getElementById('c_email').value=c.email||''; document.getElementById('c_addr').value=c.addr||''; fillPetsUI(c.animaux||[{}]); document.getElementById('btnDeleteClient').disabled=false; renderClientStats(c.id); renderClientPurchases(c.id); }
 
 document.getElementById('btnSaveClient').onclick=()=>{
   const id=editingClientId||Date.now();
@@ -469,7 +480,7 @@ function renderClients(){
     tr.onclick=()=>fillClientForm(c); tb.appendChild(tr);
   });
 
-  // Ventes: clients (liste déroulante)
+  // Ventes: clients (liste)
   const sel=document.getElementById('v_client'); sel.innerHTML=''; sel.appendChild(el('option',{value:''},['— (aucun) —'])); DB.clients.forEach(c=> sel.appendChild(el('option',{value:c.id},[c.nom||('Client '+c.id)])));
 }
 
@@ -484,6 +495,26 @@ function renderClientStats(clientId){
       <div class="card"><h3>Animaux</h3><div style="font-size:22px;font-weight:800">${(c.animaux||[]).length}</div></div>
       <div class="card"><h3>Anniv. à venir</h3><div>${soon}</div></div>
     </div>`;
+}
+
+/* --- Achats par client (12 derniers mois) --- */
+function hideClientPurch(){ document.getElementById('tblCliPurch').style.display='none'; document.getElementById('cliPurchEmpty').style.display='none'; }
+function renderClientPurchases(clientId){
+  const tbody=document.querySelector('#tblCliPurch tbody'); tbody.innerHTML='';
+  const oneYearAgo=Date.now()-days(365);
+  const lignes=[];
+  DB.ventes.filter(v=>v.clientId===clientId && v.date>=oneYearAgo).forEach(v=>{
+    (v.lignes||[]).forEach(L=>{
+      const p=DB.produits.find(x=>x.id==L.productId); lignes.push({date:v.date, prod:p?p.nom:('Produit '+L.productId), qty:L.qty||1});
+    });
+  });
+  lignes.sort((a,b)=>b.date-a.date);
+  if(!lignes.length){ hideClientPurch(); document.getElementById('cliPurchEmpty').style.display='inline'; return; }
+  lignes.forEach(row=>{
+    const tr=el('tr'); tr.innerHTML=`<td>${formatDate(row.date)}</td><td>${row.prod}</td><td>${row.qty}</td>`; tbody.appendChild(tr);
+  });
+  document.getElementById('cliPurchEmpty').style.display='none';
+  document.getElementById('tblCliPurch').style.display='table';
 }
 
 /* ================== Produits ================== */
@@ -564,6 +595,30 @@ document.getElementById('btnSaveSale').onclick=()=>{
 };
 document.getElementById('btnCancelSale').onclick=()=>{ document.getElementById('v_qty').value=1; };
 
+/* --- Historique global des ventes --- */
+document.getElementById('searchSales').oninput=renderSales;
+function renderSales(){
+  const q=(document.getElementById('searchSales').value||'').toLowerCase();
+  const tb=document.querySelector('#tblSales tbody'); tb.innerHTML='';
+  const rows=[];
+  DB.ventes.forEach(v=>{
+    const cli=DB.clients.find(c=>c.id===v.clientId);
+    const cliName=cli?(cli.nom||('#'+v.clientId)):'—';
+    (v.lignes||[]).forEach(L=>{
+      const p=DB.produits.find(x=>x.id==L.productId);
+      rows.push({date:v.date, client:cliName, prod:p?p.nom:('Produit '+L.productId), qty:L.qty||1});
+    });
+  });
+  rows.sort((a,b)=>b.date-a.date);
+  rows.filter(r=>{
+    const hay=(formatDate(r.date)+' '+r.client+' '+r.prod+' '+r.qty).toLowerCase();
+    return hay.includes(q);
+  }).forEach(r=>{
+    const tr=el('tr'); tr.innerHTML=`<td>${formatDate(r.date)}</td><td>${r.client}</td><td>${r.prod}</td><td>${r.qty}</td>`;
+    tb.appendChild(tr);
+  });
+}
+
 /* ================== Races (éditeur A→Z) ================== */
 function renderBreedEditor(key, containerId){
   const cont=document.getElementById(containerId); cont.innerHTML='';
@@ -594,7 +649,6 @@ function fileNameWithDate(){
   const d=new Date(); const y=d.getFullYear(), m=String(d.getMonth()+1).padStart(2,'0'), dd=String(d.getDate()).padStart(2,'0');
   return `ptv_sauvegarde_${y}-${m}-${dd}.txt`;
 }
-// Desktop (Chrome/Edge) : Enregistrer sous…
 async function exportChoosePath(){
   const data=snapshotString(); const name=fileNameWithDate();
   if ('showSaveFilePicker' in window) {
@@ -609,12 +663,10 @@ async function exportChoosePath(){
       return;
     }catch(e){ if(e?.name!=='AbortError') alert('Échec sauvegarde: '+e); }
   }
-  // Fallback téléchargement
   const blob=new Blob([data],{type:'text/plain;charset=utf-8'});
   const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=name;
   document.body.appendChild(a); a.click(); setTimeout(()=>{URL.revokeObjectURL(a.href); a.remove();},0);
 }
-// iOS : feuille de partage → Enregistrer dans Fichiers
 async function exportShareIOS(){
   const data=snapshotString(); const name=fileNameWithDate();
   const file=new File([data], name, { type:'text/plain' });
@@ -630,11 +682,10 @@ async function exportShareIOS(){
   } else {
     const blob=new Blob([data],{type:'text/plain;charset=utf-8'});
     const url=URL.createObjectURL(blob);
-    window.open(url,'_blank'); // puis Partager → Enregistrer dans Fichiers
-    toast('iOS : utilisez Partager → Enregistrer dans Fichiers.');
+    window.open(url,'_blank');
+    toast('iOS : Partager → Enregistrer dans Fichiers.');
   }
 }
-// Import
 async function importChooseFile(){
   if ('showOpenFilePicker' in window){
     try{
@@ -645,7 +696,6 @@ async function importChooseFile(){
       const file=await handle.getFile();
       const text=await file.text();
       DB=JSON.parse(text);
-      // réinjecter le logo si présent
       if(DB._logo) localStorage.setItem(LOGO_KEY, DB._logo);
       saveDB(); toast('Import réussi ✅');
       return;
@@ -661,14 +711,13 @@ document.getElementById('fileImport').addEventListener('change',e=>{
   r.onload=()=>{ try{
       DB=JSON.parse(String(r.result));
       if(DB._logo) localStorage.setItem(LOGO_KEY, DB._logo);
-      saveDB(); toast('Import réussi ✅');
-      e.target.value='';
+      saveDB(); toast('Import réussi ✅'); e.target.value='';
     } catch(err){ toast('Fichier invalide (JSON attendu dans le .txt)'); } };
   r.readAsText(f,'utf-8');
 });
 document.getElementById('btnExportJSON').addEventListener('click',()=>{ document.getElementById('exportArea').textContent=snapshotString(); });
 
-/* ================== Dashboard ================== */
+/* ================== Dashboard & Global render ================== */
 function renderDashboard(){
   const t30=Date.now()-days(30), t90=Date.now()-days(90);
   const actifs=new Set(DB.ventes.filter(v=>v.date>=t90 && !!v.clientId).map(v=>v.clientId)).size; document.getElementById('kpiActifs').textContent=actifs;
@@ -684,11 +733,12 @@ function renderDashboard(){
   const tbb=document.querySelector('#tblBirthSoon tbody'); tbb.innerHTML=''; soon.forEach(x=>{ const tr=el('tr'); tr.innerHTML=`<td>${x.client}</td><td><span class="gift"><i class="icon"></i><span>${x.animal}</span></span></td><td>${x.days}</td>`; tbb.appendChild(tr); });
 }
 
-/* ================== Global render ================== */
 document.getElementById('searchClient').oninput=renderClients;
+
 function renderAll(){
   renderClients();
   renderProduits();
+  renderSales();
   renderBreedEditor('breedsDog','editBreedsDog'); renderBreedEditor('breedsCat','editBreedsCat');
   const vprod=document.getElementById('v_prod'); vprod.innerHTML=''; DB.produits.forEach(p=> vprod.appendChild(el('option',{value:p.id},[p.nom])));
   const vcli=document.getElementById('v_client'); vcli.innerHTML=''; vcli.appendChild(el('option',{value:''},['— (aucun) —'])); DB.clients.forEach(c=> vcli.appendChild(el('option',{value:c.id},[c.nom||('Client '+c.id)])));
@@ -698,7 +748,7 @@ function renderAll(){
 document.addEventListener("DOMContentLoaded",()=>{
   renderChangelog();
   renderAll();
-  showVersionPopup(); // nouveautés v1.8.3
+  showVersionPopup(); // nouveautés v1.8.4
 });
 </script>
 </body>
