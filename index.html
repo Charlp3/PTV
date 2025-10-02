@@ -1,84 +1,89 @@
 <!doctype html>
 <html lang="fr">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>PASSE TEMPS VEGA – PetShop Manager</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PASSE TEMPS VEGA — v1.7</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#e5e7eb; --card:#e0e0e0; --elev:#d5d5d5; --border:#b0b3b8;
-  --text:#111827; --muted:#374151;
-  --pri:#22c55e; --pri2:#16a34a; --grad:linear-gradient(180deg,#22c55e,#16a34a);
-  --radius:14px; --shadow:0 6px 16px rgba(0,0,0,.15), inset 0 1px 0 rgba(255,255,255,.25);
-  --danger:#b91c1c;
+  /* Jaune / ocre lisible (textes sombres) */
+  --bg:#FFF8DC; --card:#FFEFB3; --elev:#FFE082; --border:#D8B84A;
+  --text:#1F2937; --muted:#4B5563;
+  --btn:#D97706; --btnH:#B45309;
+  --danger:#B91C1C;
+  --radius:14px; --shadow:0 6px 16px rgba(0,0,0,.12), inset 0 1px 0 rgba(255,255,255,.3);
 }
-*{box-sizing:border-box} html,body{height:100%}
-body{margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;color:var(--text);background:var(--bg)}
-header{display:flex;align-items:center;gap:14px;padding:12px 14px;position:sticky;top:0;z-index:10;background:var(--card);border-bottom:1px solid var(--border)}
-.brand{display:flex;align-items:center;gap:10px}
-.brand h1{font-size:18px;margin:0;letter-spacing:.3px;display:flex;align-items:center;gap:8px}
-.brand img{width:44px;height:44px;border-radius:8px;object-fit:cover;background:#f3f4f6;border:1px solid var(--border);box-shadow:var(--shadow)}
-.ver-badge{display:inline-block;padding:2px 8px;font-size:11px;font-weight:700;letter-spacing:.3px;color:#0f5132;background:#c9f2d6;border:1px solid #9fc9ad;border-radius:999px}
-.tabs{display:flex;gap:8px;flex-wrap:wrap;margin-left:auto}
-.tab{border:1px solid var(--border);background:var(--card);color:var(--text);padding:8px 12px;border-radius:10px;cursor:pointer;transition:all .15s}
-.tab:hover{transform:translateY(-1px);border-color:#94c3a6}
-.tab.active{background:var(--grad);color:#fff;border-color:transparent;font-weight:700}
-main{padding:16px;display:grid;gap:16px;max-width:1200px;margin:0 auto}
-.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:14px;box-shadow:var(--shadow)}
-.card h2{margin:0 0 12px 0;font-size:18px}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--text)}
+
+/* Header */
+header{display:flex;align-items:center;gap:12px;padding:12px;border-bottom:1px solid var(--border);background:var(--card);position:sticky;top:0;z-index:10}
+.logo{width:50px;height:50px;min-width:50px;min-height:50px;border-radius:12px;border:1px solid var(--border);background:#fff;display:grid;place-items:center;overflow:hidden;flex-shrink:0}
+.logo img{width:100%;height:100%;object-fit:cover}
+.brand h1{margin:0;font-size:18px;color:var(--text)}
+.badge{display:inline-block;margin-left:8px;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:800;color:#7c2d12;background:#ffedd5;border:1px solid #fdba74}
+.tabs{display:flex;gap:8px;margin-left:auto;flex-wrap:wrap}
+.tab{background:var(--card);border:1px solid var(--border);padding:8px 12px;border-radius:10px;cursor:pointer;color:var(--text);font-weight:700}
+.tab.active{background:linear-gradient(180deg,#FACC15,#F59E0B);color:#111;border-color:transparent}
+a.link{color:#7c2d12;text-decoration:underline;cursor:pointer;margin-left:10px}
+
+/* Layout & components */
+main{max-width:1200px;margin:0 auto;padding:16px;display:grid;gap:16px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:14px}
+h2{margin:0 0 10px;font-size:20px}
+h3{margin:10px 0 6px;font-size:16px}
+label{display:block;font-size:12px;color:var(--muted);margin-bottom:6px}
+input,select,textarea,button{width:100%;padding:11px 12px;border-radius:12px;border:1px solid var(--border);background:#fff;color:var(--text)}
+input:focus,select:focus,textarea:focus{outline:none;border-color:#F59E0B;box-shadow:0 0 0 3px rgba(245,158,11,.25)}
+button{cursor:pointer;background:var(--btn);color:#fff;font-weight:800;border:none}
+button:hover{background:var(--btnH)}
+button.secondary{background:#fff;color:#111;border:1px solid var(--border)}
+button.ghost{background:transparent;border:1px dashed var(--border);color:var(--muted)}
 .grid{display:grid;gap:12px}
 .cols-2{grid-template-columns:repeat(2,minmax(0,1fr))}
 .cols-3{grid-template-columns:repeat(3,minmax(0,1fr))}
-@media(max-width:980px){.cols-3,.cols-2{grid-template-columns:1fr}}
-label{font-size:12px;color:var(--muted);display:block;margin-bottom:6px}
-input,select,textarea,button{width:100%;padding:11px 12px;border-radius:12px;border:1px solid var(--border);background:#fff;color:var(--text);transition:border .15s,box-shadow .15s}
-input:focus,select:focus,textarea:focus{outline:none;border-color:#22c55e;box-shadow:0 0 0 3px rgba(34,197,94,.20)}
-textarea{resize:vertical;min-height:84px}
-button{cursor:pointer;background:var(--grad);color:#fff;font-weight:700;border:none}
-button.secondary{background:var(--elev);color:var(--text);border:1px solid var(--border)}
-button.ghost{background:transparent;border:1px dashed var(--border);color:var(--muted)}
+@media(max-width:980px){.cols-2,.cols-3{grid-template-columns:1fr}}
+.table{width:100%;border-collapse:collapse;border-radius:12px;overflow:hidden}
+.table th,.table td{padding:10px;border-bottom:1px solid var(--border);text-align:left}
+.table thead th{background:var(--elev);font-size:12px;color:#374151}
+
+/* KPI */
+.kpi{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.kpi .item{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px}
+.kpi .item h3{margin:0;color:#6b7280;font-size:12px}
+.kpi .item div{margin-top:6px;font-size:22px;font-weight:800}
+
+/* Gift icon (blink) */
+.gift{display:inline-flex;align-items:center;gap:6px}
+.gift i{display:inline-block}
+@keyframes blink{0%,60%,100%{opacity:1}30%{opacity:.15}}
+.gift .icon{animation:blink 1.2s infinite}
+.gift .icon::after{content:"🎁"}
+
+/* Chips lettres */
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{border:1px solid var(--border);background:#fff;padding:6px 10px;border-radius:999px;font-weight:700;cursor:pointer}
+.chip.active{background:#fef3c7;border-color:#f59e0b}
+
+/* Stocks */
+.stock-low{color:var(--danger);font-weight:800}
 small.muted{color:var(--muted)}
 hr.sep{border:0;border-top:1px dashed var(--border);margin:10px 0}
-.table{width:100%;border-collapse:collapse;overflow:hidden;border-radius:12px}
-.table th,.table td{border-bottom:1px solid var(--border);padding:10px;text-align:left}
-.table thead th{font-size:12px;color:var(--muted);background:var(--elev)}
-.table tbody tr:hover{background:rgba(0,0,0,.05)}
-.kpi{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
-.kpi .item{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:12px}
-.kpi .item h3{margin:0;font-size:12px;color:var(--muted)}
-.kpi .item div{font-size:22px;font-weight:800;margin-top:6px}
-.badge{display:inline-block;padding:2px 8px;border-radius:999px;font-size:12px}
-aside.panel{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px}
-footer{padding:14px 18px;color:var(--muted);border-top:1px solid var(--border);display:flex;justify-content:space-between;background:var(--card)}
-.listEditor{display:flex;flex-wrap:wrap;gap:6px}
-.chip{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;background:#fff;border:1px solid var(--border)}
-.chip input{width:auto;border:none;padding:0 4px}
-.chip .x{cursor:pointer;color:#a00;font-weight:700}
-.drag{cursor:grab}
-.red{color:var(--danger);font-weight:800}
-.mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+footer{padding:14px;border-top:1px solid var(--border);display:flex;justify-content:space-between;background:var(--card);color:#374151}
 
-/* Bannière version (conservée) */
-#newVersionBanner{display:none;align-items:center;gap:12px;background:#fff7ed;border:1px solid #fed7aa;color:#7c2d12;padding:10px 12px;border-radius:10px;box-shadow:var(--shadow);margin:0 16px}
-#newVersionBanner .btn{padding:6px 10px;border-radius:8px;border:1px solid #f59e0b;background:#fef3c7;color:#7c2d12;cursor:pointer}
-#newVersionBanner .btn:hover{background:#fde68a}
-
-/* Modal changelog */
-.modal{position:fixed;inset:0;background:rgba(0,0,0,.35);display:none;align-items:center;justify-content:center;z-index:50}
-.modal .dialog{background:#fff;border-radius:14px;max-width:720px;width:92%;border:1px solid var(--border);box-shadow:var(--shadow)}
-.modal header{position:static;background:#fff;border-bottom:1px solid var(--border);border-radius:14px 14px 0 0}
-.modal .body{padding:14px}
-.modal .footer{display:flex;justify-content:flex-end;gap:8px;padding:12px;border-top:1px solid var(--border)}
-.modal .footer button{padding:10px 14px;border-radius:10px}
+/* Popup changelog */
+#versionPopup{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;z-index:2000}
+#versionPopup .box{background:#fff;border-radius:12px;max-width:700px;width:92%;padding:20px;box-shadow:0 10px 30px rgba(0,0,0,.4);max-height:90%;overflow:auto}
+#versionPopup h2{margin-top:0}
+#versionPopup ul{margin:0 0 10px 18px}
 </style>
 </head>
 <body>
 <header>
-  <div class="brand">
-    <img id="logoImg" alt="Logo PASSE TEMPS VEGA">
-    <h1>PASSE TEMPS VEGA <span class="ver-badge" id="appVer">v1.6</span></h1>
-  </div>
+  <div class="logo" title="Logo"><img id="logoImg" alt="Logo PASSE TEMPS VEGA"></div>
+  <div class="brand"><h1>PASSE TEMPS VEGA <span class="badge" id="verBadge">v1.7</span><a class="link" id="btnShowWhatsNew">Nouveautés</a></h1></div>
   <nav class="tabs">
     <button class="tab active" data-tab="dash">Dashboard</button>
     <button class="tab" data-tab="clients">Clients</button>
@@ -88,35 +93,29 @@ footer{padding:14px 18px;color:var(--muted);border-top:1px solid var(--border);d
   </nav>
 </header>
 
-<!-- Bannière version -->
-<div id="newVersionBanner" role="status" aria-live="polite" style="margin-top:12px">
-  <strong>Nouvelle version disponible :</strong>
-  <span id="versOld">—</span> → <span id="versNew">—</span>
-  <button class="btn" id="btnShowChangelog">Voir ce qui a changé</button>
-  <button class="btn" id="btnDismissBanner">OK, compris</button>
-</div>
-
 <main>
   <!-- DASHBOARD -->
   <section id="dash" class="card">
     <h2>Vue d’ensemble</h2>
     <div class="kpi">
-      <div class="item"><h3>CA (30j)</h3><div id="kpiCA">€0</div></div>
-      <div class="item"><h3>Panier moyen (30j)</h3><div id="kpiPanier">€0</div></div>
-      <div class="item"><h3>Marge estimée</h3><div id="kpiMarge">€0</div></div>
       <div class="item"><h3>Clients actifs (90j)</h3><div id="kpiActifs">0</div></div>
+      <div class="item"><h3>Top produits (Qté)</h3><div id="kpiTopProd">—</div></div>
+      <div class="item"><h3>Top clients (Achats)</h3><div id="kpiTopCli">—</div></div>
     </div>
     <hr class="sep">
     <div class="grid cols-2">
       <div>
         <h3>Top produits</h3>
-        <table class="table" id="tblTopProd"><thead><tr><th>Produit</th><th>Qté</th><th>€</th></tr></thead><tbody></tbody></table>
+        <table class="table" id="tblTopProd"><thead><tr><th>Produit</th><th>Qté</th></tr></thead><tbody></tbody></table>
       </div>
       <div>
         <h3>Top clients</h3>
-        <table class="table" id="tblTopCli"><thead><tr><th>Client</th><th>Achats</th><th>€</th></tr></thead><tbody></tbody></table>
+        <table class="table" id="tblTopCli"><thead><tr><th>Client</th><th>Achats</th></tr></thead><tbody></tbody></table>
       </div>
     </div>
+    <hr class="sep">
+    <h3>Anniversaires <small class="muted">(dans 30 jours)</small></h3>
+    <table class="table" id="tblBirthSoon"><thead><tr><th>Client</th><th>Animal</th><th>Jours</th></tr></thead><tbody></tbody></table>
   </section>
 
   <!-- CLIENTS -->
@@ -126,38 +125,30 @@ footer{padding:14px 18px;color:var(--muted);border-top:1px solid var(--border);d
       <div>
         <h3>Ajouter / Éditer</h3>
         <div class="grid cols-2">
-          <div><label>Nom du propriétaire</label><input id="c_nom" placeholder="Nom Prénom"></div>
-          <div><label>Téléphone (BE)</label><input id="c_tel" type="tel" inputmode="numeric" maxlength="10" pattern="^0\\d{8,9}$" placeholder="0470123456" title="Commence par 0, 9–10 chiffres (optionnel)"></div>
-          <div><label>Email</label><input id="c_email" placeholder="a@b.com"></div>
-          <div><label>Adresse (optionnelle)</label><input id="c_addr" placeholder="Rue, n°, CP Ville"></div>
+          <div><label>Nom & prénom</label><input id="c_nom" placeholder="Nom Prénom (optionnel)"></div>
+          <div><label>Téléphone (BE, optionnel)</label><input id="c_tel" inputmode="numeric" maxlength="10" placeholder="0470123456"></div>
+          <div><label>Email (optionnel)</label><input id="c_email" placeholder="a@b.be"></div>
+          <div><label>Adresse (optionnelle)</label><input id="c_addr" placeholder="Rue, CP Ville"></div>
         </div>
-
         <hr class="sep">
         <h3>Animaux</h3>
         <div id="petsContainer" class="grid" style="gap:10px"></div>
-        <div class="grid cols-3" style="margin-top:6px">
-          <button class="secondary" id="btnAddPet">+ Ajouter un animal</button>
-          <span></span><span></span>
-        </div>
-
-        <div class="grid cols-3" style="margin-top:12px">
+        <button class="secondary" id="btnAddPet">+ Ajouter un animal</button>
+        <div class="grid cols-3" style="margin-top:10px">
           <button id="btnSaveClient">Enregistrer</button>
           <button class="secondary" id="btnNewClient">Nouveau</button>
           <button class="ghost" id="btnDeleteClient" disabled>Supprimer</button>
         </div>
       </div>
 
-      <div class="grid">
-        <div>
-          <h3>Liste</h3>
-          <input id="searchClient" placeholder="Recherche nom / email / tel / animal...">
-          <table class="table" id="tblClients">
-            <thead><tr><th>Propriétaire</th><th>Animaux</th><th>Tél</th><th>Email</th></tr></thead>
-            <tbody></tbody>
-          </table>
-        </div>
-        <aside class="panel">
-          <h3 id="cliStatsTitle">Statistiques client</h3>
+      <div>
+        <h3>Liste</h3>
+        <input id="searchClient" placeholder="Recherche nom / email / tel / animal / race…">
+        <table class="table" id="tblClients">
+          <thead><tr><th>Propriétaire</th><th>Animaux</th><th>Tél</th><th>Email</th></tr></thead><tbody></tbody>
+        </table>
+        <aside style="margin-top:10px">
+          <h3>Statistiques</h3>
           <div id="cliStats">Sélectionnez un client…</div>
         </aside>
       </div>
@@ -166,785 +157,493 @@ footer{padding:14px 18px;color:var(--muted);border-top:1px solid var(--border);d
 
   <!-- PRODUITS -->
   <section id="produits" class="card" hidden>
-    <h2>Produits & Stock</h2>
+    <h2>Produits (liste unique)</h2>
     <div class="grid cols-2">
       <div>
-        <h3>Ajouter / éditer produit</h3>
+        <h3>Ajouter / Éditer</h3>
         <div class="grid cols-3">
-          <div><label>Famille</label><select id="p_famille"></select></div>
-          <div><label>Marque</label><select id="p_marque"></select></div>
-          <div><label>Désignation</label>
-            <input id="p_nom" list="dl_designations" placeholder="Adult Poulet 12kg">
-            <datalist id="dl_designations"></datalist>
-          </div>
-          <div><label>Prix TTC (€)</label><input id="p_prix" type="number" step="0.01"></div>
-          <div><label>Prix achat HT (€)</label><input id="p_cost" type="number" step="0.01"></div>
-          <div><label>TVA %</label><input id="p_tva" type="number" value="20"></div>
+          <div style="grid-column:1/-1"><label>Nom du produit</label><input id="p_nom" placeholder="ex. Médaille gravée"></div>
           <div><label>Stock</label><input id="p_stock" type="number" value="0"></div>
-          <div><label>Stock mini</label><input id="p_min" type="number" value="1"></div>
+          <div><label>Stock minimum</label><input id="p_min" type="number" value="0"></div>
+          <input type="hidden" id="p_id">
         </div>
-        <input type="hidden" id="p_id">
-        <div class="grid cols-2">
-          <button id="btnSaveProduct">Enregistrer produit</button>
-          <div class="grid cols-2">
-            <button class="secondary" id="btnClearProduct">Nouveau</button>
-            <button class="ghost" id="btnDeleteProduct" disabled>Supprimer / Archiver</button>
-          </div>
+        <div class="grid cols-3" style="margin-top:10px">
+          <button id="btnSaveProduct">Enregistrer</button>
+          <button class="secondary" id="btnNewProduct">Nouveau</button>
+          <button class="ghost" id="btnDeleteProduct" disabled>Supprimer</button>
         </div>
       </div>
 
       <div>
         <h3>Catalogue</h3>
-        <div class="grid cols-2">
-          <input id="searchProduit" placeholder="Recherche nom / famille / marque...">
-          <label style="display:flex;align-items:center;gap:8px;"><input type="checkbox" id="showArchived"> Afficher archivés</label>
-        </div>
+        <div class="chips" id="alphaChips"></div>
+        <input id="searchProduit" placeholder="Recherche produit… (nom)">
         <table class="table" id="tblProduits">
-          <thead><tr><th>Nom</th><th>Famille</th><th>Marque</th><th>Prix</th><th>Stock</th><th>Statut</th></tr></thead>
-          <tbody></tbody>
+          <thead><tr><th>Produit</th><th>Stock</th><th>Min</th><th>Statut</th></tr></thead><tbody></tbody>
         </table>
-
-        <hr class="sep">
-        <h3>Éditer les listes</h3>
-        <div class="grid cols-3">
-          <div>
-            <label>Familles</label>
-            <div id="editFamilies" class="listEditor"></div>
-            <button class="secondary" data-add="families">+ Ajouter</button>
-          </div>
-          <div>
-            <label>Marques</label>
-            <div id="editBrands" class="listEditor"></div>
-            <button class="secondary" data-add="brands">+ Ajouter</button>
-          </div>
-          <div>
-            <label>Désignations suggérées</label>
-            <div id="editDesignations" class="listEditor"></div>
-            <button class="secondary" data-add="designations">+ Ajouter</button>
-          </div>
-        </div>
+        <small class="muted">Tri A→Z. Filtre par lettre/chiffre via les puces.</small>
       </div>
     </div>
   </section>
 
   <!-- VENTES -->
   <section id="ventes" class="card" hidden>
-    <h2>Enregistrer une vente</h2>
-    <div class="grid cols-2">
+    <h2>Enregistrer une vente (simple)</h2>
+    <div class="grid cols-3">
       <div>
-        <div class="grid cols-3">
-          <div><label>Client</label><select id="v_client"></select></div>
-          <div><label>Moyen de paiement</label><select id="v_pay"><option>CB</option><option>Espèces</option></select></div>
-          <div>
-            <label>Fidélité</label>
-            <div id="v_loyalty" class="chip" style="justify-content:space-between">
-              <span>—</span>
-              <label style="display:flex;align-items:center;gap:8px;margin:0">
-                <input type="checkbox" id="useFree"> Utiliser 1 gratuité (max config)
-              </label>
-            </div>
-          </div>
-        </div>
-        <hr class="sep">
-        <div class="grid cols-3">
-          <div>
-            <label>Recherche produit</label>
-            <input id="v_prod_search" placeholder="Tapez nom / marque / famille">
-          </div>
-          <div>
-            <label>Produit</label>
-            <select id="v_prod_select"></select>
-          </div>
-          <div>
-            <label>Quantité</label>
-            <input id="v_qty" type="number" value="1" min="1">
-          </div>
-          <div>
-            <label>Remise (€)</label>
-            <input id="v_disc" type="number" value="0" step="0.01">
-          </div>
-        </div>
-        <div class="grid cols-2">
-          <button id="btnAddLine">Ajouter ligne</button>
-          <button class="secondary" id="btnClearLines">Vider</button>
-        </div>
-        <table class="table" id="tblLines"><thead><tr><th>Produit</th><th>Qté</th><th>PU</th><th>Remise</th><th>Total</th><th></th></tr></thead><tbody></tbody></table>
-        <div style="text-align:right;margin-top:8px"><strong>Total : <span id="v_total">€0.00</span></strong></div>
-        <div class="grid cols-2" style="margin-top:8px">
-          <button id="btnSaveSale">Valider vente</button>
-          <button class="secondary" id="btnCancelSale">Annuler</button>
-        </div>
+        <label>Client (facultatif)</label>
+        <select id="v_client"></select>
       </div>
-      <div>
-        <h3>Historique récent</h3>
-        <table class="table" id="tblSales"><thead><tr><th>Date</th><th>Client</th><th>Montant</th></tr></thead><tbody></tbody></table>
+      <div style="grid-column:1/-1">
+        <div id="v_client_info" class="gift" style="display:none"><i class="icon"></i><span id="v_client_animals"></span></div>
       </div>
+      <div style="grid-column:1/-1"><label>Produit</label><select id="v_prod"></select></div>
+      <div><label>Quantité</label><input id="v_qty" type="number" value="1" min="1"></div>
+    </div>
+    <div class="grid cols-2" style="margin-top:10px">
+      <button id="btnSaveSale">Valider vente</button>
+      <button class="secondary" id="btnCancelSale">Annuler</button>
     </div>
   </section>
 
   <!-- PARAMÈTRES -->
   <section id="param" class="card" hidden>
-    <h2>Paramètres & Données</h2>
+    <h2>Paramètres</h2>
     <div class="grid cols-2">
       <div>
         <h3>Logo</h3>
-        <div class="listEditor">
-          <img id="logoPreview" class="previewLogo" alt="Aperçu logo" style="width:56px;height:56px;border-radius:10px;border:1px solid var(--border);background:#fff;object-fit:cover">
-          <input type="file" id="logoFile" accept="image/*">
-          <button id="btnSaveLogo" class="secondary">Enregistrer le logo</button>
-          <button id="btnClearLogo" class="ghost">Supprimer logo</button>
-        </div>
-        <div class="grid cols-2" style="margin-top:8px">
-          <button id="btnEmbedHTML">Exporter HTML avec logo intégré</button>
-          <button id="btnResetLogo" class="ghost">Logo par défaut</button>
-        </div>
-      </div>
-      <div>
-        <h3>Fidélité (config)</h3>
         <div class="grid cols-3">
-          <div><label>Famille éligible</label><input id="loy_family" placeholder="Croquettes"></div>
-          <div><label>Tampons pour 1 gratuité</label><input id="loy_need" type="number" value="5" min="1"></div>
-          <div><label>Max gratuités/vente</label><input id="loy_maxfree" type="number" value="1" min="1"></div>
-        </div>
-        <div class="grid cols-2" style="margin-top:8px">
-          <button id="btnSaveLoyalty">Sauver config fidélité</button>
-          <button id="btnDemo" class="ghost">Charger jeux d’essai</button>
-        </div>
-      </div>
-    </div>
-
-    <hr class="sep">
-
-    <div class="grid cols-2">
-      <div>
-        <h3>Éditer les listes</h3>
-        <div class="grid cols-2">
-          <div>
-            <label>Familles</label>
-            <div id="editFamilies" class="listEditor"></div>
-            <button class="secondary" data-add="families">+ Ajouter</button>
+          <div style="grid-column:1/-1;display:flex;gap:10px;align-items:center">
+            <div class="logo" style="width:56px;height:56px"><img id="logoPreview" alt="Aperçu"></div>
+            <input type="file" id="logoFile" accept="image/*">
           </div>
-          <div>
-            <label>Marques</label>
-            <div id="editBrands" class="listEditor"></div>
-            <button class="secondary" data-add="brands">+ Ajouter</button>
-          </div>
-          <div style="grid-column:1/-1">
-            <label>Désignations suggérées</label>
-            <div id="editDesignations" class="listEditor"></div>
-            <button class="secondary" data-add="designations">+ Ajouter</button>
-          </div>
+          <button class="secondary" id="btnSaveLogo">Enregistrer le logo</button>
+          <button class="ghost" id="btnClearLogo">Supprimer logo</button>
         </div>
+        <small class="muted">Le logo est stocké localement dans le navigateur.</small>
       </div>
 
       <div>
-        <h3>Listes de races (éditables)</h3>
+        <h3>Listes de races</h3>
         <div class="grid cols-2">
           <div>
             <label>Races de chiens</label>
-            <div id="editBreedsDog" class="listEditor"></div>
+            <div id="editBreedsDog" class="chips"></div>
             <button class="secondary" data-add="breedsDog">+ Ajouter</button>
           </div>
           <div>
             <label>Races de chats</label>
-            <div id="editBreedsCat" class="listEditor"></div>
+            <div id="editBreedsCat" class="chips"></div>
             <button class="secondary" data-add="breedsCat">+ Ajouter</button>
           </div>
         </div>
-        <small class="muted">Ces listes alimentent les menus “Race” des animaux (Clients).</small>
+        <small class="muted">Tri A→Z automatique après ajout/édition.</small>
       </div>
 
       <div>
-        <h3>Export / Import</h3>
-        <div class="grid cols-2">
-          <button id="btnExport" class="secondary">Exporter JSON</button>
-          <button id="btnImport">Importer</button>
+        <h3>Sauvegarde / Restauration</h3>
+        <div class="grid cols-3">
+          <button id="btnExportTxt" class="secondary">Télécharger sauvegarde (.txt)</button>
+          <label class="secondary" style="display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer">
+            <input type="file" id="fileImport" accept=".txt,text/plain,application/json" style="display:none">
+            Importer depuis un fichier .txt
+          </label>
+          <button id="btnExportJSON" class="ghost">Afficher JSON</button>
         </div>
-        <textarea id="importArea" rows="8" placeholder='{"clients":[],"produits":[],"ventes":[]}'></textarea>
-        <pre id="exportArea" style="max-height:240px;overflow:auto;background:#fff;border:1px solid var(--border);padding:8px;border-radius:8px"></pre>
+        <pre id="exportArea" style="max-height:220px;overflow:auto;background:#fff;border:1px solid var(--border);padding:8px;border-radius:8px;margin-top:8px"></pre>
       </div>
 
       <div>
-        <h3>Changelog & Version</h3>
-        <div class="chip">Version actuelle : <strong id="verNow" style="margin-left:6px">v1.6</strong></div>
-        <div class="grid cols-2" style="margin-top:6px">
-          <button id="btnShowChangelog2" class="secondary">Afficher le changelog</button>
-          <button id="btnResetSeen" class="ghost">Réafficher alerte nouvelle version</button>
-        </div>
-      </div>
-
-      <div>
-        <h3>Réinitialisation</h3>
-        <button id="btnResetData" class="ghost">Réinitialiser TOUT (⚠️)</button>
-        <p class="muted">Les données restent sur cet appareil (localStorage).</p>
+        <h3>Historique des versions</h3>
+        <div id="changelog"></div>
+        <button id="btnShowPopup" class="secondary" style="margin-top:8px">Relire les nouveautés</button>
       </div>
     </div>
-
-    <div>
-      <h3>À propos</h3>
-      <p><strong>PASSE TEMPS VEGA</strong> — gestion Clients / Produits / Ventes • Thème gris & vert.</p>
-      <p>© PASSE TEMPS VEGA — v1.6 • © Pierre Charlier 2025</p>
-    </div>
+    <hr class="sep">
+    <div>© PASSE TEMPS VEGA — v1.7 • © Pierre Charlier 2025 • Données locales (aucun serveur)</div>
   </section>
 </main>
 
 <footer>
-  <div>© PASSE TEMPS VEGA — <span id="appVerFoot">v1.6</span> • © Pierre Charlier 2025</div>
-  <div><small class="muted">Données locales (aucun serveur)</small></div>
+  <div>© PASSE TEMPS VEGA — v1.7 • © Pierre Charlier 2025</div>
+  <div><small class="muted">Jaune/ocre lisible • Sauvegarde .txt • Logo intégré</small></div>
 </footer>
 
-<!-- Modal changelog -->
-<div class="modal" id="modalChange">
-  <div class="dialog">
-    <header style="display:flex;align-items:center;gap:10px;padding:10px 12px">
-      <strong>Changelog</strong>
-      <span class="ver-badge" id="chgVer">v1.6</span>
-      <button id="btnCloseModal" class="secondary" style="margin-left:auto;padding:6px 10px;border-radius:8px">Fermer</button>
-    </header>
-    <div class="body" id="chgBody"></div>
-    <div class="footer">
-      <button id="btnDontShow" class="ghost">Ne plus afficher pour cette version</button>
-      <button id="btnOkModal">OK</button>
-    </div>
+<!-- Popup changelog -->
+<div id="versionPopup">
+  <div class="box">
+    <h2 id="popupTitle"></h2>
+    <div id="popupContent"></div>
+    <button class="secondary" onclick="document.getElementById('versionPopup').style.display='none'">Fermer</button>
   </div>
 </div>
 
 <script>
-/* ================= Version & Changelog ================= */
-const APP_VERSION='v1.6';
-const CHANGELOG = [
-  {ver:'v1.6', items:[
-    "Listes de races CHIENS et CHATS désormais ÉDITABLES dans Paramètres.",
-    "Anniversaire: seule la ligne de l'animal concerné passe en rouge (plus le propriétaire)."
-  ]},
-  {ver:'v1.5', items:[
-    "Alerte nouvelle version + modal changelog.",
-    "Multi-animaux par propriétaire.",
-    "Suppression totale de SKU (IDs internes)."
-  ]},
-  {ver:'v1.3–v1.4', items:[
-    "Correctifs anniversaires, champs optionnels, fidélité 5+1."
-  ]}
-];
-const VERSION_KEY='ptv_seen_version_v1';
+/* ================== Version & Changelog ================== */
+const APP_VERSION="v1.7";
+const STORAGE_VERSION_SEEN="ptv_version_seen";
+const CHANGELOG={
+  "v1.5":[
+    "Fidélité 5+1",
+    "Multi-animaux par client",
+    "Anniversaire rouge J-7"
+  ],
+  "v1.6":[
+    "Listes de races éditables",
+    "Améliorations fidèles + correctifs",
+    "Export / Import JSON (copier/coller)",
+    "Notification de nouvelle version"
+  ],
+  "v1.7":[
+    "Palette jaune/ocre lisible (textes sombres)",
+    "Logo carré fixe + logo intégré par défaut",
+    "Sauvegarde et restauration via fichier .txt",
+    "Dashboard : clients actifs, top produits/clients, anniversaires J-30 (🎁 clignotant)",
+    "Clients/Animaux simplifiés ; Produits = liste unique ; Ventes sans prix/remise/fidélité",
+    "Recherche par nom/race/mail/tel ; filtre produits par initiale",
+    "Suppression produit interdite s'il a déjà été vendu (pas d'archivage)"
+  ]
+};
+function renderChangelog(){
+  let html="";
+  const entries=Object.entries(CHANGELOG).sort((a,b)=>a[0]<b[0]?1:-1);
+  for(const [ver,items] of entries){
+    html+=`<h4 style="margin:8px 0">${ver}</h4><ul>`+items.map(i=>`<li>${i}</li>`).join("")+"</ul>";
+  }
+  document.getElementById("changelog").innerHTML=html;
+}
+function showVersionPopup(force=false){
+  const seen=localStorage.getItem(STORAGE_VERSION_SEEN);
+  if(force || seen!==APP_VERSION){
+    document.getElementById("popupTitle").textContent="Nouveautés "+APP_VERSION;
+    document.getElementById("popupContent").innerHTML="<ul>"+CHANGELOG[APP_VERSION].map(i=>"<li>"+i+"</li>").join("")+"</ul>";
+    document.getElementById("versionPopup").style.display="flex";
+    localStorage.setItem(STORAGE_VERSION_SEEN,APP_VERSION);
+  }
+}
+document.getElementById("btnShowWhatsNew").onclick=()=>showVersionPopup(true);
+document.getElementById("btnShowPopup").onclick=()=>showVersionPopup(true);
 
-/* ================= Constantes & Helpers ================= */
-const DBKEY='ptv_petshop_v5';        // bump db key (nouveaux champs: races éditables)
-const LOGO_KEY='ptv_logo_dataurl_v1';
-const DEFAULT_LOGO_SVG=`<svg xmlns='http://www.w3.org/2000/svg' width='256' height='256' viewBox='0 0 256 256'>
-<defs><linearGradient id='g' x1='0' y1='0' x2='0' y2='1'><stop offset='0' stop-color='#34d399'/><stop offset='1' stop-color='#16a34a'/></linearGradient></defs>
-<rect rx='24' width='256' height='256' fill='url(#g)'/><text x='50%' y='58%' text-anchor='middle' font-size='116' font-weight='800' font-family='Inter,Arial' fill='#fff'>PTV</text>
-</svg>`;
-const DEFAULT_LOGO_DATAURL='data:image/svg+xml;base64,'+btoa(DEFAULT_LOGO_SVG);
-const days=(d)=>d*24*3600*1000; const fmtEur=(n)=>'€'+(n||0).toFixed(2);
-function el(tag,attrs={},children=[]){const n=document.createElement(tag);Object.entries(attrs).forEach(([k,v])=> (k==='class')?n.className=v:n.setAttribute(k,v)); children.forEach(c=>n.appendChild(typeof c==='string'?document.createTextNode(c):c)); return n;}
-function toast(msg){ alert(msg); }
+/* ================== Données & helpers ================== */
+const DBKEY='ptv_simple_v17_txt';
+const LOGO_KEY='ptv_logo_dataurl_v2';
 
-/* ================= DB Load/Save + Migration ================= */
-const DEFAULT_DOGS=["Berger Allemand","Berger Australien","Border Collie","Bouledogue Français","Cavalier King Charles Spaniel","Chihuahua","Cocker Spaniel Anglais","Dalmatien","Golden Retriever","Husky Sibérien","Jack Russell Terrier","Labrador Retriever","Rottweiler","Shiba Inu","Shih Tzu","Teckel","Yorkshire Terrier"];
-const DEFAULT_CATS=["Abyssin","Bengal","Birman","Bleu Russe","British Shorthair","Chartreux","Maine Coon","Norvégien","Persan","Ragdoll","Siamois","Sphynx","Européen (DSH)"];
+const DEFAULT_DOGS=["Barbet","Beagle","Berger Allemand","Berger Australien","Border Collie","Boxer","Bouledogue Français","Cavalier King Charles","Chihuahua","Cocker","Dalmatien","Golden Retriever","Husky","Jack Russell","Labrador","Rottweiler","Shiba Inu","Shih Tzu","Teckel","Yorkshire Terrier"].sort((a,b)=>a.localeCompare(b,'fr'));
+const DEFAULT_CATS=["Abyssin","Bengal","Birman","Bleu Russe","British Shorthair","Chartreux","Européen (DSH)","Maine Coon","Norvégien","Persan","Ragdoll","Siamois","Sphynx"].sort((a,b)=>a.localeCompare(b,'fr'));
+
+function days(n){return n*24*3600*1000}
+function el(t,a={},c=[]){const n=document.createElement(t);for(const k in a){(k==='class')?n.className=a[k]:n.setAttribute(k,a[k])}c.forEach(x=>n.append(typeof x==='string'?document.createTextNode(x):x));return n;}
+function toast(m){alert(m)}
 
 function loadDB(){
   const raw=localStorage.getItem(DBKEY);
-  if(raw){ try{ return JSON.parse(raw) }catch(e){} }
-
-  // Migrer depuis v1.5 si présent
-  const prev=localStorage.getItem('ptv_petshop_v4') || localStorage.getItem('ptv_petshop_v3');
-  if(prev){
-    try{
-      const db=JSON.parse(prev);
-      db.lists=db.lists||{};
-      // injecter nouvelles listes si absentes
-      if(!Array.isArray(db.lists.breedsDog)) db.lists.breedsDog=[...DEFAULT_DOGS];
-      if(!Array.isArray(db.lists.breedsCat)) db.lists.breedsCat=[...DEFAULT_CATS];
-      localStorage.setItem(DBKEY, JSON.stringify(db));
-      return db;
-    }catch(e){}
-  }
-
-  // Base neuve
+  if(raw){ try{return JSON.parse(raw)}catch(e){} }
   return {
-    clients:[], produits:[], ventes:[],
-    lists:{
-      families:["Croquettes chiens","Croquettes chats","Laisses & colliers","Jouets"],
-      brands:["C Pro Food","Hill’s","Royal Canin","Purina","Autre"],
-      designations:["Adult Poulet 12kg","Sterilized Saumon 3kg","Balle caoutchouc","Collier néoprène M"],
-      breedsDog:[...DEFAULT_DOGS],
-      breedsCat:[...DEFAULT_CATS]
-    },
-    loyalty:{familyKey:"Croquettes", stampsPerFree:5, maxFreePerSale:1, stamps:{}}
+    clients:[],
+    produits:[],   // {id, nom, stock, min}
+    ventes:[],     // {id,date,clientId?, lignes:[{productId,qty}]}
+    lists:{breedsDog:[...DEFAULT_DOGS],breedsCat:[...DEFAULT_CATS]}
   };
 }
 let DB=loadDB();
 function saveDB(){ localStorage.setItem(DBKEY, JSON.stringify(DB)); renderAll(); }
 
-/* ================= Navigation ================= */
+/* ================== Navigation ================== */
 document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>{
   document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active')); t.classList.add('active');
   document.querySelectorAll('main section').forEach(s=>s.hidden=true);
   document.getElementById(t.dataset.tab).hidden=false;
 }));
 
-/* ================= Logo ================= */
-function loadLogo(){ const data=localStorage.getItem(LOGO_KEY)||DEFAULT_LOGO_DATAURL; const img=document.getElementById('logoImg'), prev=document.getElementById('logoPreview'); if(img) img.src=data; if(prev) prev.src=data; }
-function setLogoFromFile(file){ const r=new FileReader(); r.onload=()=>{ localStorage.setItem(LOGO_KEY,r.result); loadLogo(); toast('Logo enregistré 👍'); }; r.readAsDataURL(file); }
-document.getElementById('logoFile')?.addEventListener('change',e=>{const f=e.target.files?.[0]; if(f) setLogoFromFile(f);});
-document.getElementById('btnSaveLogo')?.addEventListener('click',()=>{const f=document.getElementById('logoFile').files?.[0]; if(!f) return toast('Choisis une image.'); setLogoFromFile(f);});
-document.getElementById('btnClearLogo')?.addEventListener('click',()=>{localStorage.removeItem(LOGO_KEY); loadLogo(); toast('Logo supprimé.');});
-document.getElementById('btnResetLogo')?.addEventListener('click',()=>{localStorage.setItem(LOGO_KEY,DEFAULT_LOGO_DATAURL); loadLogo(); toast('Logo par défaut.');});
-function download(filename,content){ const blob=new Blob([content],{type:'text/html;charset=utf-8'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=filename; document.body.appendChild(a); a.click(); setTimeout(()=>{URL.revokeObjectURL(a.href); a.remove();},0); }
-document.getElementById('btnEmbedHTML')?.addEventListener('click',()=>{
-  const logoData=localStorage.getItem(LOGO_KEY)||DEFAULT_LOGO_DATAURL;
-  const doc=document.documentElement.cloneNode(true);
-  doc.querySelector('#logoImg')?.setAttribute('src',logoData);
-  const html='<!doctype html>\n'+doc.outerHTML.replace(/const LOGO_KEY[\s\S]*?DEFAULT_LOGO_DATAURL[^;]*;/,'const LOGO_KEY=""; const DEFAULT_LOGO_DATAURL="";').replace(/loadLogo\(\);/g,'');
-  download('index.html',html); toast('HTML exporté avec logo intégré ✅');
+/* ================== Logo ================== */
+function defaultLogoDataUrl(){
+  const svg=`<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 128 128'>
+    <rect rx='16' width='128' height='128' fill='#333'/>
+    <text x='50%' y='54%' text-anchor='middle' font-family='Inter,Arial' font-weight='800' font-size='40' fill='#fff'>PTV</text>
+  </svg>`;
+  return 'data:image/svg+xml;utf8,'+encodeURIComponent(svg);
+}
+function loadLogo(){
+  const data=localStorage.getItem(LOGO_KEY) || defaultLogoDataUrl();
+  document.getElementById('logoImg').src=data;
+  document.getElementById('logoPreview').src=data;
+}
+function setLogoFromFile(file){
+  const r=new FileReader();
+  r.onload=()=>{ localStorage.setItem(LOGO_KEY, r.result); loadLogo(); toast('Logo enregistré 👍'); };
+  r.readAsDataURL(file);
+}
+document.getElementById('logoFile').addEventListener('change',e=>{
+  const f=e.target.files?.[0]; if(f) setLogoFromFile(f);
 });
-
-/* ================= Listes (familles / marques / designations / races) ================= */
-function renderSelectFromLists(){
-  const famSel=document.getElementById('p_famille'), brandSel=document.getElementById('p_marque'), dl=document.getElementById('dl_designations');
-  famSel.innerHTML=''; brandSel.innerHTML=''; dl.innerHTML='';
-  DB.lists.families.forEach(v=>{const o=el('option',{value:v}); o.textContent=v; famSel.appendChild(o);});
-  DB.lists.brands.forEach(v=>{const o=el('option',{value:v}); o.textContent=v; brandSel.appendChild(o);});
-  DB.lists.designations.forEach(v=>{const o=el('option'); o.value=v; dl.appendChild(o);});
-  // Aliment préféré (client)
-  document.querySelectorAll('.pet-brand').forEach(sel=>{
-    sel.innerHTML=''; DB.lists.brands.forEach(v=>{const o=el('option'); o.textContent=v; sel.appendChild(o);});
-  });
-}
-function buildEditor(key,containerId){
-  const cont=document.getElementById(containerId); cont.innerHTML='';
-  DB.lists[key].forEach((val,idx)=>{
-    const chip=el('div',{class:'chip drag',draggable:'true'});
-    const inp=el('input',{value:val});
-    inp.addEventListener('change',()=>{ DB.lists[key][idx]=(inp.value||'').trim(); saveDB(); renderSelectFromLists(); });
-    const del=el('span',{class:'x',title:'Supprimer'},['×']);
-    del.onclick=()=>{ DB.lists[key].splice(idx,1); saveDB(); renderListEditors(); renderSelectFromLists(); };
-    chip.append(inp,del); cont.appendChild(chip);
-    chip.addEventListener('dragstart',e=>{e.dataTransfer.setData('text/plain',idx);});
-    cont.addEventListener('dragover',e=>e.preventDefault());
-    cont.addEventListener('drop',e=>{e.preventDefault(); const from=+e.dataTransfer.getData('text/plain'); const to=idx; const arr=DB.lists[key]; arr.splice(to,0,arr.splice(from,1)[0]); saveDB(); renderListEditors(); renderSelectFromLists();});
-  });
-}
-function renderListEditors(){
-  buildEditor('families','editFamilies');
-  buildEditor('brands','editBrands');
-  buildEditor('designations','editDesignations');
-  buildEditor('breedsDog','editBreedsDog');
-  buildEditor('breedsCat','editBreedsCat');
-}
-document.querySelectorAll('button[data-add]').forEach(b=>{
-  b.addEventListener('click',()=>{
-    const key=b.getAttribute('data-add');
-    const v=prompt('Nouvelle entrée :'); if(v==null) return;
-    DB.lists[key].push((v||'').trim()); saveDB(); renderListEditors(); renderSelectFromLists(); // + menus marques
-    // Si on ajoute une race, mettre à jour les selects Race visibles
-    if(key==='breedsDog' || key==='breedsCat'){ refreshAllPetRaceSelects(); }
-  });
+document.getElementById('btnSaveLogo').addEventListener('click',()=>{
+  const f=document.getElementById('logoFile').files?.[0]; if(!f) return toast('Choisis une image'); setLogoFromFile(f);
 });
+document.getElementById('btnClearLogo').addEventListener('click',()=>{ localStorage.removeItem(LOGO_KEY); loadLogo(); toast('Logo supprimé (logo par défaut rétabli).'); });
 
-/* ================= Races (éditables) ================= */
-function getBreedsFor(espece){
-  return (espece==='Chien') ? (DB.lists.breedsDog||[]) : (DB.lists.breedsCat||[]);
-}
-function refreshAllPetRaceSelects(){
-  document.querySelectorAll('.pet-espece').forEach((espSel,i)=>{
-    const raceSel=espSel.closest('.card').querySelector('.pet-race');
-    const current=raceSel.value;
-    const list=getBreedsFor(espSel.value);
-    raceSel.innerHTML=''; list.forEach(r=>raceSel.appendChild(el('option',{value:r},[r])));
-    if(list.includes(current)) raceSel.value=current;
-  });
+/* ================== Anniversaire J-30 ================== */
+function nextBirthdayInfo(ts){
+  if(!ts) return {within:false,days:null};
+  const d=new Date(ts), today=new Date(), y=today.getFullYear();
+  const t0=new Date(y,today.getMonth(),today.getDate());
+  let next=new Date(y,d.getMonth(),d.getDate());
+  if(next < t0) next=new Date(y+1,d.getMonth(),d.getDate());
+  const dd=Math.round((next-t0)/days(1));
+  return {within: dd>=0 && dd<=30, days: dd};
 }
 
-/* ================= Clients (multi-animaux) ================= */
-const petsContainer = document.getElementById('petsContainer');
-function petCard(pet={}){
-  const card = el('div',{class:'card',style:'padding:10px'});
-  const topGrid = el('div',{class:'grid cols-3'});
-  const especeSel = el('select',{class:'pet-espece'});
-  ['Chien','Chat'].forEach(v=>especeSel.appendChild(el('option',{value:v},[v])));
-  especeSel.value = pet.espece||'Chien';
-
-  const raceSel = el('select',{class:'pet-race'});
-  function populateRace(){ const list=getBreedsFor(especeSel.value); raceSel.innerHTML=''; list.forEach(r=>raceSel.appendChild(el('option',{value:r},[r]))); raceSel.value = pet.race && getBreedsFor(especeSel.value).includes(pet.race)?pet.race:list[0]||''; }
-  populateRace(); especeSel.addEventListener('change',populateRace);
-
-  const nameInp = el('input',{class:'pet-name',placeholder:'Nom de l’animal',value:pet.name||''});
-  const dobInp  = el('input',{class:'pet-dob',type:'date',value: pet.dob? new Date(pet.dob).toISOString().slice(0,10):''});
-  const algInp  = el('input',{class:'pet-allergies',placeholder:'Allergies',value:pet.allergies||''});
-  const brandSel= el('select',{class:'pet-brand'}); // rempli par renderSelectFromLists
-  const noteInp = el('input',{class:'pet-note',placeholder:'Détails aliment (goût/produit)',value:pet.foodNote||''});
-
-  const delBtn  = el('button',{class:'ghost',style:'margin-top:6px'},['Supprimer cet animal']);
-  delBtn.addEventListener('click',()=>{ if(confirm('Supprimer cet animal ?')){ card.remove(); }});
-
-  topGrid.appendChild(el('div',{},[el('label',{},['Espèce']),especeSel]));
-  topGrid.appendChild(el('div',{},[el('label',{},['Race']),raceSel]));
-  topGrid.appendChild(el('div',{},[el('label',{},['Nom']),nameInp]));
-  topGrid.appendChild(el('div',{},[el('label',{},['Naissance']),dobInp]));
-  topGrid.appendChild(el('div',{},[el('label',{},['Allergies']),algInp]));
-  topGrid.appendChild(el('div',{},[el('label',{},['Aliment préféré – Marque']),brandSel]));
-  const full = el('div',{style:'grid-column:1/-1'},[el('label',{},['Détails aliment']),noteInp]);
-
-  card.appendChild(topGrid); card.appendChild(full); card.appendChild(delBtn);
+/* ================== Clients ================== */
+const petsContainer=document.getElementById('petsContainer');
+function petCard(p={}){
+  const card=el('div',{class:'card',style:'padding:10px'});
+  const grid=el('div',{class:'grid cols-3'});
+  const esp=el('select',{class:'pet-espece'}); ["Chien","Chat"].forEach(v=>esp.append(el('option',{value:v},[v]))); esp.value=p.espece||"Chien";
+  const race=el('select',{class:'pet-race'});
+  function fillRace(){
+    const list=(esp.value==='Chien'?DB.lists.breedsDog:DB.lists.breedsCat)||[];
+    race.innerHTML=''; list.forEach(r=>race.append(el('option',{value:r},[r])));
+    if(p.race && list.includes(p.race)) race.value=p.race;
+  }
+  fillRace(); esp.addEventListener('change',fillRace);
+  const name=el('input',{class:'pet-name',placeholder:'Nom',value:p.name||''});
+  const dob=el('input',{class:'pet-dob',type:'date',value: p.dob? new Date(p.dob).toISOString().slice(0,10):''});
+  grid.append(el('div',{},[el('label',{},['Espèce']),esp]));
+  grid.append(el('div',{},[el('label',{},['Race']),race]));
+  grid.append(el('div',{},[el('label',{},['Nom']),name]));
+  grid.append(el('div',{},[el('label',{},['Naissance']),dob]));
+  const del=el('button',{class:'ghost',style:'margin-top:8px'},['Supprimer cet animal']);
+  del.onclick=()=>{ if(confirm('Supprimer cet animal ?')) card.remove(); };
+  card.append(grid,del);
   return card;
 }
-document.getElementById('btnAddPet').addEventListener('click',()=>{ petsContainer.appendChild(petCard()); renderSelectFromLists(); });
+document.getElementById('btnAddPet').onclick=()=>{ petsContainer.appendChild(petCard()); };
 
-document.getElementById('c_tel').addEventListener('input',e=>{e.target.value=e.target.value.replace(/\D+/g,'').slice(0,10);});
 let editingClientId=null;
-function clearClientForm(){
-  ['c_nom','c_tel','c_email','c_addr'].forEach(id=>{const elx=document.getElementById(id); if(elx) elx.value='';});
-  petsContainer.innerHTML=''; editingClientId=null; document.getElementById('btnDeleteClient').disabled=true;
-  document.getElementById('cliStats').textContent='Sélectionnez un client…'; document.getElementById('cliStatsTitle').textContent='Statistiques client';
-}
-function readPetsFromUI(){
-  const cards=[...petsContainer.querySelectorAll('.card')];
-  return cards.map(c=>{
-    return {
-      name: c.querySelector('.pet-name').value.trim(),
-      espece: c.querySelector('.pet-espece').value,
-      race: c.querySelector('.pet-race').value,
-      dob: (c.querySelector('.pet-dob').value? new Date(c.querySelector('.pet-dob').value).getTime():null),
-      allergies: c.querySelector('.pet-allergies').value.trim(),
-      foodBrand: c.querySelector('.pet-brand').value,
-      foodNote: c.querySelector('.pet-note').value.trim()
-    };
-  });
-}
-function fillPetsUI(arr=[]){
-  petsContainer.innerHTML='';
-  (arr.length?arr:[{}]).forEach(p=>petsContainer.appendChild(petCard(p)));
-  renderSelectFromLists();
-  petsContainer.querySelectorAll('.pet-brand').forEach(sel=>{ if(!sel.value && sel.options[0]) sel.value=sel.options[0].value; });
-}
-function fillClientForm(c){
-  editingClientId=c.id;
-  document.getElementById('c_nom').value=c.nom||''; document.getElementById('c_tel').value=c.tel||''; document.getElementById('c_email').value=c.email||''; document.getElementById('c_addr').value=c.addr||'';
-  fillPetsUI(c.animaux||[{}]);
-  document.getElementById('btnDeleteClient').disabled=false; renderClientStats(c.id);
-}
+function clearClientForm(){ ['c_nom','c_tel','c_email','c_addr'].forEach(id=>document.getElementById(id).value=''); petsContainer.innerHTML=''; editingClientId=null; document.getElementById('btnDeleteClient').disabled=true; document.getElementById('cliStats').textContent='Sélectionnez un client…'; }
 document.getElementById('btnNewClient').onclick=clearClientForm;
 
+function readPetsFromUI(){
+  return [...petsContainer.querySelectorAll('.card')].map(c=>({
+    espece:c.querySelector('.pet-espece').value,
+    race:c.querySelector('.pet-race').value,
+    name:c.querySelector('.pet-name').value.trim(),
+    dob:c.querySelector('.pet-dob').value? new Date(c.querySelector('.pet-dob').value).getTime():null
+  }));
+}
+function fillPetsUI(arr=[]){ petsContainer.innerHTML=''; (arr.length?arr:[{}]).forEach(p=>petsContainer.appendChild(petCard(p))); }
+function fillClientForm(c){ editingClientId=c.id; document.getElementById('c_nom').value=c.nom||''; document.getElementById('c_tel').value=c.tel||''; document.getElementById('c_email').value=c.email||''; document.getElementById('c_addr').value=c.addr||''; fillPetsUI(c.animaux||[{}]); document.getElementById('btnDeleteClient').disabled=false; renderClientStats(c.id); }
+
 document.getElementById('btnSaveClient').onclick=()=>{
-  const tel=(document.getElementById('c_tel').value||'').trim();
-  if(tel && !/^0\d{8,9}$/.test(tel)){ return toast('Téléphone BE invalide : commence par 0 et comporte 9–10 chiffres (ou laissez vide).');}
   const id=editingClientId||Date.now();
+  const tel=(document.getElementById('c_tel').value||'').trim();
+  if(tel && !/^0\d{8,9}$/.test(tel)) return toast('Téléphone BE invalide : 0 + 9–10 chiffres (ou laisser vide).');
   const cli={ id,
     nom:(document.getElementById('c_nom').value||'').trim(),
     tel, email:(document.getElementById('c_email').value||'').trim(),
     addr:(document.getElementById('c_addr').value||'').trim(),
-    animaux: readPetsFromUI()
+    animaux:readPetsFromUI()
   };
   const idx=DB.clients.findIndex(x=>x.id===id); if(idx>=0) DB.clients[idx]=cli; else DB.clients.push(cli);
   saveDB(); clearClientForm();
 };
 document.getElementById('btnDeleteClient').onclick=()=>{
-  if(!editingClientId) return; if(!confirm('Supprimer ce client ?')) return;
-  DB.clients=DB.clients.filter(c=>c.id!==editingClientId); DB.ventes=DB.ventes.filter(v=>v.clientId!==editingClientId);
-  delete DB.loyalty.stamps[editingClientId]; saveDB(); clearClientForm();
+  if(!editingClientId) return;
+  if(!confirm('Supprimer ce client et ses ventes ?')) return;
+  DB.clients=DB.clients.filter(c=>c.id!==editingClientId);
+  DB.ventes=DB.ventes.filter(v=>v.clientId!==editingClientId);
+  saveDB(); clearClientForm();
 };
 
-/* ---- Anniversaires ---- */
-function nextBirthdayInfo(ts){
-  if(!ts) return {days:null, isSoon:false};
-  const b=new Date(ts);
-  const today=new Date(); const y=today.getFullYear();
-  let next=new Date(y, b.getMonth(), b.getDate());
-  const todayMid=new Date(y, today.getMonth(), today.getDate());
-  if(next < todayMid) next = new Date(y+1, b.getMonth(), b.getDate());
-  const diffDays = Math.round((next - todayMid)/days(1));
-  return {days:diffDays, isSoon: diffDays>=0 && diffDays<=7};
-}
 function renderClients(){
   const q=(document.getElementById('searchClient').value||'').toLowerCase();
   const tb=document.querySelector('#tblClients tbody'); tb.innerHTML='';
   DB.clients.filter(c=>{
-    const hay=(c.nom+' '+(c.email||'')+' '+(c.tel||'')+' '+(c.animaux||[]).map(a=>(a.name||'')+' '+(a.race||'')).join(' ')).toLowerCase();
+    const hay=((c.nom||'')+' '+(c.email||'')+' '+(c.tel||'')+' '+(c.animaux||[]).map(a=>(a.name||'')+' '+(a.race||'')).join(' ')).toLowerCase();
     return hay.includes(q);
   }).forEach(c=>{
-    // Construire la cellule animaux avec coloration SEULEMENT pour ceux en J-7..J
-    const animals=(c.animaux&&c.animaux.length? c.animaux : [{name:'—'}]).map(a=>{
-      const info=nextBirthdayInfo(a.dob);
-      const cls=info.isSoon?'red':'';
-      return `<span class="${cls}">${a.name||'—'}</span>`;
+    const animals=(c.animaux||[]).map(a=>{
+      const i=nextBirthdayInfo(a.dob);
+      return i.within ? `<span class="gift"><i class="icon"></i><span>${a.name||'—'}</span></span>` : (a.name||'—');
     }).join(', ');
-    const tr=el('tr'); tr.innerHTML=`<td>${c.nom||'—'}</td><td>${animals}</td><td>${c.tel||'—'}</td><td>${c.email||'—'}</td>`;
-    tr.addEventListener('click',()=>{ fillClientForm(c); document.querySelector('[data-tab="clients"]').click();});
-    tb.appendChild(tr);
+    const tr=el('tr'); tr.innerHTML=`<td>${c.nom||'—'}</td><td>${animals||'—'}</td><td>${c.tel||'—'}</td><td>${c.email||'—'}</td>`;
+    tr.onclick=()=>fillClientForm(c); tb.appendChild(tr);
   });
-  const sel=document.getElementById('v_client'); sel.innerHTML='';
-  DB.clients.forEach(c=>{ const o=el('option',{value:c.id},[c.nom||('Client '+c.id)]); sel.appendChild(o); });
+
+  // Ventes: clients
+  const sel=document.getElementById('v_client'); sel.innerHTML=''; sel.appendChild(el('option',{value:''},['— (aucun) —'])); DB.clients.forEach(c=> sel.appendChild(el('option',{value:c.id},[c.nom||('Client '+c.id)])));
 }
 
-/* ===== Stats client (inchangé, texte explicite) ===== */
 function renderClientStats(clientId){
   const c=DB.clients.find(x=>x.id===clientId); if(!c){document.getElementById('cliStats').textContent='Sélectionnez un client…'; return;}
   const t90=Date.now()-days(90);
-  const vv=DB.ventes.filter(v=>v.clientId===clientId); const vv90=vv.filter(v=>v.date>=t90);
-  const total=vv.reduce((s,v)=>s+v.total,0); const freq=vv90.length; const panier=vv.length?total/vv.length:0;
-  const btxt=(c.animaux||[]).map(a=>{ const i=nextBirthdayInfo(a.dob); if(a.dob==null) return null; return `${a.name||'—'}: ${i.days===0?'AUJOURD’HUI 🎉':'dans '+i.days+' j'}`; }).filter(Boolean).join(' • ') || '—';
-  const stamps=DB.loyalty.stamps[c.id]||0; const need=DB.loyalty.stampsPerFree; const free=Math.floor(stamps/need);
-  const html=`
+  const ventes90=DB.ventes.filter(v=>v.clientId===clientId && v.date>=t90).length;
+  const soon=(c.animaux||[]).map(a=>{const i=nextBirthdayInfo(a.dob); if(i.within) return `${a.name}: dans ${i.days} j`;}).filter(Boolean).join(' • ') || '—';
+  document.getElementById('cliStats').innerHTML=`
     <div class="grid cols-3">
-      <div class="card"><h2 style="font-size:12px;margin:0;color:var(--muted)">Total dépensé</h2><div style="font-size:20px;font-weight:800">${fmtEur(total)}</div></div>
-      <div class="card"><h2 style="font-size:12px;margin:0;color:var(--muted)">Fréquence (90j)</h2><div style="font-size:20px;font-weight:800">${freq}</div></div>
-      <div class="card"><h2 style="font-size:12px;margin:0;color:var(--muted)">Panier moyen</h2><div style="font-size:20px;font-weight:800">${fmtEur(panier)}</div></div>
-    </div>
-    <hr class="sep">
-    <div>Anniversaires à venir : <strong>${btxt}</strong></div>
-    <div style="margin-top:6px">Fidélité : <strong>${stamps%need}/${need} tampons</strong> • Gratuités dispo : <strong>${free}</strong></div>
-  `;
-  document.getElementById('cliStatsTitle').textContent='Statistiques • '+(c.nom||('Client '+c.id)); document.getElementById('cliStats').innerHTML=html;
+      <div class="card"><h3>Achats (90j)</h3><div style="font-size:22px;font-weight:800">${ventes90}</div></div>
+      <div class="card"><h3>Animaux</h3><div style="font-size:22px;font-weight:800">${(c.animaux||[]).length}</div></div>
+      <div class="card"><h3>Anniv. à venir</h3><div>${soon}</div></div>
+    </div>`;
 }
 
-/* ================= Produits, Ventes, Dashboard (identiques v1.5) ================= */
+/* ================== Produits ================== */
 let editingProductId=null;
-function clearProductForm(){ ['p_nom','p_prix','p_cost','p_tva','p_stock','p_min'].forEach(id=>document.getElementById(id).value=''); document.getElementById('p_famille').value=DB.lists.families[0]||''; document.getElementById('p_marque').value=DB.lists.brands[0]||''; editingProductId=null; document.getElementById('btnDeleteProduct').disabled=true; document.getElementById('p_id').value=''; }
-function fillProductForm(p){
-  document.getElementById('p_id').value=p.id; document.getElementById('p_famille').value=p.famille||''; document.getElementById('p_marque').value=p.marque||'';
-  document.getElementById('p_nom').value=p.nom||''; document.getElementById('p_prix').value=p.prixTTC||0; document.getElementById('p_cost').value=p.coutHT||0; document.getElementById('p_tva').value=p.tva||20; document.getElementById('p_stock').value=p.stock||0; document.getElementById('p_min').value=p.stockMin||0;
-  editingProductId=p.id; document.getElementById('btnDeleteProduct').disabled=false;
-}
-document.getElementById('btnClearProduct').onclick=clearProductForm;
+function clearProductForm(){ document.getElementById('p_id').value=''; document.getElementById('p_nom').value=''; document.getElementById('p_stock').value=0; document.getElementById('p_min').value=0; editingProductId=null; document.getElementById('btnDeleteProduct').disabled=true; }
+document.getElementById('btnNewProduct').onclick=clearProductForm;
+
 document.getElementById('btnSaveProduct').onclick=()=>{
-  const id = document.getElementById('p_id').value || (Date.now()|0);
-  const prev=DB.produits.find(p=>p.id==id);
+  const id=document.getElementById('p_id').value || (Date.now()|0);
   const nom=(document.getElementById('p_nom').value||'').trim();
-  if(nom && !DB.lists.designations.includes(nom)) DB.lists.designations.unshift(nom);
-  const p={id, famille:document.getElementById('p_famille').value, marque:document.getElementById('p_marque').value, nom, prixTTC:+(document.getElementById('p_prix').value||0), coutHT:+(document.getElementById('p_cost').value||0), tva:+(document.getElementById('p_tva').value||20), stock:+(document.getElementById('p_stock').value||0), stockMin:+(document.getElementById('p_min').value||0), archived:prev?!!prev.archived:false};
+  if(!nom) return toast('Nom du produit requis.');
+  const p={id, nom, stock:+(document.getElementById('p_stock').value||0), min:+(document.getElementById('p_min').value||0)};
   const i=DB.produits.findIndex(x=>x.id==id); if(i>=0) DB.produits[i]=p; else DB.produits.push(p);
+  DB.produits.sort((a,b)=>a.nom.localeCompare(b.nom,'fr',{sensitivity:'base'}));
   saveDB(); clearProductForm();
 };
 document.getElementById('btnDeleteProduct').onclick=()=>{
-  if(!editingProductId) return toast('Sélectionnez un produit'); const id=editingProductId;
-  const used=DB.ventes.some(v=>(v.lignes||[]).some(L=>L.productId==id));
-  if(used){ if(!confirm("Déjà vendu. L'ARCHIVER ?")) return; const p=DB.produits.find(x=>x.id==id); if(p){p.archived=true; saveDB(); toast('Archivé.');} }
-  else{ if(!confirm('Supprimer définitivement ?')) return; DB.produits=DB.produits.filter(p=>p.id!=id); saveDB(); toast('Supprimé.'); }
-  clearProductForm(); renderProduits();
+  if(!editingProductId) return;
+  const used=DB.ventes.some(v=>(v.lignes||[]).some(L=>L.productId==editingProductId));
+  if(used){ toast('Ce produit a déjà été vendu. Suppression interdite (pas d’archivage).'); return; }
+  if(!confirm('Supprimer définitivement ce produit ?')) return;
+  DB.produits=DB.produits.filter(p=>p.id!=editingProductId); saveDB(); clearProductForm();
 };
+function fillProductForm(p){ editingProductId=p.id; document.getElementById('btnDeleteProduct').disabled=false; document.getElementById('p_id').value=p.id; document.getElementById('p_nom').value=p.nom||''; document.getElementById('p_stock').value=p.stock||0; document.getElementById('p_min').value=p.min||0; }
+
+let alphaFilter='';
+function renderAlphaChips(){
+  const cont=document.getElementById('alphaChips'); cont.innerHTML='';
+  const letters='0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+  const all=el('div',{class:'chip'+(alphaFilter===''?' active':'')},['Tous']); all.onclick=()=>{alphaFilter='';renderProduits();}; cont.appendChild(all);
+  letters.forEach(ch=>{ const b=el('div',{class:'chip'+(alphaFilter===ch?' active':'')},[ch]); b.onclick=()=>{alphaFilter=(alphaFilter===ch?'':ch); renderProduits();}; cont.appendChild(b); });
+}
+function produitMatchesAlpha(nom){
+  if(!alphaFilter) return true;
+  const c=(nom||'').trim().charAt(0).toUpperCase();
+  if('0123456789'.includes(alphaFilter)) return '0123456789'.includes(c);
+  return c===alphaFilter;
+}
 function renderProduits(){
-  renderSelectFromLists();
-  const showArchived=document.getElementById('showArchived')?.checked;
-  const q=(document.getElementById('searchProduit')?.value||'').toLowerCase();
+  renderAlphaChips();
+  const q=(document.getElementById('searchProduit').value||'').toLowerCase();
   const tb=document.querySelector('#tblProduits tbody'); tb.innerHTML='';
-  DB.produits.filter(p=>showArchived||!p.archived).filter(p=>{const hay=((p.nom||'')+' '+(p.famille||'')+' '+(p.marque||'')).toLowerCase(); return hay.includes(q);})
-  .forEach(p=>{
-    const statut=p.archived?'<span class="badge" style="background:#fff7ed;border:1px solid #fed7aa;color:#7c2d12">Archivé</span>': ( (p.stock||0)<=0 ? '<span class="badge" style="background:#fee2e2;color:#7f1d1d;border:1px solid #fecaca">Stock épuisé</span>' : '<span class="badge" style="background:#ecfdf5;color:#065f46;border:1px solid #a7f3d0">Actif</span>' );
-    const tr=el('tr'); tr.innerHTML=`<td>${p.nom||'—'}</td><td>${p.famille||'—'}</td><td>${p.marque||''}</td><td>${fmtEur(p.prixTTC||0)}</td><td>${p.stock||0}</td><td>${statut}</td>`;
-    tr.addEventListener('click',()=>fillProductForm(p)); tb.appendChild(tr);
-  });
+  DB.produits.filter(p=> produitMatchesAlpha(p.nom)).filter(p=> (p.nom||'').toLowerCase().includes(q))
+    .sort((a,b)=>a.nom.localeCompare(b.nom,'fr',{sensitivity:'base'}))
+    .forEach(p=>{
+      const low=(p.stock||0)<(p.min||0);
+      const statut=low?'<span class="stock-low">Stock bas</span>':'OK';
+      const tr=el('tr'); tr.innerHTML=`<td>${p.nom}</td><td>${p.stock||0}</td><td>${p.min||0}</td><td>${statut}</td>`;
+      tr.onclick=()=>fillProductForm(p); tb.appendChild(tr);
+    });
 
-  // Remplir la liste de produits pour les ventes
-  const sel=document.getElementById('v_prod_select'); if(sel){ sel.innerHTML=''; DB.produits.filter(p=>!p.archived).forEach(p=>{ sel.appendChild(el('option',{value:p.id},[p.nom+' — '+(p.marque||'')+' — '+(p.famille||'')])); }); }
+  // Ventes: produits
+  const sel=document.getElementById('v_prod'); sel.innerHTML='';
+  DB.produits.forEach(p=> sel.appendChild(el('option',{value:p.id},[p.nom])) );
 }
-document.getElementById('searchProduit').addEventListener('input',renderProduits);
-document.getElementById('showArchived').addEventListener('change',renderProduits);
+document.getElementById('searchProduit').oninput=renderProduits;
 
-/* ================= Ventes + Fidélité ================= */
-const lines=[];
-function loyaltySummaryText(clientId){
-  const stamps=DB.loyalty.stamps[clientId]||0, need=DB.loyalty.stampsPerFree;
-  const free=Math.floor(stamps/need);
-  return `${stamps%need}/${need} tampons • Gratuités dispo : ${free}`;
-}
-function refreshLoyaltyUI(){
-  const cid=+document.getElementById('v_client').value||0;
-  document.querySelector('#v_loyalty span').textContent = cid? loyaltySummaryText(cid) : '—';
-  const freeAvailable = Math.floor((DB.loyalty.stamps[cid]||0)/DB.loyalty.stampsPerFree) > 0;
-  const cb=document.getElementById('useFree');
-  cb.disabled = !freeAvailable;
-  if(!freeAvailable) cb.checked=false;
-}
-document.getElementById('v_client').addEventListener('change',refreshLoyaltyUI);
-
-// Recherche produit live
-document.getElementById('v_prod_search').addEventListener('input',()=>{
-  const q=document.getElementById('v_prod_search').value.toLowerCase();
-  const sel=document.getElementById('v_prod_select'); sel.innerHTML='';
-  DB.produits.filter(p=>!p.archived).filter(p=> ((p.nom||'')+' '+(p.marque||'')+' '+(p.famille||'')).toLowerCase().includes(q))
-    .forEach(p=> sel.appendChild(el('option',{value:p.id},[p.nom+' — '+(p.marque||'')+' — '+(p.famille||'')])) );
+/* ================== Ventes ================== */
+document.getElementById('v_client').addEventListener('change',()=>{
+  const id=+document.getElementById('v_client').value||0;
+  const wrap=document.getElementById('v_client_info');
+  if(!id){ wrap.style.display='none'; return; }
+  const c=DB.clients.find(x=>x.id===id);
+  const list=(c?.animaux||[]).map(a=>{ const info=nextBirthdayInfo(a.dob); return info.within ? `<span class="gift"><i class="icon"></i><span>${a.name}</span></span>` : a.name; }).join(', ');
+  document.getElementById('v_client_animals').innerHTML=list||'—'; wrap.style.display='flex';
 });
-
-function refreshLines(){
-  const tb=document.querySelector('#tblLines tbody'); tb.innerHTML=''; let total=0;
-  lines.forEach((L,i)=>{ total+=L.total; const tr=el('tr'); tr.innerHTML=`<td>${L.nom}</td><td>${L.qty}</td><td>${fmtEur(L.pu)}</td><td>${fmtEur(L.remise)}</td><td>${fmtEur(L.total)}</td><td><button class="secondary" onclick="lines.splice(${i},1);refreshLines()">X</button></td>`; tb.appendChild(tr);});
-  document.getElementById('v_total').textContent=fmtEur(total);
-}
-document.getElementById('btnAddLine').onclick=()=>{
-  const pid=+document.getElementById('v_prod_select').value; const qty=parseInt(document.getElementById('v_qty').value||'1'); const remise=parseFloat(document.getElementById('v_disc').value||'0');
-  const p=DB.produits.find(x=>x.id==pid); if(!p) return toast('Produit introuvable'); if(p.archived) return toast('Produit archivé.');
-  const pu=p.prixTTC||0; const total=Math.max(0, pu*qty - remise);
-  lines.push({productId:pid,nom:p.nom||('Produit '+pid),qty,pu,remise,total,famille:p.famille||''}); refreshLines();
-};
-document.getElementById('btnClearLines').onclick=()=>{lines.length=0;refreshLines();};
-
-function estimateMargin(ls){ let m=0; for(const L of ls){ const p=DB.produits.find(x=>x.id==L.productId); if(!p) continue; const coutTTC=(p.coutHT||0)*(1+((p.tva||20)/100)); m+=Math.max(0,(p.prixTTC||0)-coutTTC)*L.qty - L.remise; } return Math.max(0,m); }
-
-/* Gratuités sur moins cher */
-function applyFreebiesOnLines(familyKey, maxFree){
-  const key=familyKey.toLowerCase();
-  const units=[];
-  lines.forEach((L,idx)=>{
-    if((L.famille||'').toLowerCase().includes(key)){
-      for(let k=0;k<L.qty;k++){ units.push({idx, pu:L.pu}); }
-    }
-  });
-  units.sort((a,b)=>a.pu-b.pu);
-  let applied=0;
-  for(const u of units){
-    if(applied>=maxFree) break;
-    const L=lines[u.idx];
-    L.remise += L.pu;
-    L.total = Math.max(0, L.pu*L.qty - L.remise);
-    applied++;
-  }
-  if(applied>0) refreshLines();
-  return applied;
-}
-
 document.getElementById('btnSaveSale').onclick=()=>{
-  if(!lines.length) return toast('Ajoutez des lignes');
-  const clientId=+document.getElementById('v_client').value; if(!clientId) return toast('Choisissez un client');
-
-  let usedFree=0;
-  const cb=document.getElementById('useFree');
-  if(cb.checked){
-    const stamps=DB.loyalty.stamps[clientId]||0, need=DB.loyalty.stampsPerFree||5;
-    const availFree=Math.floor(stamps/need);
-    if(availFree>0){
-      const maxPerSale=DB.loyalty.maxFreePerSale||1;
-      const toApply=Math.min(availFree, maxPerSale);
-      usedFree = applyFreebiesOnLines(DB.loyalty.familyKey||'Croquettes', toApply);
-    } else cb.checked=false;
-  }
-
-  const total=lines.reduce((s,L)=>s+L.total,0);
-  const vente={id:Date.now(), date:Date.now(), clientId, total, pay:document.getElementById('v_pay').value, lignes:[...lines], margeEstimee:estimateMargin(lines)};
-  for(const L of lines){ const p=DB.produits.find(x=>x.id==L.productId); if(p) p.stock=(p.stock||0)-L.qty; }
-
-  const famKey=(DB.loyalty.familyKey||'Croquettes').toLowerCase();
-  const stampsAdd = lines.filter(L=>(L.famille||'').toLowerCase().includes(famKey)).reduce((s,L)=>s+L.qty,0);
-  const need=DB.loyalty.stampsPerFree||5;
-  const prev = DB.loyalty.stamps[clientId]||0;
-  let newStamps = prev + stampsAdd - (usedFree*need);
-  DB.loyalty.stamps[clientId] = Math.max(0, newStamps);
-
-  DB.ventes.push(vente); lines.length=0; saveDB(); toast('Vente enregistrée.');
-  refreshLoyaltyUI();
+  const pid=+document.getElementById('v_prod').value; const qty=+document.getElementById('v_qty').value||1;
+  if(!pid) return toast('Choisissez un produit');
+  const p=DB.produits.find(x=>x.id==pid); if(!p) return toast('Produit introuvable');
+  p.stock=(p.stock||0)-qty;
+  const cid=+document.getElementById('v_client').value||null;
+  DB.ventes.push({id:Date.now(), date:Date.now(), clientId: cid||undefined, lignes:[{productId:pid, qty}]});
+  saveDB(); toast('Vente enregistrée (stock mis à jour).'); document.getElementById('v_qty').value=1;
 };
-document.getElementById('btnCancelSale').onclick=()=>{lines.length=0;refreshLines();};
+document.getElementById('btnCancelSale').onclick=()=>{ document.getElementById('v_qty').value=1; };
 
-function renderSales(){
-  const tb=document.querySelector('#tblSales tbody'); tb.innerHTML='';
-  [...DB.ventes].sort((a,b)=>b.date-a.date).slice(0,20).forEach(v=>{
-    const c=DB.clients.find(x=>x.id===v.clientId); const tr=el('tr'); tr.innerHTML=`<td>${new Date(v.date).toLocaleString()}</td><td>${c?(c.nom||'—'):'—'}</td><td>${fmtEur(v.total)}</td>`; tb.appendChild(tr);
+/* ================== Paramètres : Races (A→Z) ================== */
+function renderBreedEditor(key, containerId){
+  const cont=document.getElementById(containerId); cont.innerHTML='';
+  const arr=[...(DB.lists[key]||[])].sort((a,b)=>a.localeCompare(b,'fr',{sensitivity:'base'})); DB.lists[key]=arr;
+  arr.forEach((val,idx)=>{
+    const chip=el('div',{class:'chip'},[val]); chip.title='Cliquer pour renommer';
+    chip.onclick=()=>{ const nv=prompt('Renommer :', val); if(nv==null) return; const t=(nv||'').trim(); if(!t) return; DB.lists[key][idx]=t; DB.lists[key].sort((a,b)=>a.localeCompare(b,'fr',{sensitivity:'base'})); saveDB(); renderBreedEditor(key,containerId); refreshAllPetRaceSelects(); };
+    const del=el('span',{style:'margin-left:6px;cursor:pointer;color:var(--danger)'},['×']);
+    del.onclick=(e)=>{ e.stopPropagation(); if(confirm('Supprimer ?')){ DB.lists[key].splice(idx,1); saveDB(); renderBreedEditor(key,containerId); refreshAllPetRaceSelects(); } };
+    chip.appendChild(del); cont.appendChild(chip);
+  });
+}
+document.querySelectorAll('button[data-add]').forEach(b=>{
+  b.addEventListener('click',()=>{
+    const key=b.getAttribute('data-add'); const v=prompt('Nouvelle race :'); if(v==null) return;
+    DB.lists[key].push((v||'').trim()); DB.lists[key]=DB.lists[key].filter(Boolean).sort((a,b)=>a.localeCompare(b,'fr',{sensitivity:'base'})); saveDB(); renderBreedEditor(key,key==='breedsDog'?'editBreedsDog':'editBreedsCat'); refreshAllPetRaceSelects();
+  });
+});
+function refreshAllPetRaceSelects(){
+  document.querySelectorAll('.pet-espece').forEach(sel=>{
+    const race=sel.closest('.card').querySelector('.pet-race'); const list=(sel.value==='Chien'?DB.lists.breedsDog:DB.lists.breedsCat)||[]; const cur=race.value;
+    race.innerHTML=''; list.forEach(r=>race.append(el('option',{value:r},[r]))); if(list.includes(cur)) race.value=cur;
   });
 }
 
-/* ================= Dashboard ================= */
+/* ================== Export / Import FICHIER .txt ================== */
+function download(filename,content){ const blob=new Blob([content],{type:'text/plain;charset=utf-8'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=filename; document.body.appendChild(a); a.click(); setTimeout(()=>{URL.revokeObjectURL(a.href); a.remove();},0); }
+document.getElementById('btnExportTxt').addEventListener('click',()=>{
+  const data=JSON.stringify(DB,null,2);
+  const dt=new Date(); const stamp=`${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,'0')}-${String(dt.getDate()).padStart(2,'0')}`;
+  download(`ptv_sauvegarde_${stamp}.txt`, data);
+  toast('Fichier .txt téléchargé ✅');
+});
+document.getElementById('fileImport').addEventListener('change',e=>{
+  const f=e.target.files?.[0]; if(!f) return;
+  const r=new FileReader();
+  r.onload=()=>{ try{ DB=JSON.parse(String(r.result)); saveDB(); toast('Import .txt réussi ✅'); e.target.value=''; } catch(err){ toast('Fichier invalide (JSON requis à l’intérieur du .txt)'); } };
+  r.readAsText(f,'utf-8');
+});
+document.getElementById('btnExportJSON').addEventListener('click',()=>{ document.getElementById('exportArea').textContent=JSON.stringify(DB,null,2); });
+
+/* ================== Dashboard ================== */
 function renderDashboard(){
   const t30=Date.now()-days(30), t90=Date.now()-days(90);
-  const ventes30=DB.ventes.filter(v=>v.date>=t30);
-  const ca=ventes30.reduce((s,v)=>s+v.total,0);
-  const paniers=ventes30.length? ca/ventes30.length:0;
-  const marge=ventes30.reduce((s,v)=>s+v.margeEstimee,0);
-  const actifs=new Set(DB.ventes.filter(v=>v.date>=t90).map(v=>v.clientId)).size;
-  document.getElementById('kpiCA').textContent=fmtEur(ca);
-  document.getElementById('kpiPanier').textContent=fmtEur(paniers);
-  document.getElementById('kpiMarge').textContent=fmtEur(marge);
-  document.getElementById('kpiActifs').textContent=actifs;
+  // Clients actifs
+  const actifs=new Set(DB.ventes.filter(v=>v.date>=t90 && !!v.clientId).map(v=>v.clientId)).size; document.getElementById('kpiActifs').textContent=actifs;
 
-  const byProd={}; DB.ventes.forEach(v=>v.lignes.forEach(L=>{byProd[L.productId]=byProd[L.productId]||{nom:L.nom,q:0,e:0}; byProd[L.productId].q+=L.qty; byProd[L.productId].e+=L.total;}));
-  const tbp=document.querySelector('#tblTopProd tbody'); tbp.innerHTML='';
-  Object.values(byProd).sort((a,b)=>b.e-a.e).slice(0,10).forEach(x=>{const tr=el('tr'); tr.innerHTML=`<td>${x.nom}</td><td>${x.q}</td><td>${fmtEur(x.e)}</td>`; tbp.appendChild(tr);});
-  const byClient={}; DB.ventes.forEach(v=>{const c=DB.clients.find(x=>x.id===v.clientId); const key=c?(c.nom||('#'+v.clientId)):'#'+v.clientId; byClient[key]=byClient[key]||{nom:key,n:0,e:0}; byClient[key].n++; byClient[key].e+=v.total;});
-  const tbc=document.querySelector('#tblTopCli tbody'); tbc.innerHTML='';
-  Object.values(byClient).sort((a,b)=>b.e-a.e).slice(0,10).forEach(x=>{const tr=el('tr'); tr.innerHTML=`<td>${x.nom}</td><td>${x.n}</td><td>${fmtEur(x.e)}</td>`; tbc.appendChild(tr);});
+  // Top produits
+  const byProd={}; DB.ventes.filter(v=>v.date>=t30).forEach(v=>v.lignes.forEach(L=>{ const p=DB.produits.find(x=>x.id==L.productId); const name=p?p.nom:('Produit '+L.productId); byProd[name]=(byProd[name]||0)+(L.qty||0);})); const tp=Object.entries(byProd).sort((a,b)=>b[1]-a[1]).slice(0,10);
+  const tbp=document.querySelector('#tblTopProd tbody'); tbp.innerHTML=''; tp.forEach(([n,q])=>{ const tr=el('tr'); tr.innerHTML=`<td>${n}</td><td>${q}</td>`; tbp.appendChild(tr); }); document.getElementById('kpiTopProd').textContent=tp.length?`${tp[0][0]} (${tp[0][1]})`:'—';
+
+  // Top clients
+  const byCli={}; DB.ventes.filter(v=>v.date>=t30 && !!v.clientId).forEach(v=>{ const c=DB.clients.find(x=>x.id===v.clientId); const name=c?(c.nom||('#'+v.clientId)):'#'+v.clientId; byCli[name]=(byCli[name]||0)+1; }); const tc=Object.entries(byCli).sort((a,b)=>b[1]-a[1]).slice(0,10);
+  const tbc=document.querySelector('#tblTopCli tbody'); tbc.innerHTML=''; tc.forEach(([n,k])=>{ const tr=el('tr'); tr.innerHTML=`<td>${n}</td><td>${k}</td>`; tbc.appendChild(tr); }); document.getElementById('kpiTopCli').textContent=tc.length?`${tc[0][0]} (${tc[0][1]})`:'—';
+
+  // Anniversaires (30j)
+  const soon=[]; DB.clients.forEach(c=> (c.animaux||[]).forEach(a=>{ const i=nextBirthdayInfo(a.dob); if(i.within) soon.push({client:c.nom||'—', animal:a.name||'—', days:i.days}); }));
+  soon.sort((a,b)=>a.days-b.days || a.animal.localeCompare(b.animal,'fr'));
+  const tbb=document.querySelector('#tblBirthSoon tbody'); tbb.innerHTML=''; soon.forEach(x=>{ const tr=el('tr'); tr.innerHTML=`<td>${x.client}</td><td><span class="gift"><i class="icon"></i><span>${x.animal}</span></span></td><td>${x.days}</td>`; tbb.appendChild(tr); });
 }
 
-/* ================= Paramètres (fidélité + export/import + changelog) ================= */
-document.getElementById('btnSaveLoyalty').onclick=()=>{
-  DB.loyalty.familyKey=document.getElementById('loy_family').value||'Croquettes';
-  DB.loyalty.stampsPerFree=+document.getElementById('loy_need').value||5;
-  DB.loyalty.maxFreePerSale=+document.getElementById('loy_maxfree').value||1;
-  saveDB(); toast('Config fidélité enregistrée');
-};
-document.getElementById('btnExport').onclick=()=>{ document.getElementById('exportArea').textContent=JSON.stringify(DB,null,2); };
-document.getElementById('btnImport').onclick=()=>{ try{ DB=JSON.parse(document.getElementById('importArea').value); saveDB(); toast('Import OK'); }catch(e){ toast('JSON invalide'); } };
-document.getElementById('btnDemo').onclick=()=>{
-  DB.clients=[
-    {id:1, nom:'Alice Martin', tel:'', email:'', addr:'', animaux:[
-      {name:'Rex',espece:'Chien',race:'Border Collie',dob:Date.now()+days(5),allergies:'',foodBrand:'C Pro Food',foodNote:'Adult Poulet 12kg'},
-      {name:'Misty',espece:'Chat',race:'Maine Coon',dob:null,allergies:'',foodBrand:'Hill’s',foodNote:'Sterilized Saumon 3kg'}
-    ]},
-    {id:2, nom:'Bruno Leroy',  tel:'', email:'', addr:'', animaux:[
-      {name:'Moka',espece:'Chat',race:'Maine Coon',dob:null,allergies:'',foodBrand:'Hill’s',foodNote:'Sterilized Saumon 3kg'}
-    ]},
-  ];
-  DB.produits=[
-    {id:101,famille:'Croquettes chiens',marque:'C Pro Food',nom:'Adult Poulet 12kg',prixTTC:54.9,coutHT:30,tva:20,stock:6,stockMin:2},
-    {id:102,famille:'Croquettes chats',marque:'Hill’s',nom:'Sterilized Saumon 3kg',prixTTC:22.9,coutHT:12,tva:20,stock:10,stockMin:3},
-    {id:103,famille:'Laisses & colliers',marque:'WalkPro',nom:'Collier néoprène M',prixTTC:14.9,coutHT:6,tva:20,stock:8,stockMin:2},
-  ];
-  DB.lists.breedsDog=[...DEFAULT_DOGS];
-  DB.lists.breedsCat=[...DEFAULT_CATS];
-  DB.loyalty.stamps={1:5,2:0};
-  DB.ventes=[]; saveDB();
-};
-document.getElementById('btnResetData').onclick=()=>{ if(confirm('Effacer toutes les données ?')){ localStorage.removeItem(DBKEY); DB=loadDB(); renderAll(); } };
-
-/* ===== Changelog ===== */
-function renderChangelogHTML(){
-  const wrap=document.createElement('div');
-  CHANGELOG.forEach(block=>{
-    const h=el('h3',{},[block.ver]);
-    const ul=document.createElement('ul');
-    block.items.forEach(it=>ul.appendChild(el('li',{},[it])));
-    wrap.appendChild(h); wrap.appendChild(ul);
-  });
-  return wrap.innerHTML;
-}
-function showBannerIfNew(){
-  const seen=localStorage.getItem(VERSION_KEY)||'';
-  if(seen!==APP_VERSION){
-    document.getElementById('versOld').textContent=seen||'—';
-    document.getElementById('versNew').textContent=APP_VERSION;
-    document.getElementById('newVersionBanner').style.display='flex';
-  }
-}
-document.getElementById('btnDismissBanner').addEventListener('click',()=>{
-  localStorage.setItem(VERSION_KEY, APP_VERSION);
-  document.getElementById('newVersionBanner').style.display='none';
-});
-function openChangelogModal(){
-  document.getElementById('chgVer').textContent=APP_VERSION;
-  document.getElementById('chgBody').innerHTML=renderChangelogHTML();
-  document.getElementById('modalChange').style.display='flex';
-}
-document.getElementById('btnShowChangelog').addEventListener('click',openChangelogModal);
-document.getElementById('btnShowChangelog2').addEventListener('click',openChangelogModal);
-document.getElementById('btnCloseModal').addEventListener('click',()=>{ document.getElementById('modalChange').style.display='none'; });
-document.getElementById('btnOkModal').addEventListener('click',()=>{ localStorage.setItem(VERSION_KEY, APP_VERSION); document.getElementById('modalChange').style.display='none'; document.getElementById('newVersionBanner').style.display='none'; });
-document.getElementById('btnDontShow').addEventListener('click',()=>{ localStorage.setItem(VERSION_KEY, APP_VERSION); document.getElementById('modalChange').style.display='none'; document.getElementById('newVersionBanner').style.display='none'; });
-document.getElementById('btnResetSeen').addEventListener('click',()=>{ localStorage.removeItem(VERSION_KEY); toast('L’alerte sera réaffichée au prochain chargement.'); });
-
-/* ================= Rendu global ================= */
+/* ================== Global render ================== */
 document.getElementById('searchClient').oninput=renderClients;
 function renderAll(){
-  renderSelectFromLists(); renderListEditors();
-  renderClients(); renderProduits(); renderSales(); renderDashboard();
-  document.getElementById('loy_family').value=DB.loyalty.familyKey||'Croquettes';
-  document.getElementById('loy_need').value=DB.loyalty.stampsPerFree||5;
-  document.getElementById('loy_maxfree').value=DB.loyalty.maxFreePerSale||1;
-  refreshAllPetRaceSelects();
-  refreshLoyaltyUI();
+  // Clients
+  renderClients();
+  // Produits
+  renderProduits();
+  // Races
+  renderBreedEditor('breedsDog','editBreedsDog'); renderBreedEditor('breedsCat','editBreedsCat');
+  // Ventes lists
+  const vprod=document.getElementById('v_prod'); vprod.innerHTML=''; DB.produits.forEach(p=> vprod.appendChild(el('option',{value:p.id},[p.nom])));
+  const vcli=document.getElementById('v_client'); vcli.innerHTML=''; vcli.appendChild(el('option',{value:''},['— (aucun) —'])); DB.clients.forEach(c=> vcli.appendChild(el('option',{value:c.id},[c.nom||('Client '+c.id)])));
+  // Dashboard
+  renderDashboard();
+  // Logo preview
+  loadLogo();
 }
-renderAll();
-document.getElementById('appVer').textContent=APP_VERSION; document.getElementById('appVerFoot').textContent=APP_VERSION; document.getElementById('verNow').textContent=APP_VERSION; loadLogo();
-showBannerIfNew();
+document.addEventListener("DOMContentLoaded",()=>{
+  renderChangelog();
+  renderAll();
+  showVersionPopup(); // alerte si version nouvelle
+});
 </script>
 </body>
 </html>
