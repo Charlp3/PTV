@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>PASSE TEMPS VEGA — v1.8.4</title>
+<title>PASSE TEMPS VEGA — v1.8.5</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
 <style>
 :root{
@@ -75,7 +75,7 @@ footer{padding:14px;border-top:1px solid var(--border);display:flex;justify-cont
 <body>
 <header>
   <div class="logo" title="Logo"><img id="logoImg" alt="Logo PASSE TEMPS VEGA"></div>
-  <div class="brand"><h1>PASSE TEMPS VEGA <span class="badge">v1.8.4</span><a class="link" id="btnShowWhatsNew">Nouveautés</a></h1></div>
+  <div class="brand"><h1>PASSE TEMPS VEGA <span class="badge">v1.8.5</span><a class="link" id="btnShowWhatsNew">Nouveautés</a></h1></div>
   <nav class="tabs">
     <button class="tab active" data-tab="dash">Dashboard</button>
     <button class="tab" data-tab="clients">Clients</button>
@@ -249,15 +249,15 @@ footer{padding:14px;border-top:1px solid var(--border);display:flex;justify-cont
       <div>
         <h3>Sauvegarde / Restauration</h3>
         <div class="grid cols-3">
-          <button id="btnExportChoose" class="secondary">Sauvegarder (choisir l’emplacement)</button>
-          <button id="btnExportShare" class="secondary">Sauvegarder (iPhone/iPad)</button>
+          <button id="btnExportChoose" class="secondary">Sauvegarder (.json — choisir dossier)</button>
+          <button id="btnExportShare" class="secondary">Sauvegarder (.json — iPhone/iPad)</button>
           <label class="secondary" style="display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer">
-            <input type="file" id="fileImport" accept=".txt,text/plain,application/json" style="display:none">
+            <input type="file" id="fileImport" accept=".json,application/json,.txt,text/plain" style="display:none">
             Importer (choisir un fichier)
           </label>
           <button id="btnExportJSON" class="ghost">Afficher JSON</button>
         </div>
-        <small class="muted">iPhone/iPad : « Sauvegarder (iPhone/iPad) » → Partager → Enregistrer dans Fichiers (choisir le dossier).</small>
+        <small class="muted">iPhone/iPad : « Sauvegarder (.json — iPhone/iPad) » → Partager → Enregistrer dans Fichiers (choisissez le dossier).</small>
         <pre id="exportArea" style="max-height:220px;overflow:auto;background:#fff;border:1px solid var(--border);padding:8px;border-radius:8px;margin-top:8px"></pre>
       </div>
 
@@ -268,13 +268,13 @@ footer{padding:14px;border-top:1px solid var(--border);display:flex;justify-cont
       </div>
     </div>
     <hr class="sep">
-    <div>© PASSE TEMPS VEGA — v1.8.4 • © Pierre Charlier 2025 • Données locales</div>
+    <div>© PASSE TEMPS VEGA — v1.8.5 • © Pierre Charlier 2025 • Données locales</div>
   </section>
 </main>
 
 <footer>
-  <div>© PASSE TEMPS VEGA — v1.8.4 • © Pierre Charlier 2025</div>
-  <div><small class="muted">Sauvegarde .txt (choix dossier) • Logo intégré</small></div>
+  <div>© PASSE TEMPS VEGA — v1.8.5 • © Pierre Charlier 2025</div>
+  <div><small class="muted">Sauvegarde .json (choix dossier) • Logo intégré</small></div>
 </footer>
 
 <!-- Popup changelog -->
@@ -288,7 +288,7 @@ footer{padding:14px;border-top:1px solid var(--border);display:flex;justify-cont
 
 <script>
 /* ================== Version & Changelog ================== */
-const APP_VERSION="v1.8.4";
+const APP_VERSION="v1.8.5";
 const STORAGE_VERSION_SEEN="ptv_version_seen";
 const CHANGELOG={
   "v1.8":[
@@ -296,13 +296,9 @@ const CHANGELOG={
     "Restauration : choix de fichier",
     "Correctif icône 🎁 en Ventes"
   ],
-  "v1.8.3":[
-    "Export = snapshot localStorage (clients, ventes, produits, races, logo)"
-  ],
-  "v1.8.4":[
-    "Historique global des ventes (tableau)",
-    "Fiche client : tableau des achats (12 derniers mois)"
-  ]
+  "v1.8.3":[ "Export = snapshot localStorage (clients, ventes, produits, races, logo)" ],
+  "v1.8.4":[ "Historique global des ventes", "Fiche client : achats (12 derniers mois)" ],
+  "v1.8.5":[ "Export en .json (compat iOS) • Import tolérant (BOM, data-URL, wrappers)"]
 };
 function renderChangelog(){
   let html=""; const entries=Object.entries(CHANGELOG).sort((a,b)=>a[0]<b[0]?1:-1);
@@ -322,7 +318,7 @@ document.getElementById("btnShowWhatsNew").onclick=()=>showVersionPopup(true);
 document.getElementById("btnShowPopup").onclick=()=>showVersionPopup(true);
 
 /* ================== Données & helpers ================== */
-const DBKEY='ptv_simple_v184_txt';
+const DBKEY='ptv_simple_v185_json';
 const LOGO_KEY='ptv_logo_dataurl_v2';
 
 const DEFAULT_DOGS=["Barbet","Beagle","Berger Allemand","Berger Australien","Border Collie","Boxer","Bouledogue Français","Cavalier King Charles","Chihuahua","Cocker","Dalmatien","Golden Retriever","Husky","Jack Russell","Labrador","Rottweiler","Shiba Inu","Shih Tzu","Teckel","Yorkshire Terrier"].sort((a,b)=>a.localeCompare(b,'fr'));
@@ -644,78 +640,96 @@ function refreshAllPetRaceSelects(){
   });
 }
 
-/* ================== Sauvegarde / Restauration ================== */
+/* ================== Sauvegarde / Restauration (.json) ================== */
 function fileNameWithDate(){
   const d=new Date(); const y=d.getFullYear(), m=String(d.getMonth()+1).padStart(2,'0'), dd=String(d.getDate()).padStart(2,'0');
-  return `ptv_sauvegarde_${y}-${m}-${dd}.txt`;
+  return `ptv_sauvegarde_${y}-${m}-${dd}.json`;
 }
+// Desktop (Chrome/Edge/Safari macOS) : Enregistrer sous…
 async function exportChoosePath(){
-  const data=snapshotString(); const name=fileNameWithDate();
+  const data=snapshotString(), name=fileNameWithDate();
   if ('showSaveFilePicker' in window) {
     try{
       const handle=await window.showSaveFilePicker({
         suggestedName:name,
-        types:[{description:'Fichier texte', accept:{'text/plain':['.txt']}}]
+        types:[{description:'Sauvegarde PTV', accept:{'application/json':['.json']}}]
       });
-      const writable=await handle.createWritable();
-      await writable.write(data); await writable.close();
-      toast('Sauvegarde enregistrée ✅');
-      return;
+      const w=await handle.createWritable(); await w.write(data); await w.close();
+      alert('Sauvegarde enregistrée ✅'); return;
     }catch(e){ if(e?.name!=='AbortError') alert('Échec sauvegarde: '+e); }
   }
-  const blob=new Blob([data],{type:'text/plain;charset=utf-8'});
+  // Fallback téléchargement
+  const blob=new Blob([data],{type:'application/json;charset=utf-8'});
   const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=name;
   document.body.appendChild(a); a.click(); setTimeout(()=>{URL.revokeObjectURL(a.href); a.remove();},0);
 }
+// iPhone/iPad : Partager → Enregistrer dans Fichiers
 async function exportShareIOS(){
-  const data=snapshotString(); const name=fileNameWithDate();
-  const file=new File([data], name, { type:'text/plain' });
+  const data=snapshotString(), name=fileNameWithDate();
+  const file=new File([data], name, { type:'application/json' });
   if (navigator.canShare && navigator.canShare({ files:[file] })) {
     try{
-      await navigator.share({
-        files:[file],
-        title:'Sauvegarde PASSE TEMPS VEGA',
-        text:'Choisissez « Enregistrer dans Fichiers » puis votre dossier.'
-      });
-      toast('Partage lancé ✅');
+      await navigator.share({ files:[file], title:'Sauvegarde PASSE TEMPS VEGA' });
+      alert('Partage lancé ✅ (Enregistrer dans Fichiers).');
     }catch(e){ if(e?.name!=='AbortError') alert('Partage annulé/indisponible.'); }
   } else {
-    const blob=new Blob([data],{type:'text/plain;charset=utf-8'});
+    const blob=new Blob([data],{type:'application/json;charset=utf-8'});
     const url=URL.createObjectURL(blob);
-    window.open(url,'_blank');
-    toast('iOS : Partager → Enregistrer dans Fichiers.');
+    window.open(url,'_blank'); alert('iOS : Partager → Enregistrer dans Fichiers.');
   }
 }
+// Import (tolérant .json/.txt, BOM, data-URL, wrappers)
 async function importChooseFile(){
+  const parseSafe = (text) => {
+    text = text.replace(/^\uFEFF/, '').trim();        // 1) BOM
+    if (text.startsWith('data:')) {                   // 2) data URL ?
+      const m = text.match(/^data:.*?;base64,(.*)$/);
+      if (m) { try{ text = atob(m[1]); }catch{} }
+      else { const i=text.indexOf(','); if(i>-1) text=text.slice(i+1); }
+    }
+    try { return JSON.parse(text); } catch {}
+    const first=text.indexOf('{'), last=text.lastIndexOf('}');
+    if (first!==-1 && last!==-1 && last>first) {      // 3) extraction { ... }
+      const inner=text.slice(first,last+1);
+      try { return JSON.parse(inner); } catch {}
+    }
+    throw new Error('INVALID_JSON');
+  };
+
+  const doImport = async (file) => {
+    const text = await file.text();
+    let obj;
+    try { obj = parseSafe(text); }
+    catch { alert('Fichier invalide (JSON attendu).'); return; }
+
+    // Validation minimale
+    if (!obj || typeof obj!=='object' || !('clients' in obj) || !('produits' in obj) || !('ventes' in obj) || !('lists' in obj)) {
+      alert('Sauvegarde incomplète ou corrompue.'); return;
+    }
+    if (obj._logo) localStorage.setItem(LOGO_KEY, obj._logo);
+    DB = obj; localStorage.setItem(DBKEY, JSON.stringify(DB));
+    renderAll(); alert('Import réussi ✅');
+  };
+
   if ('showOpenFilePicker' in window){
     try{
       const [handle]=await window.showOpenFilePicker({
         multiple:false,
-        types:[{description:'Sauvegarde PTV', accept:{'text/plain':['.txt'],'application/json':['.json']}}]
+        types:[{ description:'Sauvegarde PTV', accept:{ 'application/json':['.json'], 'text/plain':['.txt'] } }]
       });
-      const file=await handle.getFile();
-      const text=await file.text();
-      DB=JSON.parse(text);
-      if(DB._logo) localStorage.setItem(LOGO_KEY, DB._logo);
-      saveDB(); toast('Import réussi ✅');
+      await doImport(await handle.getFile());
       return;
     }catch(e){ if(e?.name!=='AbortError') alert('Échec import: '+e); return; }
   }
-  document.getElementById('fileImport').click();
+  const inp=document.getElementById('fileImport');
+  inp.accept='.json,application/json,.txt,text/plain';
+  inp.onchange=async e=>{ const f=e.target.files?.[0]; if(f){ await doImport(f); e.target.value=''; } };
+  inp.click();
 }
 document.getElementById('btnExportChoose').addEventListener('click',exportChoosePath);
 document.getElementById('btnExportShare').addEventListener('click',exportShareIOS);
-document.getElementById('fileImport').addEventListener('change',e=>{
-  const f=e.target.files?.[0]; if(!f) return;
-  const r=new FileReader();
-  r.onload=()=>{ try{
-      DB=JSON.parse(String(r.result));
-      if(DB._logo) localStorage.setItem(LOGO_KEY, DB._logo);
-      saveDB(); toast('Import réussi ✅'); e.target.value='';
-    } catch(err){ toast('Fichier invalide (JSON attendu dans le .txt)'); } };
-  r.readAsText(f,'utf-8');
-});
 document.getElementById('btnExportJSON').addEventListener('click',()=>{ document.getElementById('exportArea').textContent=snapshotString(); });
+document.getElementById('fileImport').addEventListener('change',()=>{}); // géré dynamiquement
 
 /* ================== Dashboard & Global render ================== */
 function renderDashboard(){
@@ -735,6 +749,28 @@ function renderDashboard(){
 
 document.getElementById('searchClient').oninput=renderClients;
 
+function renderSales(){
+  const q=(document.getElementById('searchSales').value||'').toLowerCase();
+  const tb=document.querySelector('#tblSales tbody'); tb.innerHTML='';
+  const rows=[];
+  DB.ventes.forEach(v=>{
+    const cli=DB.clients.find(c=>c.id===v.clientId);
+    const cliName=cli?(cli.nom||('#'+v.clientId)):'—';
+    (v.lignes||[]).forEach(L=>{
+      const p=DB.produits.find(x=>x.id==L.productId);
+      rows.push({date:v.date, client:cliName, prod:p?p.nom:('Produit '+L.productId), qty:L.qty||1});
+    });
+  });
+  rows.sort((a,b)=>b.date-a.date);
+  rows.filter(r=>{
+    const hay=(formatDate(r.date)+' '+r.client+' '+r.prod+' '+r.qty).toLowerCase();
+    return hay.includes(q);
+  }).forEach(r=>{
+    const tr=el('tr'); tr.innerHTML=`<td>${formatDate(r.date)}</td><td>${r.client}</td><td>${r.prod}</td><td>${r.qty}</td>`;
+    tb.appendChild(tr);
+  });
+}
+
 function renderAll(){
   renderClients();
   renderProduits();
@@ -748,7 +784,7 @@ function renderAll(){
 document.addEventListener("DOMContentLoaded",()=>{
   renderChangelog();
   renderAll();
-  showVersionPopup(); // nouveautés v1.8.4
+  showVersionPopup(); // nouveautés v1.8.5
 });
 </script>
 </body>
