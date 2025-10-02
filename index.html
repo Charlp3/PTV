@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>PASSE TEMPS VEGA — v1.8.5</title>
+<title>PASSE TEMPS VEGA — v1.8.6</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
 <style>
 :root{
@@ -75,7 +75,7 @@ footer{padding:14px;border-top:1px solid var(--border);display:flex;justify-cont
 <body>
 <header>
   <div class="logo" title="Logo"><img id="logoImg" alt="Logo PASSE TEMPS VEGA"></div>
-  <div class="brand"><h1>PASSE TEMPS VEGA <span class="badge">v1.8.5</span><a class="link" id="btnShowWhatsNew">Nouveautés</a></h1></div>
+  <div class="brand"><h1>PASSE TEMPS VEGA <span class="badge">v1.8.6</span><a class="link" id="btnShowWhatsNew">Nouveautés</a></h1></div>
   <nav class="tabs">
     <button class="tab active" data-tab="dash">Dashboard</button>
     <button class="tab" data-tab="clients">Clients</button>
@@ -249,15 +249,15 @@ footer{padding:14px;border-top:1px solid var(--border);display:flex;justify-cont
       <div>
         <h3>Sauvegarde / Restauration</h3>
         <div class="grid cols-3">
-          <button id="btnExportChoose" class="secondary">Sauvegarder (.json — choisir dossier)</button>
-          <button id="btnExportShare" class="secondary">Sauvegarder (.json — iPhone/iPad)</button>
+          <button id="btnExportChoose" class="secondary">Sauvegarder (.txt — choisir dossier)</button>
+          <button id="btnExportShare" class="secondary">Sauvegarder (.txt — iPhone/iPad)</button>
           <label class="secondary" style="display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer">
-            <input type="file" id="fileImport" accept=".json,application/json,.txt,text/plain" style="display:none">
+            <input type="file" id="fileImport" accept=".txt,text/plain,.json,application/json" style="display:none">
             Importer (choisir un fichier)
           </label>
           <button id="btnExportJSON" class="ghost">Afficher JSON</button>
         </div>
-        <small class="muted">iPhone/iPad : « Sauvegarder (.json — iPhone/iPad) » → Partager → Enregistrer dans Fichiers (choisissez le dossier).</small>
+        <small class="muted">iPhone/iPad : « Sauvegarder (.txt — iPhone/iPad) » → Partager → Enregistrer dans Fichiers (choisissez le dossier).</small>
         <pre id="exportArea" style="max-height:220px;overflow:auto;background:#fff;border:1px solid var(--border);padding:8px;border-radius:8px;margin-top:8px"></pre>
       </div>
 
@@ -268,13 +268,13 @@ footer{padding:14px;border-top:1px solid var(--border);display:flex;justify-cont
       </div>
     </div>
     <hr class="sep">
-    <div>© PASSE TEMPS VEGA — v1.8.5 • © Pierre Charlier 2025 • Données locales</div>
+    <div>© PASSE TEMPS VEGA — v1.8.6 • © Pierre Charlier 2025 • Données locales</div>
   </section>
 </main>
 
 <footer>
-  <div>© PASSE TEMPS VEGA — v1.8.5 • © Pierre Charlier 2025</div>
-  <div><small class="muted">Sauvegarde .json (choix dossier) • Logo intégré</small></div>
+  <div>© PASSE TEMPS VEGA — v1.8.6 • © Pierre Charlier 2025</div>
+  <div><small class="muted">Sauvegarde .txt (choix dossier) • Logo intégré</small></div>
 </footer>
 
 <!-- Popup changelog -->
@@ -288,17 +288,13 @@ footer{padding:14px;border-top:1px solid var(--border);display:flex;justify-cont
 
 <script>
 /* ================== Version & Changelog ================== */
-const APP_VERSION="v1.8.5";
+const APP_VERSION="v1.8.6";
 const STORAGE_VERSION_SEEN="ptv_version_seen";
 const CHANGELOG={
-  "v1.8":[
-    "Sauvegarde : choix d’emplacement (File System Access) + fallback iOS",
-    "Restauration : choix de fichier",
-    "Correctif icône 🎁 en Ventes"
-  ],
-  "v1.8.3":[ "Export = snapshot localStorage (clients, ventes, produits, races, logo)" ],
-  "v1.8.4":[ "Historique global des ventes", "Fiche client : achats (12 derniers mois)" ],
-  "v1.8.5":[ "Export en .json (compat iOS) • Import tolérant (BOM, data-URL, wrappers)"]
+  "v1.8":  ["Sauvegarde : choix d’emplacement (File System Access) + fallback iOS","Restauration : choix de fichier","Correctif icône 🎁 en Ventes"],
+  "v1.8.4":["Historique global des ventes","Fiche client : achats (12 derniers mois)"],
+  "v1.8.5":["Compat iOS améliorée"],
+  "v1.8.6":["Import robuste iPhone : BOM/UTF-16/data-URL/texte parasite acceptés • retour au .txt"]
 };
 function renderChangelog(){
   let html=""; const entries=Object.entries(CHANGELOG).sort((a,b)=>a[0]<b[0]?1:-1);
@@ -318,7 +314,7 @@ document.getElementById("btnShowWhatsNew").onclick=()=>showVersionPopup(true);
 document.getElementById("btnShowPopup").onclick=()=>showVersionPopup(true);
 
 /* ================== Données & helpers ================== */
-const DBKEY='ptv_simple_v185_json';
+const DBKEY='ptv_simple_v186_txt';
 const LOGO_KEY='ptv_logo_dataurl_v2';
 
 const DEFAULT_DOGS=["Barbet","Beagle","Berger Allemand","Berger Australien","Border Collie","Boxer","Bouledogue Français","Cavalier King Charles","Chihuahua","Cocker","Dalmatien","Golden Retriever","Husky","Jack Russell","Labrador","Rottweiler","Shiba Inu","Shih Tzu","Teckel","Yorkshire Terrier"].sort((a,b)=>a.localeCompare(b,'fr'));
@@ -640,71 +636,81 @@ function refreshAllPetRaceSelects(){
   });
 }
 
-/* ================== Sauvegarde / Restauration (.json) ================== */
+/* ================== Sauvegarde / Restauration (.txt) ================== */
 function fileNameWithDate(){
   const d=new Date(); const y=d.getFullYear(), m=String(d.getMonth()+1).padStart(2,'0'), dd=String(d.getDate()).padStart(2,'0');
-  return `ptv_sauvegarde_${y}-${m}-${dd}.json`;
+  return `ptv_sauvegarde_${y}-${m}-${dd}.txt`;
 }
-// Desktop (Chrome/Edge/Safari macOS) : Enregistrer sous…
+// Desktop : Enregistrer sous…
 async function exportChoosePath(){
   const data=snapshotString(), name=fileNameWithDate();
   if ('showSaveFilePicker' in window) {
     try{
       const handle=await window.showSaveFilePicker({
         suggestedName:name,
-        types:[{description:'Sauvegarde PTV', accept:{'application/json':['.json']}}]
+        types:[{description:'Sauvegarde PTV', accept:{'text/plain':['.txt']}}]
       });
       const w=await handle.createWritable(); await w.write(data); await w.close();
       alert('Sauvegarde enregistrée ✅'); return;
     }catch(e){ if(e?.name!=='AbortError') alert('Échec sauvegarde: '+e); }
   }
-  // Fallback téléchargement
-  const blob=new Blob([data],{type:'application/json;charset=utf-8'});
+  const blob=new Blob([data],{type:'text/plain;charset=utf-8'});
   const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=name;
   document.body.appendChild(a); a.click(); setTimeout(()=>{URL.revokeObjectURL(a.href); a.remove();},0);
 }
 // iPhone/iPad : Partager → Enregistrer dans Fichiers
 async function exportShareIOS(){
   const data=snapshotString(), name=fileNameWithDate();
-  const file=new File([data], name, { type:'application/json' });
+  const file=new File([data], name, { type:'text/plain' });
   if (navigator.canShare && navigator.canShare({ files:[file] })) {
     try{
       await navigator.share({ files:[file], title:'Sauvegarde PASSE TEMPS VEGA' });
       alert('Partage lancé ✅ (Enregistrer dans Fichiers).');
     }catch(e){ if(e?.name!=='AbortError') alert('Partage annulé/indisponible.'); }
   } else {
-    const blob=new Blob([data],{type:'application/json;charset=utf-8'});
+    const blob=new Blob([data],{type:'text/plain;charset=utf-8'});
     const url=URL.createObjectURL(blob);
     window.open(url,'_blank'); alert('iOS : Partager → Enregistrer dans Fichiers.');
   }
 }
-// Import (tolérant .json/.txt, BOM, data-URL, wrappers)
+// Import (hyper tolérant : .txt/.json, BOM, data-URL, HTML/texte autour)
 async function importChooseFile(){
   const parseSafe = (text) => {
-    text = text.replace(/^\uFEFF/, '').trim();        // 1) BOM
-    if (text.startsWith('data:')) {                   // 2) data URL ?
+    // 1) supprime BOM éventuel / normalise
+    text = text.replace(/^\uFEFF/, '').trim();
+
+    // 2) data:URL ?
+    if (text.startsWith('data:')) {
       const m = text.match(/^data:.*?;base64,(.*)$/);
-      if (m) { try{ text = atob(m[1]); }catch{} }
+      if (m) { try { text = atob(m[1]); } catch {} }
       else { const i=text.indexOf(','); if(i>-1) text=text.slice(i+1); }
     }
+
+    // 3) essai direct
     try { return JSON.parse(text); } catch {}
-    const first=text.indexOf('{'), last=text.lastIndexOf('}');
-    if (first!==-1 && last!==-1 && last>first) {      // 3) extraction { ... }
-      const inner=text.slice(first,last+1);
-      try { return JSON.parse(inner); } catch {}
-    }
+
+    // 4) JSON noyé : bloc complet contenant "clients" et "lists"
+    const m2 = text.match(/{[\s\S]*?"clients"[\s\S]*?"lists"[\s\S]*?}/m);
+    if (m2) { try { return JSON.parse(m2[0]); } catch {} }
+
+    // 5) dernier recours : 1er { → dernier }
+    const a=text.indexOf('{'), b=text.lastIndexOf('}');
+    if (a!==-1 && b>a) { try { return JSON.parse(text.slice(a,b+1)); } catch {} }
+
     throw new Error('INVALID_JSON');
   };
 
   const doImport = async (file) => {
-    const text = await file.text();
+    const raw = await file.text();
     let obj;
-    try { obj = parseSafe(text); }
-    catch { alert('Fichier invalide (JSON attendu).'); return; }
+    try { obj = parseSafe(raw); }
+    catch { alert('Fichier invalide : JSON introuvable.'); return; }
 
     // Validation minimale
-    if (!obj || typeof obj!=='object' || !('clients' in obj) || !('produits' in obj) || !('ventes' in obj) || !('lists' in obj)) {
-      alert('Sauvegarde incomplète ou corrompue.'); return;
+    if (!obj || typeof obj!=='object' ||
+        !('clients' in obj) || !('produits' in obj) ||
+        !('ventes' in obj)  || !('lists' in obj)) {
+      alert('Sauvegarde incomplète/corrompue (clés manquantes).'); return;
     }
     if (obj._logo) localStorage.setItem(LOGO_KEY, obj._logo);
     DB = obj; localStorage.setItem(DBKEY, JSON.stringify(DB));
@@ -715,14 +721,14 @@ async function importChooseFile(){
     try{
       const [handle]=await window.showOpenFilePicker({
         multiple:false,
-        types:[{ description:'Sauvegarde PTV', accept:{ 'application/json':['.json'], 'text/plain':['.txt'] } }]
+        types:[{ description:'Sauvegarde PTV', accept:{ 'text/plain':['.txt'], 'application/json':['.json'] } }]
       });
       await doImport(await handle.getFile());
       return;
     }catch(e){ if(e?.name!=='AbortError') alert('Échec import: '+e); return; }
   }
   const inp=document.getElementById('fileImport');
-  inp.accept='.json,application/json,.txt,text/plain';
+  inp.accept='.txt,text/plain,.json,application/json';
   inp.onchange=async e=>{ const f=e.target.files?.[0]; if(f){ await doImport(f); e.target.value=''; } };
   inp.click();
 }
@@ -734,40 +740,40 @@ document.getElementById('fileImport').addEventListener('change',()=>{}); // gér
 /* ================== Dashboard & Global render ================== */
 function renderDashboard(){
   const t30=Date.now()-days(30), t90=Date.now()-days(90);
-  const actifs=new Set(DB.ventes.filter(v=>v.date>=t90 && !!v.clientId).map(v=>v.clientId)).size; document.getElementById('kpiActifs').textContent=actifs;
+  const actifs=new Set(DB.ventes.filter(v=>v.date>=t90 && !!v.clientId).map(v=>v.clientId)).size;
+  document.getElementById('kpiActifs').textContent=actifs;
 
-  const byProd={}; DB.ventes.filter(v=>v.date>=t30).forEach(v=>v.lignes.forEach(L=>{ const p=DB.produits.find(x=>x.id==L.productId); const name=p?p.nom:('Produit '+L.productId); byProd[name]=(byProd[name]||0)+(L.qty||0);})); const tp=Object.entries(byProd).sort((a,b)=>b[1]-a[1]).slice(0,10);
-  const tbp=document.querySelector('#tblTopProd tbody'); tbp.innerHTML=''; tp.forEach(([n,q])=>{ const tr=el('tr'); tr.innerHTML=`<td>${n}</td><td>${q}</td>`; tbp.appendChild(tr); }); document.getElementById('kpiTopProd').textContent=tp.length?`${tp[0][0]} (${tp[0][1]})`:'—';
+  const byProd={};
+  DB.ventes.filter(v=>v.date>=t30).forEach(v=>v.lignes.forEach(L=>{
+    const p=DB.produits.find(x=>x.id==L.productId);
+    const name=p?p.nom:('Produit '+L.productId);
+    byProd[name]=(byProd[name]||0)+(L.qty||1);
+  }));
+  const tp=Object.entries(byProd).sort((a,b)=>b[1]-a[1]).slice(0,10);
+  const tbp=document.querySelector('#tblTopProd tbody'); tbp.innerHTML='';
+  tp.forEach(([n,q])=>{ const tr=el('tr'); tr.innerHTML=`<td>${n}</td><td>${q}</td>`; tbp.appendChild(tr); });
+  document.getElementById('kpiTopProd').textContent=tp.length?`${tp[0][0]} (${tp[0][1]})`:'—';
 
-  const byCli={}; DB.ventes.filter(v=>v.date>=t30 && !!v.clientId).forEach(v=>{ const c=DB.clients.find(x=>x.id===v.clientId); const name=c?(c.nom||('#'+v.clientId)):'#'+v.clientId; byCli[name]=(byCli[name]||0)+1; }); const tc=Object.entries(byCli).sort((a,b)=>b[1]-a[1]).slice(0,10);
-  const tbc=document.querySelector('#tblTopCli tbody'); tbc.innerHTML=''; tc.forEach(([n,k])=>{ const tr=el('tr'); tr.innerHTML=`<td>${n}</td><td>${k}</td>`; tbc.appendChild(tr); }); document.getElementById('kpiTopCli').textContent=tc.length?`${tc[0][0]} (${tc[0][1]})`:'—';
-
-  const soon=[]; DB.clients.forEach(c=> (c.animaux||[]).forEach(a=>{ const i=nextBirthdayInfo(a.dob); if(i.within) soon.push({client:c.nom||'—', animal:a.name||'—', days:i.days}); }));
-  soon.sort((a,b)=>a.days-b.days || a.animal.localeCompare(b.animal,'fr'));
-  const tbb=document.querySelector('#tblBirthSoon tbody'); tbb.innerHTML=''; soon.forEach(x=>{ const tr=el('tr'); tr.innerHTML=`<td>${x.client}</td><td><span class="gift"><i class="icon"></i><span>${x.animal}</span></span></td><td>${x.days}</td>`; tbb.appendChild(tr); });
-}
-
-document.getElementById('searchClient').oninput=renderClients;
-
-function renderSales(){
-  const q=(document.getElementById('searchSales').value||'').toLowerCase();
-  const tb=document.querySelector('#tblSales tbody'); tb.innerHTML='';
-  const rows=[];
-  DB.ventes.forEach(v=>{
-    const cli=DB.clients.find(c=>c.id===v.clientId);
-    const cliName=cli?(cli.nom||('#'+v.clientId)):'—';
-    (v.lignes||[]).forEach(L=>{
-      const p=DB.produits.find(x=>x.id==L.productId);
-      rows.push({date:v.date, client:cliName, prod:p?p.nom:('Produit '+L.productId), qty:L.qty||1});
-    });
+  const byCli={};
+  DB.ventes.filter(v=>v.date>=t30 && !!v.clientId).forEach(v=>{
+    const c=DB.clients.find(x=>x.id===v.clientId);
+    const name=c?(c.nom||('#'+v.clientId)):'#'+v.clientId;
+    byCli[name]=(byCli[name]||0)+1;
   });
-  rows.sort((a,b)=>b.date-a.date);
-  rows.filter(r=>{
-    const hay=(formatDate(r.date)+' '+r.client+' '+r.prod+' '+r.qty).toLowerCase();
-    return hay.includes(q);
-  }).forEach(r=>{
-    const tr=el('tr'); tr.innerHTML=`<td>${formatDate(r.date)}</td><td>${r.client}</td><td>${r.prod}</td><td>${r.qty}</td>`;
-    tb.appendChild(tr);
+  const tc=Object.entries(byCli).sort((a,b)=>b[1]-a[1]).slice(0,10);
+  const tbc=document.querySelector('#tblTopCli tbody'); tbc.innerHTML='';
+  tc.forEach(([n,k])=>{ const tr=el('tr'); tr.innerHTML=`<td>${n}</td><td>${k}</td>`; tbc.appendChild(tr); });
+  document.getElementById('kpiTopCli').textContent=tc.length?`${tc[0][0]} (${tc[0][1]})`:'—';
+
+  const soon=[];
+  DB.clients.forEach(c=> (c.animaux||[]).forEach(a=>{
+    const i=nextBirthdayInfo(a.dob); if(i.within) soon.push({client:c.nom||'—', animal:a.name||'—', days:i.days});
+  }));
+  soon.sort((a,b)=>a.days-b.days || a.animal.localeCompare(b.animal,'fr'));
+  const tbb=document.querySelector('#tblBirthSoon tbody'); tbb.innerHTML='';
+  soon.forEach(x=>{
+    const tr=el('tr'); tr.innerHTML=`<td>${x.client}</td><td><span class="gift"><i class="icon"></i><span>${x.animal}</span></span></td><td>${x.days}</td>`;
+    tbb.appendChild(tr);
   });
 }
 
@@ -775,16 +781,21 @@ function renderAll(){
   renderClients();
   renderProduits();
   renderSales();
-  renderBreedEditor('breedsDog','editBreedsDog'); renderBreedEditor('breedsCat','editBreedsCat');
-  const vprod=document.getElementById('v_prod'); vprod.innerHTML=''; DB.produits.forEach(p=> vprod.appendChild(el('option',{value:p.id},[p.nom])));
-  const vcli=document.getElementById('v_client'); vcli.innerHTML=''; vcli.appendChild(el('option',{value:''},['— (aucun) —'])); DB.clients.forEach(c=> vcli.appendChild(el('option',{value:c.id},[c.nom||('Client '+c.id)])));
+  renderBreedEditor('breedsDog','editBreedsDog');
+  renderBreedEditor('breedsCat','editBreedsCat');
+  const vprod=document.getElementById('v_prod'); vprod.innerHTML='';
+  DB.produits.forEach(p=> vprod.appendChild(el('option',{value:p.id},[p.nom])));
+  const vcli=document.getElementById('v_client'); vcli.innerHTML='';
+  vcli.appendChild(el('option',{value:''},['— (aucun) —']));
+  DB.clients.forEach(c=> vcli.appendChild(el('option',{value:c.id},[c.nom||('Client '+c.id)])));
   renderDashboard();
   loadLogo();
 }
+
 document.addEventListener("DOMContentLoaded",()=>{
   renderChangelog();
   renderAll();
-  showVersionPopup(); // nouveautés v1.8.5
+  showVersionPopup(); // nouveautés v1.8.6
 });
 </script>
 </body>
