@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>PASSE TEMPS VEGA — v1.8.2</title>
+<title>PASSE TEMPS VEGA — v1.8.3</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
 <style>
 :root{
@@ -50,7 +50,7 @@ button.ghost{background:transparent;border:1px dashed var(--border);color:var(--
 .kpi .item{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px}
 .kpi .item h3{margin:0;color:#6b7280;font-size:12px}
 .kpi .item div{margin-top:6px;font-size:22px;font-weight:800}
-/* Gift icon */
+/* Gift icon (only where .gift is used) */
 .gift{display:inline-flex;align-items:center;gap:6px}
 .gift i{display:inline-block}
 @keyframes blink{0%,60%,100%{opacity:1}30%{opacity:.15}}
@@ -75,7 +75,7 @@ footer{padding:14px;border-top:1px solid var(--border);display:flex;justify-cont
 <body>
 <header>
   <div class="logo" title="Logo"><img id="logoImg" alt="Logo PASSE TEMPS VEGA"></div>
-  <div class="brand"><h1>PASSE TEMPS VEGA <span class="badge">v1.8.2</span><a class="link" id="btnShowWhatsNew">Nouveautés</a></h1></div>
+  <div class="brand"><h1>PASSE TEMPS VEGA <span class="badge">v1.8.3</span><a class="link" id="btnShowWhatsNew">Nouveautés</a></h1></div>
   <nav class="tabs">
     <button class="tab active" data-tab="dash">Dashboard</button>
     <button class="tab" data-tab="clients">Clients</button>
@@ -212,7 +212,7 @@ footer{padding:14px;border-top:1px solid var(--border);display:flex;justify-cont
           <button class="secondary" id="btnSaveLogo">Enregistrer le logo</button>
           <button class="ghost" id="btnClearLogo">Supprimer logo</button>
         </div>
-        <small class="muted">Logo par défaut intégré • téléversable et remplaçable localement.</small>
+        <small class="muted">Logo par défaut intégré • téléversable localement.</small>
       </div>
 
       <div>
@@ -243,7 +243,7 @@ footer{padding:14px;border-top:1px solid var(--border);display:flex;justify-cont
           </label>
           <button id="btnExportJSON" class="ghost">Afficher JSON</button>
         </div>
-        <small class="muted">Sur iPhone/iPad : « Sauvegarder (iPhone/iPad) » → Partager → Enregistrer dans Fichiers (choisir le dossier).</small>
+        <small class="muted">iPhone/iPad : « Sauvegarder (iPhone/iPad) » → Partager → Enregistrer dans Fichiers (choisir le dossier).</small>
         <pre id="exportArea" style="max-height:220px;overflow:auto;background:#fff;border:1px solid var(--border);padding:8px;border-radius:8px;margin-top:8px"></pre>
       </div>
 
@@ -254,12 +254,12 @@ footer{padding:14px;border-top:1px solid var(--border);display:flex;justify-cont
       </div>
     </div>
     <hr class="sep">
-    <div>© PASSE TEMPS VEGA — v1.8.2 • © Pierre Charlier 2025 • Données locales</div>
+    <div>© PASSE TEMPS VEGA — v1.8.3 • © Pierre Charlier 2025 • Données locales</div>
   </section>
 </main>
 
 <footer>
-  <div>© PASSE TEMPS VEGA — v1.8.2 • © Pierre Charlier 2025</div>
+  <div>© PASSE TEMPS VEGA — v1.8.3 • © Pierre Charlier 2025</div>
   <div><small class="muted">Sauvegarde .txt (choix dossier) • Logo intégré</small></div>
 </footer>
 
@@ -274,7 +274,7 @@ footer{padding:14px;border-top:1px solid var(--border);display:flex;justify-cont
 
 <script>
 /* ================== Version & Changelog ================== */
-const APP_VERSION="v1.8.2";
+const APP_VERSION="v1.8.3";
 const STORAGE_VERSION_SEEN="ptv_version_seen";
 const CHANGELOG={
   "v1.8":[
@@ -282,16 +282,14 @@ const CHANGELOG={
     "Restauration : choix de fichier",
     "Correctif icône 🎁 en Ventes"
   ],
-  "v1.8.2":[
-    "Logo par défaut intégré (SVG) — aucun fichier externe requis"
+  "v1.8.3":[
+    "Export sauvegarde = snapshot depuis localStorage (clients, ventes, produits, races, logo)",
+    "Bouton iPhone/iPad via feuille de partage • Import avec sélecteur de fichier"
   ]
 };
 function renderChangelog(){
-  let html="";
-  const entries=Object.entries(CHANGELOG).sort((a,b)=>a[0]<b[0]?1:-1);
-  for(const [ver,items] of entries){
-    html+=`<h4 style="margin:8px 0">${ver}</h4><ul>`+items.map(i=>`<li>${i}</li>`).join("")+"</ul>";
-  }
+  let html=""; const entries=Object.entries(CHANGELOG).sort((a,b)=>a[0]<b[0]?1:-1);
+  for(const [ver,items] of entries) html+=`<h4 style="margin:8px 0">${ver}</h4><ul>`+items.map(i=>`<li>${i}</li>`).join("")+"</ul>";
   document.getElementById("changelog").innerHTML=html;
 }
 function showVersionPopup(force=false){
@@ -307,7 +305,7 @@ document.getElementById("btnShowWhatsNew").onclick=()=>showVersionPopup(true);
 document.getElementById("btnShowPopup").onclick=()=>showVersionPopup(true);
 
 /* ================== Données & helpers ================== */
-const DBKEY='ptv_simple_v182_txt';
+const DBKEY='ptv_simple_v183_txt';
 const LOGO_KEY='ptv_logo_dataurl_v2';
 
 const DEFAULT_DOGS=["Barbet","Beagle","Berger Allemand","Berger Australien","Border Collie","Boxer","Bouledogue Français","Cavalier King Charles","Chihuahua","Cocker","Dalmatien","Golden Retriever","Husky","Jack Russell","Labrador","Rottweiler","Shiba Inu","Shih Tzu","Teckel","Yorkshire Terrier"].sort((a,b)=>a.localeCompare(b,'fr'));
@@ -317,18 +315,36 @@ function days(n){return n*24*3600*1000}
 function el(t,a={},c=[]){const n=document.createElement(t);for(const k in a){(k==='class')?n.className=a[k]:n.setAttribute(k,a[k])}c.forEach(x=>n.append(typeof x==='string'?document.createTextNode(x):x));return n;}
 function toast(m){alert(m)}
 
+/* ---------- Persistance ---------- */
 function loadDB(){
   const raw=localStorage.getItem(DBKEY);
   if(raw){ try{return JSON.parse(raw)}catch(e){} }
   return {
-    clients:[],
-    produits:[],
-    ventes:[],
-    lists:{breedsDog:[...DEFAULT_DOGS],breedsCat:[...DEFAULT_CATS]}
+    clients:[],          // {id, nom, tel, email, addr, animaux:[{espece,race,name,dob}]}
+    produits:[],         // {id, nom, stock, min}
+    ventes:[],           // {id,date,clientId?,lignes:[{productId,qty}]}
+    lists:{breedsDog:[...DEFAULT_DOGS],breedsCat:[...DEFAULT_CATS]},
+    // on stocke aussi le logo
+    _logo: localStorage.getItem(LOGO_KEY) || embeddedLogo()
   };
 }
 let DB=loadDB();
 function saveDB(){ localStorage.setItem(DBKEY, JSON.stringify(DB)); renderAll(); }
+
+/* ---------- Snapshot pour export : TOUTES les données ---------- */
+function getSnapshot(){
+  // Relecture du JSON persistant (source de vérité)
+  const raw=localStorage.getItem(DBKEY);
+  let snap = null;
+  try { snap = raw ? JSON.parse(raw) : null; } catch {}
+  if(!snap) snap = DB;
+
+  // S'assurer que le logo courant est présent
+  const currLogo = localStorage.getItem(LOGO_KEY);
+  if(currLogo) snap._logo = currLogo;
+  return snap;
+}
+function snapshotString(){ return JSON.stringify(getSnapshot(), null, 2); }
 
 /* ================== Navigation ================== */
 document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>{
@@ -337,36 +353,22 @@ document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>{
   document.getElementById(t.dataset.tab).hidden=false;
 }));
 
-/* ================== Logo ================== */
-/* Logo intégré (dessin chien & chat blanc sur fond gris arrondi) en SVG encodé */
+/* ================== Logo (intégré) ================== */
 function embeddedLogo(){
-  const svg=`<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'>
-    <rect x='16' y='16' width='480' height='480' rx='80' fill='#3a3a3a'/>
-    <g fill='none' stroke='#fff' stroke-width='18' stroke-linecap='round' stroke-linejoin='round'>
-      <!-- Tête chien -->
-      <path d='M150 220c-40 20-90 110-60 150 15 20 40 22 58 15 0 70 62 102 122 86 48-13 60-56 56-98 12-8 18-24 18-40 0-40-30-90-56-110-18 10-24 28-24 28-26-42-60-56-114-31z' fill='#fff'/>
-      <circle cx='220' cy='260' r='8' fill='#3a3a3a'/>
-      <circle cx='260' cy='260' r='8' fill='#3a3a3a'/>
-      <path d='M232 318c16 6 32 6 48 0 12 20-4 38-24 38s-36-18-24-38z' fill='#3a3a3a'/>
-      <path d='M256 356v20'/>
-      <!-- Tête chat -->
-      <path d='M372 180c-20 20-28 80-28 100 30-6 62-6 92 0 10-24 36-60 64-80 14 22 10 90 4 116 16 22 24 66 0 98-40 54-144 54-192 0-36-40-18-120 16-164 0-28 16-58 44-70z' fill='#fff'/>
-      <circle cx='364' cy='284' r='10' fill='#3a3a3a'/>
-      <circle cx='424' cy='284' r='10' fill='#3a3a3a'/>
-      <path d='M394 312c0 8 8 16 16 16s16-8 16-16' />
-      <path d='M350 308h88M350 328h88' />
-    </g>
+  const svg=`<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 128 128'>
+    <rect rx='16' width='128' height='128' fill='#333'/>
+    <text x='50%' y='54%' text-anchor='middle' font-family='Inter,Arial' font-weight='800' font-size='40' fill='#fff'>PTV</text>
   </svg>`;
   return 'data:image/svg+xml;utf8,'+encodeURIComponent(svg);
 }
 function loadLogo(){
-  const data=localStorage.getItem(LOGO_KEY) || embeddedLogo();
+  const data = localStorage.getItem(LOGO_KEY) || DB._logo || embeddedLogo();
   document.getElementById('logoImg').src=data;
   document.getElementById('logoPreview').src=data;
 }
 function setLogoFromFile(file){
   const r=new FileReader();
-  r.onload=()=>{ localStorage.setItem(LOGO_KEY, r.result); loadLogo(); toast('Logo enregistré 👍'); };
+  r.onload=()=>{ localStorage.setItem(LOGO_KEY, r.result); DB._logo=r.result; saveDB(); toast('Logo enregistré 👍'); };
   r.readAsDataURL(file);
 }
 document.getElementById('logoFile').addEventListener('change',e=>{
@@ -375,7 +377,9 @@ document.getElementById('logoFile').addEventListener('change',e=>{
 document.getElementById('btnSaveLogo').addEventListener('click',()=>{
   const f=document.getElementById('logoFile').files?.[0]; if(!f) return toast('Choisis une image'); setLogoFromFile(f);
 });
-document.getElementById('btnClearLogo').addEventListener('click',()=>{ localStorage.removeItem(LOGO_KEY); loadLogo(); toast('Logo par défaut rétabli.'); });
+document.getElementById('btnClearLogo').addEventListener('click',()=>{
+  localStorage.removeItem(LOGO_KEY); DB._logo=embeddedLogo(); saveDB(); toast('Logo par défaut rétabli.');
+});
 
 /* ================== Anniversaires J-30 ================== */
 function nextBirthdayInfo(ts){
@@ -465,7 +469,7 @@ function renderClients(){
     tr.onclick=()=>fillClientForm(c); tb.appendChild(tr);
   });
 
-  // Ventes: clients
+  // Ventes: clients (liste déroulante)
   const sel=document.getElementById('v_client'); sel.innerHTML=''; sel.appendChild(el('option',{value:''},['— (aucun) —'])); DB.clients.forEach(c=> sel.appendChild(el('option',{value:c.id},[c.nom||('Client '+c.id)])));
 }
 
@@ -499,7 +503,7 @@ document.getElementById('btnSaveProduct').onclick=()=>{
 document.getElementById('btnDeleteProduct').onclick=()=>{
   if(!editingProductId) return;
   const used=DB.ventes.some(v=>(v.lignes||[]).some(L=>L.productId==editingProductId));
-  if(used){ toast('Ce produit a déjà été vendu. Suppression interdite (pas d’archivage).'); return; }
+  if(used){ toast('Ce produit a déjà été vendu. Suppression interdite.'); return; }
   if(!confirm('Supprimer définitivement ce produit ?')) return;
   DB.produits=DB.produits.filter(p=>p.id!=editingProductId); saveDB(); clearProductForm();
 };
@@ -532,8 +536,7 @@ function renderProduits(){
     });
 
   // Ventes: produits
-  const sel=document.getElementById('v_prod'); sel.innerHTML='';
-  DB.produits.forEach(p=> sel.appendChild(el('option',{value:p.id},[p.nom])) );
+  const sel=document.getElementById('v_prod'); sel.innerHTML=''; DB.produits.forEach(p=> sel.appendChild(el('option',{value:p.id},[p.nom])) );
 }
 document.getElementById('searchProduit').oninput=renderProduits;
 
@@ -586,15 +589,14 @@ function refreshAllPetRaceSelects(){
   });
 }
 
-/* ================== Sauvegarde/Restauration ================== */
+/* ================== Sauvegarde / Restauration ================== */
 function fileNameWithDate(){
   const d=new Date(); const y=d.getFullYear(), m=String(d.getMonth()+1).padStart(2,'0'), dd=String(d.getDate()).padStart(2,'0');
   return `ptv_sauvegarde_${y}-${m}-${dd}.txt`;
 }
 // Desktop (Chrome/Edge) : Enregistrer sous…
 async function exportChoosePath(){
-  const data=JSON.stringify(DB,null,2);
-  const name=fileNameWithDate();
+  const data=snapshotString(); const name=fileNameWithDate();
   if ('showSaveFilePicker' in window) {
     try{
       const handle=await window.showSaveFilePicker({
@@ -602,8 +604,7 @@ async function exportChoosePath(){
         types:[{description:'Fichier texte', accept:{'text/plain':['.txt']}}]
       });
       const writable=await handle.createWritable();
-      await writable.write(data);
-      await writable.close();
+      await writable.write(data); await writable.close();
       toast('Sauvegarde enregistrée ✅');
       return;
     }catch(e){ if(e?.name!=='AbortError') alert('Échec sauvegarde: '+e); }
@@ -615,25 +616,22 @@ async function exportChoosePath(){
 }
 // iOS : feuille de partage → Enregistrer dans Fichiers
 async function exportShareIOS(){
-  const data = JSON.stringify(DB, null, 2);
-  const name = fileNameWithDate();
-  const file = new File([data], name, { type: 'text/plain' });
-  if (navigator.canShare && navigator.canShare({ files: [file] })) {
-    try {
+  const data=snapshotString(); const name=fileNameWithDate();
+  const file=new File([data], name, { type:'text/plain' });
+  if (navigator.canShare && navigator.canShare({ files:[file] })) {
+    try{
       await navigator.share({
-        files: [file],
-        title: 'Sauvegarde PASSE TEMPS VEGA',
-        text: 'Choisissez « Enregistrer dans Fichiers » puis le dossier de votre choix.'
+        files:[file],
+        title:'Sauvegarde PASSE TEMPS VEGA',
+        text:'Choisissez « Enregistrer dans Fichiers » puis votre dossier.'
       });
-      toast('Partage lancé ✅ (choisissez votre dossier dans Fichiers).');
-    } catch (e) {
-      if (e?.name !== 'AbortError') alert('Partage annulé/indisponible.');
-    }
+      toast('Partage lancé ✅');
+    }catch(e){ if(e?.name!=='AbortError') alert('Partage annulé/indisponible.'); }
   } else {
-    const blob = new Blob([data], { type: 'text/plain;charset=utf-8' });
-    const url = URL.createObjectURL(blob);
-    window.open(url, '_blank'); // puis Partager → Enregistrer dans Fichiers
-    toast('iOS : utilise Partager → Enregistrer dans Fichiers.');
+    const blob=new Blob([data],{type:'text/plain;charset=utf-8'});
+    const url=URL.createObjectURL(blob);
+    window.open(url,'_blank'); // puis Partager → Enregistrer dans Fichiers
+    toast('iOS : utilisez Partager → Enregistrer dans Fichiers.');
   }
 }
 // Import
@@ -647,6 +645,8 @@ async function importChooseFile(){
       const file=await handle.getFile();
       const text=await file.text();
       DB=JSON.parse(text);
+      // réinjecter le logo si présent
+      if(DB._logo) localStorage.setItem(LOGO_KEY, DB._logo);
       saveDB(); toast('Import réussi ✅');
       return;
     }catch(e){ if(e?.name!=='AbortError') alert('Échec import: '+e); return; }
@@ -658,10 +658,15 @@ document.getElementById('btnExportShare').addEventListener('click',exportShareIO
 document.getElementById('fileImport').addEventListener('change',e=>{
   const f=e.target.files?.[0]; if(!f) return;
   const r=new FileReader();
-  r.onload=()=>{ try{ DB=JSON.parse(String(r.result)); saveDB(); toast('Import réussi ✅'); e.target.value=''; } catch(err){ toast('Fichier invalide (JSON attendu dans le .txt)'); } };
+  r.onload=()=>{ try{
+      DB=JSON.parse(String(r.result));
+      if(DB._logo) localStorage.setItem(LOGO_KEY, DB._logo);
+      saveDB(); toast('Import réussi ✅');
+      e.target.value='';
+    } catch(err){ toast('Fichier invalide (JSON attendu dans le .txt)'); } };
   r.readAsText(f,'utf-8');
 });
-document.getElementById('btnExportJSON').addEventListener('click',()=>{ document.getElementById('exportArea').textContent=JSON.stringify(DB,null,2); });
+document.getElementById('btnExportJSON').addEventListener('click',()=>{ document.getElementById('exportArea').textContent=snapshotString(); });
 
 /* ================== Dashboard ================== */
 function renderDashboard(){
@@ -693,7 +698,7 @@ function renderAll(){
 document.addEventListener("DOMContentLoaded",()=>{
   renderChangelog();
   renderAll();
-  showVersionPopup(); // nouveautés v1.8.2
+  showVersionPopup(); // nouveautés v1.8.3
 });
 </script>
 </body>
