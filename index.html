@@ -3,11 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>PASSE TEMPS VEGA — v1.7</title>
+<title>PASSE TEMPS VEGA — v1.8</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
 <style>
 :root{
-  /* Jaune / ocre lisible (textes sombres) */
   --bg:#FFF8DC; --card:#FFEFB3; --elev:#FFE082; --border:#D8B84A;
   --text:#1F2937; --muted:#4B5563;
   --btn:#D97706; --btnH:#B45309;
@@ -55,7 +54,7 @@ button.ghost{background:transparent;border:1px dashed var(--border);color:var(--
 .kpi .item h3{margin:0;color:#6b7280;font-size:12px}
 .kpi .item div{margin-top:6px;font-size:22px;font-weight:800}
 
-/* Gift icon (blink) */
+/* Gift icon (blink) — s’affiche seulement dans les balises .gift attachées à chaque animal */
 .gift{display:inline-flex;align-items:center;gap:6px}
 .gift i{display:inline-block}
 @keyframes blink{0%,60%,100%{opacity:1}30%{opacity:.15}}
@@ -83,7 +82,7 @@ footer{padding:14px;border-top:1px solid var(--border);display:flex;justify-cont
 <body>
 <header>
   <div class="logo" title="Logo"><img id="logoImg" alt="Logo PASSE TEMPS VEGA"></div>
-  <div class="brand"><h1>PASSE TEMPS VEGA <span class="badge" id="verBadge">v1.7</span><a class="link" id="btnShowWhatsNew">Nouveautés</a></h1></div>
+  <div class="brand"><h1>PASSE TEMPS VEGA <span class="badge" id="verBadge">v1.8</span><a class="link" id="btnShowWhatsNew">Nouveautés</a></h1></div>
   <nav class="tabs">
     <button class="tab active" data-tab="dash">Dashboard</button>
     <button class="tab" data-tab="clients">Clients</button>
@@ -195,7 +194,8 @@ footer{padding:14px;border-top:1px solid var(--border);display:flex;justify-cont
         <select id="v_client"></select>
       </div>
       <div style="grid-column:1/-1">
-        <div id="v_client_info" class="gift" style="display:none"><i class="icon"></i><span id="v_client_animals"></span></div>
+        <!-- FIX v1.8 : plus d’icône globale ici -->
+        <div id="v_client_info" style="display:none"><span id="v_client_animals"></span></div>
       </div>
       <div style="grid-column:1/-1"><label>Produit</label><select id="v_prod"></select></div>
       <div><label>Quantité</label><input id="v_qty" type="number" value="1" min="1"></div>
@@ -243,13 +243,14 @@ footer{padding:14px;border-top:1px solid var(--border);display:flex;justify-cont
       <div>
         <h3>Sauvegarde / Restauration</h3>
         <div class="grid cols-3">
-          <button id="btnExportTxt" class="secondary">Télécharger sauvegarde (.txt)</button>
+          <button id="btnExportChoose" class="secondary">Sauvegarder (choisir l’emplacement)</button>
           <label class="secondary" style="display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer">
             <input type="file" id="fileImport" accept=".txt,text/plain,application/json" style="display:none">
-            Importer depuis un fichier .txt
+            Importer (choisir un fichier)
           </label>
           <button id="btnExportJSON" class="ghost">Afficher JSON</button>
         </div>
+        <small class="muted">Sur iPhone/Safari, après sauvegarde un onglet s’ouvre : fais <em>Partager → Enregistrer dans Fichiers</em> pour choisir le dossier.</small>
         <pre id="exportArea" style="max-height:220px;overflow:auto;background:#fff;border:1px solid var(--border);padding:8px;border-radius:8px;margin-top:8px"></pre>
       </div>
 
@@ -260,13 +261,13 @@ footer{padding:14px;border-top:1px solid var(--border);display:flex;justify-cont
       </div>
     </div>
     <hr class="sep">
-    <div>© PASSE TEMPS VEGA — v1.7 • © Pierre Charlier 2025 • Données locales (aucun serveur)</div>
+    <div>© PASSE TEMPS VEGA — v1.8 • © Pierre Charlier 2025 • Données locales (aucun serveur)</div>
   </section>
 </main>
 
 <footer>
-  <div>© PASSE TEMPS VEGA — v1.7 • © Pierre Charlier 2025</div>
-  <div><small class="muted">Jaune/ocre lisible • Sauvegarde .txt • Logo intégré</small></div>
+  <div>© PASSE TEMPS VEGA — v1.8 • © Pierre Charlier 2025</div>
+  <div><small class="muted">Sauvegarde .txt (choix dossier) • Logo intégré</small></div>
 </footer>
 
 <!-- Popup changelog -->
@@ -280,28 +281,23 @@ footer{padding:14px;border-top:1px solid var(--border);display:flex;justify-cont
 
 <script>
 /* ================== Version & Changelog ================== */
-const APP_VERSION="v1.7";
+const APP_VERSION="v1.8";
 const STORAGE_VERSION_SEEN="ptv_version_seen";
 const CHANGELOG={
-  "v1.5":[
-    "Fidélité 5+1",
-    "Multi-animaux par client",
-    "Anniversaire rouge J-7"
-  ],
   "v1.6":[
     "Listes de races éditables",
-    "Améliorations fidèles + correctifs",
-    "Export / Import JSON (copier/coller)",
-    "Notification de nouvelle version"
+    "Export/Import JSON (copier-coller)",
+    "Notification nouvelle version"
   ],
   "v1.7":[
-    "Palette jaune/ocre lisible (textes sombres)",
-    "Logo carré fixe + logo intégré par défaut",
-    "Sauvegarde et restauration via fichier .txt",
-    "Dashboard : clients actifs, top produits/clients, anniversaires J-30 (🎁 clignotant)",
-    "Clients/Animaux simplifiés ; Produits = liste unique ; Ventes sans prix/remise/fidélité",
-    "Recherche par nom/race/mail/tel ; filtre produits par initiale",
-    "Suppression produit interdite s'il a déjà été vendu (pas d'archivage)"
+    "Palette jaune/ocre lisible, logo intégré",
+    "Sauvegarde & import via fichier .txt",
+    "Anniversaires J-30 (🎁) • Produits/Ventes simplifiés"
+  ],
+  "v1.8":[
+    "Sauvegarde : choix d’emplacement (File System Access si dispo) ; fallback iPhone/Safari avec partage",
+    "Restauration : choix de fichier (picker natif ou fichier .txt)",
+    "Correctif : icône 🎁 en page Ventes n’apparaît que pour les animaux concernés"
   ]
 };
 function renderChangelog(){
@@ -325,7 +321,7 @@ document.getElementById("btnShowWhatsNew").onclick=()=>showVersionPopup(true);
 document.getElementById("btnShowPopup").onclick=()=>showVersionPopup(true);
 
 /* ================== Données & helpers ================== */
-const DBKEY='ptv_simple_v17_txt';
+const DBKEY='ptv_simple_v18_txt';
 const LOGO_KEY='ptv_logo_dataurl_v2';
 
 const DEFAULT_DOGS=["Barbet","Beagle","Berger Allemand","Berger Australien","Border Collie","Boxer","Bouledogue Français","Cavalier King Charles","Chihuahua","Cocker","Dalmatien","Golden Retriever","Husky","Jack Russell","Labrador","Rottweiler","Shiba Inu","Shih Tzu","Teckel","Yorkshire Terrier"].sort((a,b)=>a.localeCompare(b,'fr'));
@@ -379,7 +375,9 @@ document.getElementById('logoFile').addEventListener('change',e=>{
 document.getElementById('btnSaveLogo').addEventListener('click',()=>{
   const f=document.getElementById('logoFile').files?.[0]; if(!f) return toast('Choisis une image'); setLogoFromFile(f);
 });
-document.getElementById('btnClearLogo').addEventListener('click',()=>{ localStorage.removeItem(LOGO_KEY); loadLogo(); toast('Logo supprimé (logo par défaut rétabli).'); });
+document.getElementById('btnClearLogo').addEventListener('click',()=>{
+  localStorage.removeItem(LOGO_KEY); loadLogo(); toast('Logo supprimé (logo par défaut rétabli).');
+});
 
 /* ================== Anniversaire J-30 ================== */
 function nextBirthdayInfo(ts){
@@ -536,8 +534,7 @@ function renderProduits(){
     });
 
   // Ventes: produits
-  const sel=document.getElementById('v_prod'); sel.innerHTML='';
-  DB.produits.forEach(p=> sel.appendChild(el('option',{value:p.id},[p.nom])) );
+  const sel=document.getElementById('v_prod'); sel.innerHTML=''; DB.produits.forEach(p=> sel.appendChild(el('option',{value:p.id},[p.nom])) );
 }
 document.getElementById('searchProduit').oninput=renderProduits;
 
@@ -547,8 +544,12 @@ document.getElementById('v_client').addEventListener('change',()=>{
   const wrap=document.getElementById('v_client_info');
   if(!id){ wrap.style.display='none'; return; }
   const c=DB.clients.find(x=>x.id===id);
-  const list=(c?.animaux||[]).map(a=>{ const info=nextBirthdayInfo(a.dob); return info.within ? `<span class="gift"><i class="icon"></i><span>${a.name}</span></span>` : a.name; }).join(', ');
-  document.getElementById('v_client_animals').innerHTML=list||'—'; wrap.style.display='flex';
+  const list=(c?.animaux||[]).map(a=>{
+    const info=nextBirthdayInfo(a.dob);
+    return info.within ? `<span class="gift"><i class="icon"></i><span>${a.name}</span></span>` : (a.name||'');
+  }).filter(Boolean).join(', ');
+  document.getElementById('v_client_animals').innerHTML=list||'—';
+  wrap.style.display=list?'block':'none';
 });
 document.getElementById('btnSaveSale').onclick=()=>{
   const pid=+document.getElementById('v_prod').value; const qty=+document.getElementById('v_qty').value||1;
@@ -586,18 +587,62 @@ function refreshAllPetRaceSelects(){
   });
 }
 
-/* ================== Export / Import FICHIER .txt ================== */
-function download(filename,content){ const blob=new Blob([content],{type:'text/plain;charset=utf-8'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=filename; document.body.appendChild(a); a.click(); setTimeout(()=>{URL.revokeObjectURL(a.href); a.remove();},0); }
-document.getElementById('btnExportTxt').addEventListener('click',()=>{
+/* ================== Sauvegarde / Restauration — choix d’emplacement ================== */
+function fileNameWithDate(){
+  const d=new Date(); const y=d.getFullYear(), m=String(d.getMonth()+1).padStart(2,'0'), dd=String(d.getDate()).padStart(2,'0');
+  return `ptv_sauvegarde_${y}-${m}-${dd}.txt`;
+}
+async function exportChoosePath(){
   const data=JSON.stringify(DB,null,2);
-  const dt=new Date(); const stamp=`${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,'0')}-${String(dt.getDate()).padStart(2,'0')}`;
-  download(`ptv_sauvegarde_${stamp}.txt`, data);
-  toast('Fichier .txt téléchargé ✅');
-});
+  const name=fileNameWithDate();
+
+  // 1) Navigateurs compatibles (Chrome/Edge desktop) : showSaveFilePicker
+  if ('showSaveFilePicker' in window) {
+    try{
+      const handle=await window.showSaveFilePicker({
+        suggestedName:name,
+        types:[{description:'Fichier texte', accept:{'text/plain':['.txt']}}]
+      });
+      const writable=await handle.createWritable();
+      await writable.write(data);
+      await writable.close();
+      toast('Sauvegarde enregistrée ✅');
+      return;
+    }catch(e){ if(e?.name!=='AbortError') alert('Échec sauvegarde: '+e); }
+  }
+
+  // 2) Fallback tous navigateurs : téléchargement + ouverture dans un onglet (utile sur iPhone Safari)
+  const blob=new Blob([data],{type:'text/plain;charset=utf-8'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=name;
+  document.body.appendChild(a); a.click(); setTimeout(()=>{URL.revokeObjectURL(a.href); a.remove();},0);
+
+  // iOS Safari : ouvrir aussi le contenu pour « Partager → Enregistrer dans Fichiers »
+  const url=URL.createObjectURL(blob);
+  window.open(url,'_blank');
+}
+async function importChooseFile(){
+  // 1) Navigateurs compatibles
+  if ('showOpenFilePicker' in window){
+    try{
+      const [handle]=await window.showOpenFilePicker({
+        multiple:false,
+        types:[{description:'Sauvegarde PTV (.txt)', accept:{'text/plain':['.txt'],'application/json':['.json']}}]
+      });
+      const file=await handle.getFile();
+      const text=await file.text();
+      DB=JSON.parse(text);
+      saveDB(); toast('Import réussi ✅');
+      return;
+    }catch(e){ if(e?.name!=='AbortError') alert('Échec import: '+e); return; }
+  }
+  // 2) Fallback : input file
+  document.getElementById('fileImport').click();
+}
+document.getElementById('btnExportChoose').addEventListener('click',exportChoosePath);
 document.getElementById('fileImport').addEventListener('change',e=>{
   const f=e.target.files?.[0]; if(!f) return;
   const r=new FileReader();
-  r.onload=()=>{ try{ DB=JSON.parse(String(r.result)); saveDB(); toast('Import .txt réussi ✅'); e.target.value=''; } catch(err){ toast('Fichier invalide (JSON requis à l’intérieur du .txt)'); } };
+  r.onload=()=>{ try{ DB=JSON.parse(String(r.result)); saveDB(); toast('Import réussi ✅'); e.target.value=''; } catch(err){ toast('Fichier invalide (JSON attendu dans le .txt)'); } };
   r.readAsText(f,'utf-8');
 });
 document.getElementById('btnExportJSON').addEventListener('click',()=>{ document.getElementById('exportArea').textContent=JSON.stringify(DB,null,2); });
@@ -605,18 +650,14 @@ document.getElementById('btnExportJSON').addEventListener('click',()=>{ document
 /* ================== Dashboard ================== */
 function renderDashboard(){
   const t30=Date.now()-days(30), t90=Date.now()-days(90);
-  // Clients actifs
   const actifs=new Set(DB.ventes.filter(v=>v.date>=t90 && !!v.clientId).map(v=>v.clientId)).size; document.getElementById('kpiActifs').textContent=actifs;
 
-  // Top produits
   const byProd={}; DB.ventes.filter(v=>v.date>=t30).forEach(v=>v.lignes.forEach(L=>{ const p=DB.produits.find(x=>x.id==L.productId); const name=p?p.nom:('Produit '+L.productId); byProd[name]=(byProd[name]||0)+(L.qty||0);})); const tp=Object.entries(byProd).sort((a,b)=>b[1]-a[1]).slice(0,10);
   const tbp=document.querySelector('#tblTopProd tbody'); tbp.innerHTML=''; tp.forEach(([n,q])=>{ const tr=el('tr'); tr.innerHTML=`<td>${n}</td><td>${q}</td>`; tbp.appendChild(tr); }); document.getElementById('kpiTopProd').textContent=tp.length?`${tp[0][0]} (${tp[0][1]})`:'—';
 
-  // Top clients
   const byCli={}; DB.ventes.filter(v=>v.date>=t30 && !!v.clientId).forEach(v=>{ const c=DB.clients.find(x=>x.id===v.clientId); const name=c?(c.nom||('#'+v.clientId)):'#'+v.clientId; byCli[name]=(byCli[name]||0)+1; }); const tc=Object.entries(byCli).sort((a,b)=>b[1]-a[1]).slice(0,10);
   const tbc=document.querySelector('#tblTopCli tbody'); tbc.innerHTML=''; tc.forEach(([n,k])=>{ const tr=el('tr'); tr.innerHTML=`<td>${n}</td><td>${k}</td>`; tbc.appendChild(tr); }); document.getElementById('kpiTopCli').textContent=tc.length?`${tc[0][0]} (${tc[0][1]})`:'—';
 
-  // Anniversaires (30j)
   const soon=[]; DB.clients.forEach(c=> (c.animaux||[]).forEach(a=>{ const i=nextBirthdayInfo(a.dob); if(i.within) soon.push({client:c.nom||'—', animal:a.name||'—', days:i.days}); }));
   soon.sort((a,b)=>a.days-b.days || a.animal.localeCompare(b.animal,'fr'));
   const tbb=document.querySelector('#tblBirthSoon tbody'); tbb.innerHTML=''; soon.forEach(x=>{ const tr=el('tr'); tr.innerHTML=`<td>${x.client}</td><td><span class="gift"><i class="icon"></i><span>${x.animal}</span></span></td><td>${x.days}</td>`; tbb.appendChild(tr); });
@@ -625,24 +666,18 @@ function renderDashboard(){
 /* ================== Global render ================== */
 document.getElementById('searchClient').oninput=renderClients;
 function renderAll(){
-  // Clients
   renderClients();
-  // Produits
   renderProduits();
-  // Races
   renderBreedEditor('breedsDog','editBreedsDog'); renderBreedEditor('breedsCat','editBreedsCat');
-  // Ventes lists
   const vprod=document.getElementById('v_prod'); vprod.innerHTML=''; DB.produits.forEach(p=> vprod.appendChild(el('option',{value:p.id},[p.nom])));
   const vcli=document.getElementById('v_client'); vcli.innerHTML=''; vcli.appendChild(el('option',{value:''},['— (aucun) —'])); DB.clients.forEach(c=> vcli.appendChild(el('option',{value:c.id},[c.nom||('Client '+c.id)])));
-  // Dashboard
   renderDashboard();
-  // Logo preview
   loadLogo();
 }
 document.addEventListener("DOMContentLoaded",()=>{
   renderChangelog();
   renderAll();
-  showVersionPopup(); // alerte si version nouvelle
+  showVersionPopup(); // affiche nouveautés v1.8 une fois
 });
 </script>
 </body>
