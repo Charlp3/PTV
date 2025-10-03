@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>PASSE TEMPS VEGA — v1.8.6</title>
+<title>PASSE TEMPS VEGA — v1.9.0 (Persistence & Confidentialité)</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
 <style>
 :root{
@@ -31,13 +31,13 @@ main{max-width:1200px;margin:0 auto;padding:16px;display:grid;gap:16px}
 .card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:14px}
 h2{margin:0 0 10px;font-size:20px}
 h3{margin:10px 0 6px;font-size:16px}
-label{display:block;font-size:12px;color:var(--muted);margin-bottom:6px}
-input,select,textarea,button{width:100%;padding:11px 12px;border-radius:12px;border:1px solid var(--border);background:#fff;color:var(--text)}
+label{display:block;font-size:12px;color:#6b7280;margin-bottom:6px}
+input,select,textarea,button{width:100%;padding:11px 12px;border-radius:12px;border:1px solid var(--border);background:#fff;color:#111}
 input:focus,select:focus,textarea:focus{outline:none;border-color:#F59E0B;box-shadow:0 0 0 3px rgba(245,158,11,.25)}
 button{cursor:pointer;background:var(--btn);color:#fff;font-weight:800;border:none}
 button:hover{background:var(--btnH)}
 button.secondary{background:#fff;color:#111;border:1px solid var(--border)}
-button.ghost{background:transparent;border:1px dashed var(--border);color:var(--muted)}
+button.ghost{background:transparent;border:1px dashed var(--border);color:#6b7280}
 .grid{display:grid;gap:12px}
 .cols-2{grid-template-columns:repeat(2,minmax(0,1fr))}
 .cols-3{grid-template-columns:repeat(3,minmax(0,1fr))}
@@ -62,7 +62,7 @@ button.ghost{background:transparent;border:1px dashed var(--border);color:var(--
 .chip.active{background:#fef3c7;border-color:#f59e0b}
 /* Stocks */
 .stock-low{color:var(--danger);font-weight:800}
-small.muted{color:var(--muted)}
+small.muted{color:#6b7280}
 hr.sep{border:0;border-top:1px dashed var(--border);margin:10px 0}
 footer{padding:14px;border-top:1px solid var(--border);display:flex;justify-content:space-between;background:var(--card);color:#374151}
 /* Popup changelog */
@@ -74,8 +74,8 @@ footer{padding:14px;border-top:1px solid var(--border);display:flex;justify-cont
 </head>
 <body>
 <header>
-  <div class="logo" title="Logo"><img id="logoImg" alt="Logo PASSE TEMPS VEGA"></div>
-  <div class="brand"><h1>PASSE TEMPS VEGA <span class="badge">v1.8.6</span><a class="link" id="btnShowWhatsNew">Nouveautés</a></h1></div>
+  <div class="logo" title="Logo"><img id="logoImg" alt="Logo"></div>
+  <div class="brand"><h1>PASSE TEMPS VEGA <span class="badge">v1.9.0</span><a class="link" id="btnShowWhatsNew">Nouveautés</a></h1></div>
   <nav class="tabs">
     <button class="tab active" data-tab="dash">Dashboard</button>
     <button class="tab" data-tab="clients">Clients</button>
@@ -226,7 +226,7 @@ footer{padding:14px;border-top:1px solid var(--border);display:flex;justify-cont
           <button class="secondary" id="btnSaveLogo">Enregistrer le logo</button>
           <button class="ghost" id="btnClearLogo">Supprimer logo</button>
         </div>
-        <small class="muted">Logo par défaut intégré • téléversable localement.</small>
+        <small class="muted">Logo stocké localement (confidentiel, pas d’envoi).</small>
       </div>
 
       <div>
@@ -247,17 +247,16 @@ footer{padding:14px;border-top:1px solid var(--border);display:flex;justify-cont
       </div>
 
       <div>
-        <h3>Sauvegarde / Restauration</h3>
+        <h3>Sauvegarde / Restauration (local uniquement)</h3>
         <div class="grid cols-3">
           <button id="btnExportChoose" class="secondary">Sauvegarder (.txt — choisir dossier)</button>
           <button id="btnExportShare" class="secondary">Sauvegarder (.txt — iPhone/iPad)</button>
-          <label class="secondary" style="display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer">
-            <input type="file" id="fileImport" accept=".txt,text/plain,.json,application/json" style="display:none">
-            Importer (choisir un fichier)
-          </label>
+          <button id="btnImport" class="secondary">Importer (choisir un fichier)</button>
+          <input type="file" id="fileImport" accept=".txt,text/plain,.json,application/json" style="display:none">
           <button id="btnExportJSON" class="ghost">Afficher JSON</button>
+          <button id="btnResetAll" class="ghost" style="color:#B91C1C;border-color:#B91C1C">Réinitialiser données locales</button>
         </div>
-        <small class="muted">iPhone/iPad : « Sauvegarder (.txt — iPhone/iPad) » → Partager → Enregistrer dans Fichiers (choisissez le dossier).</small>
+        <small class="muted">Confidentialité : tout reste sur cet appareil. Aucun envoi réseau.</small>
         <pre id="exportArea" style="max-height:220px;overflow:auto;background:#fff;border:1px solid var(--border);padding:8px;border-radius:8px;margin-top:8px"></pre>
       </div>
 
@@ -268,13 +267,13 @@ footer{padding:14px;border-top:1px solid var(--border);display:flex;justify-cont
       </div>
     </div>
     <hr class="sep">
-    <div>© PASSE TEMPS VEGA — v1.8.6 • © Pierre Charlier 2025 • Données locales</div>
+    <div>© PASSE TEMPS VEGA — v1.9.0 • © Pierre Charlier 2025 • Données locales</div>
   </section>
 </main>
 
 <footer>
-  <div>© PASSE TEMPS VEGA — v1.8.6 • © Pierre Charlier 2025</div>
-  <div><small class="muted">Sauvegarde .txt (choix dossier) • Logo intégré</small></div>
+  <div>© PASSE TEMPS VEGA — v1.9.0 • © Pierre Charlier 2025</div>
+  <div><small class="muted">LocalStorage persistant • Export/Import locaux</small></div>
 </footer>
 
 <!-- Popup changelog -->
@@ -288,13 +287,15 @@ footer{padding:14px;border-top:1px solid var(--border);display:flex;justify-cont
 
 <script>
 /* ================== Version & Changelog ================== */
-const APP_VERSION="v1.8.6";
+const APP_VERSION="v1.9.0";
 const STORAGE_VERSION_SEEN="ptv_version_seen";
 const CHANGELOG={
-  "v1.8":  ["Sauvegarde : choix d’emplacement (File System Access) + fallback iOS","Restauration : choix de fichier","Correctif icône 🎁 en Ventes"],
-  "v1.8.4":["Historique global des ventes","Fiche client : achats (12 derniers mois)"],
-  "v1.8.5":["Compat iOS améliorée"],
-  "v1.8.6":["Import robuste iPhone : BOM/UTF-16/data-URL/texte parasite acceptés • retour au .txt"]
+  "v1.9.0":[
+    "Clé de stockage STABLE (ptv_db_main) : données conservées entre versions",
+    "Migration douce depuis anciennes clés si base vide",
+    "Import/Export robustes (iOS inclus), strictement locaux (aucun réseau)",
+    "Demande de persistance navigateur pour éviter l’éjection iOS"
+  ]
 };
 function renderChangelog(){
   let html=""; const entries=Object.entries(CHANGELOG).sort((a,b)=>a[0]<b[0]?1:-1);
@@ -314,7 +315,7 @@ document.getElementById("btnShowWhatsNew").onclick=()=>showVersionPopup(true);
 document.getElementById("btnShowPopup").onclick=()=>showVersionPopup(true);
 
 /* ================== Données & helpers ================== */
-const DBKEY='ptv_simple_v186_txt';
+const DBKEY='ptv_db_main';          // ⚠️ Clé stable et définitive
 const LOGO_KEY='ptv_logo_dataurl_v2';
 
 const DEFAULT_DOGS=["Barbet","Beagle","Berger Allemand","Berger Australien","Border Collie","Boxer","Bouledogue Français","Cavalier King Charles","Chihuahua","Cocker","Dalmatien","Golden Retriever","Husky","Jack Russell","Labrador","Rottweiler","Shiba Inu","Shih Tzu","Teckel","Yorkshire Terrier"].sort((a,b)=>a.localeCompare(b,'fr'));
@@ -325,21 +326,56 @@ function el(t,a={},c=[]){const n=document.createElement(t);for(const k in a){(k=
 function toast(m){alert(m)}
 function formatDate(ts){ const d=new Date(ts); return d.toLocaleDateString('fr-BE',{year:'2-digit',month:'2-digit',day:'2-digit'}); }
 
-/* ---------- Persistance ---------- */
+/* ---------- Persistance / Confidentialité ---------- */
+// Valide la structure
+function isValidDB(o){
+  return o && typeof o==='object'
+      && Array.isArray(o.clients)
+      && Array.isArray(o.produits)
+      && Array.isArray(o.ventes)
+      && o.lists && Array.isArray(o.lists.breedsDog) && Array.isArray(o.lists.breedsCat);
+}
+function withLogo(db){
+  if (!db._logo) db._logo = localStorage.getItem(LOGO_KEY) || embeddedLogo();
+  return db;
+}
+// Charge sans écraser si des données existent ; sinon migre depuis anciennes clés
 function loadDB(){
-  const raw=localStorage.getItem(DBKEY);
-  if(raw){ try{return JSON.parse(raw)}catch(e){} }
-  return {
+  // 1) clé stable actuelle
+  const raw = localStorage.getItem(DBKEY);
+  if (raw) { try{ const o=JSON.parse(raw); if(isValidDB(o)) return withLogo(o);}catch{} }
+
+  // 2) Migration douce : anciennes clés possibles
+  const OLD_KEYS=['ptv_simple_v186_txt','ptv_simple_v185_json','ptv_simple'];
+  for (const k of OLD_KEYS){
+    const v=localStorage.getItem(k);
+    if(!v) continue;
+    try{
+      const o=JSON.parse(v);
+      if(isValidDB(o)){
+        localStorage.setItem(DBKEY, JSON.stringify(o)); // copie 1x vers clé stable
+        return withLogo(o);
+      }
+    }catch{}
+  }
+
+  // 3) Première exécution → base neuve
+  return withLogo({
     clients:[], produits:[], ventes:[],
-    lists:{breedsDog:[...DEFAULT_DOGS],breedsCat:[...DEFAULT_CATS]},
-    _logo: localStorage.getItem(LOGO_KEY) || embeddedLogo()
-  };
+    lists:{breedsDog:[...DEFAULT_DOGS],breedsCat:[...DEFAULT_CATS]}
+  });
 }
 let DB=loadDB();
+
+// Sauvegarde sûre : on NE touche QUE quand l’utilisateur modifie
 function saveDB(){ localStorage.setItem(DBKEY, JSON.stringify(DB)); renderAll(); }
+
+// Demander une persistance plus forte (si supporté)
+if (navigator.storage && navigator.storage.persist) { navigator.storage.persist().catch(()=>{}); }
 
 /* ---------- Snapshot export ---------- */
 function getSnapshot(){
+  // Toujours partir de la version stockée si dispo (ne pas écraser)
   const raw=localStorage.getItem(DBKEY);
   let snap=null; try{ snap = raw ? JSON.parse(raw) : null; }catch{}
   if(!snap) snap = DB;
@@ -356,7 +392,7 @@ document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>{
   document.getElementById(t.dataset.tab).hidden=false;
 }));
 
-/* ================== Logo (intégré) ================== */
+/* ================== Logo (local uniquement) ================== */
 function embeddedLogo(){
   const svg=`<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 128 128'>
     <rect rx='16' width='128' height='128' fill='#333'/>
@@ -636,7 +672,7 @@ function refreshAllPetRaceSelects(){
   });
 }
 
-/* ================== Sauvegarde / Restauration (.txt) ================== */
+/* ================== Sauvegarde / Restauration (local) ================== */
 function fileNameWithDate(){
   const d=new Date(); const y=d.getFullYear(), m=String(d.getMonth()+1).padStart(2,'0'), dd=String(d.getDate()).padStart(2,'0');
   return `ptv_sauvegarde_${y}-${m}-${dd}.txt`;
@@ -660,82 +696,79 @@ async function exportChoosePath(){
 }
 // iPhone/iPad : Partager → Enregistrer dans Fichiers
 async function exportShareIOS(){
-  const data=snapshotString(), name=fileNameWithDate();
-  const file=new File([data], name, { type:'text/plain' });
-  if (navigator.canShare && navigator.canShare({ files:[file] })) {
-    try{
+  try{
+    const data = snapshotString(), name=fileNameWithDate();
+    const area=document.getElementById('exportArea'); if(area) area.textContent=data; // aperçu
+    const file=new File([data], name, { type:'text/plain' });
+    if (navigator.canShare && navigator.canShare({ files:[file] })) {
       await navigator.share({ files:[file], title:'Sauvegarde PASSE TEMPS VEGA' });
-      alert('Partage lancé ✅ (Enregistrer dans Fichiers).');
-    }catch(e){ if(e?.name!=='AbortError') alert('Partage annulé/indisponible.'); }
-  } else {
+      alert('Partage lancé ✅ (Enregistrer dans Fichiers).'); return;
+    }
+    // Fallback lien
     const blob=new Blob([data],{type:'text/plain;charset=utf-8'});
     const url=URL.createObjectURL(blob);
-    window.open(url,'_blank'); alert('iOS : Partager → Enregistrer dans Fichiers.');
-  }
+    const a=document.createElement('a'); a.href=url; a.download=name; a.rel='noopener'; document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(()=>URL.revokeObjectURL(url),1000);
+    alert('Si un onglet s’ouvre : Partager → Enregistrer dans Fichiers.');
+  }catch(e){ alert('Échec export iOS : '+(e?.message||e)); }
 }
-// Import (hyper tolérant : .txt/.json, BOM, data-URL, HTML/texte autour)
-async function importChooseFile(){
-  const parseSafe = (text) => {
-    // 1) supprime BOM éventuel / normalise
-    text = text.replace(/^\uFEFF/, '').trim();
 
-    // 2) data:URL ?
-    if (text.startsWith('data:')) {
-      const m = text.match(/^data:.*?;base64,(.*)$/);
-      if (m) { try { text = atob(m[1]); } catch {} }
-      else { const i=text.indexOf(','); if(i>-1) text=text.slice(i+1); }
-    }
-
-    // 3) essai direct
-    try { return JSON.parse(text); } catch {}
-
-    // 4) JSON noyé : bloc complet contenant "clients" et "lists"
-    const m2 = text.match(/{[\s\S]*?"clients"[\s\S]*?"lists"[\s\S]*?}/m);
-    if (m2) { try { return JSON.parse(m2[0]); } catch {} }
-
-    // 5) dernier recours : 1er { → dernier }
-    const a=text.indexOf('{'), b=text.lastIndexOf('}');
-    if (a!==-1 && b>a) { try { return JSON.parse(text.slice(a,b+1)); } catch {} }
-
-    throw new Error('INVALID_JSON');
-  };
-
-  const doImport = async (file) => {
-    const raw = await file.text();
-    let obj;
-    try { obj = parseSafe(raw); }
-    catch { alert('Fichier invalide : JSON introuvable.'); return; }
-
-    // Validation minimale
-    if (!obj || typeof obj!=='object' ||
-        !('clients' in obj) || !('produits' in obj) ||
-        !('ventes' in obj)  || !('lists' in obj)) {
-      alert('Sauvegarde incomplète/corrompue (clés manquantes).'); return;
-    }
-    if (obj._logo) localStorage.setItem(LOGO_KEY, obj._logo);
-    DB = obj; localStorage.setItem(DBKEY, JSON.stringify(DB));
-    renderAll(); alert('Import réussi ✅');
-  };
-
-  if ('showOpenFilePicker' in window){
-    try{
-      const [handle]=await window.showOpenFilePicker({
-        multiple:false,
-        types:[{ description:'Sauvegarde PTV', accept:{ 'text/plain':['.txt'], 'application/json':['.json'] } }]
-      });
-      await doImport(await handle.getFile());
-      return;
-    }catch(e){ if(e?.name!=='AbortError') alert('Échec import: '+e); return; }
+/* ---- Import robuste câblé GLOBAL (iOS/desktop) ---- */
+function parseSafe(text){
+  text = text.replace(/^\uFEFF/, '').trim();           // BOM
+  if (text.startsWith('data:')) {                      // data URL ?
+    const m = text.match(/^data:.*?;base64,(.*)$/);
+    if (m) { try { text = atob(m[1]); } catch {} }
+    else { const i=text.indexOf(','); if (i>-1) text=text.slice(i+1); }
   }
-  const inp=document.getElementById('fileImport');
-  inp.accept='.txt,text/plain,.json,application/json';
-  inp.onchange=async e=>{ const f=e.target.files?.[0]; if(f){ await doImport(f); e.target.value=''; } };
-  inp.click();
+  try { return JSON.parse(text); } catch {}
+  // JSON noyé
+  const a=text.indexOf('{'), b=text.lastIndexOf('}');
+  if (a!==-1 && b>a) { try { return JSON.parse(text.slice(a,b+1)); } catch {} }
+  throw new Error('INVALID_JSON');
 }
+function importFromText(text){
+  const obj = parseSafe(text);
+  if (!obj || typeof obj!=='object' ||
+      !('clients' in obj) || !('produits' in obj) ||
+      !('ventes' in obj)  || !('lists'  in obj)) {
+    throw new Error('Sauvegarde incomplète/corrompue (clés manquantes).');
+  }
+  if (obj._logo) localStorage.setItem(LOGO_KEY, obj._logo);
+  DB = obj;
+  localStorage.setItem(DBKEY, JSON.stringify(DB)); // ⚠️ on remplace uniquement si l’utilisateur importe
+  renderAll();
+}
+
+/* Handlers Import / Export / Reset */
 document.getElementById('btnExportChoose').addEventListener('click',exportChoosePath);
 document.getElementById('btnExportShare').addEventListener('click',exportShareIOS);
 document.getElementById('btnExportJSON').addEventListener('click',()=>{ document.getElementById('exportArea').textContent=snapshotString(); });
-document.getElementById('fileImport').addEventListener('change',()=>{}); // géré dynamiquement
+
+document.getElementById('btnImport').addEventListener('click',()=>{
+  const inp=document.getElementById('fileImport'); inp.click();
+});
+document.getElementById('fileImport').addEventListener('change', async (e)=>{
+  const f=e.target.files?.[0]; if(!f) return;
+  try{
+    // lecture ArrayBuffer -> TextDecoder (gère UTF-8/16)
+    const buf=await f.arrayBuffer();
+    let text;
+    try{ text=new TextDecoder('utf-8',{fatal:false}).decode(buf); }
+    catch{ text=await f.text(); }
+    importFromText(text);
+    alert('Import réussi ✅');
+  }catch(err){
+    alert((err&&err.message)?err.message:'Import impossible.');
+  }finally{ e.target.value=''; }
+});
+
+document.getElementById('btnResetAll').addEventListener('click',()=>{
+  if(!confirm('Effacer toutes les données locales de cette app ? (Sauvegardez avant)')) return;
+  const KEEP=[LOGO_KEY]; // on garde éventuellement le logo
+  for(let i=localStorage.length-1;i>=0;i--){ const k=localStorage.key(i); if(KEEP.includes(k)) continue; localStorage.removeItem(k); }
+  location.reload();
+});
 
 /* ================== Dashboard & Global render ================== */
 function renderDashboard(){
@@ -795,7 +828,7 @@ function renderAll(){
 document.addEventListener("DOMContentLoaded",()=>{
   renderChangelog();
   renderAll();
-  showVersionPopup(); // nouveautés v1.8.6
+  showVersionPopup(); // nouveautés
 });
 </script>
 </body>
