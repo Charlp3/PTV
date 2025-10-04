@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>PASSE TEMPS VEGA — v2.3.1</title>
+<title>PASSE TEMPS VEGA — v2.3.3</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
 <style>
 :root{
@@ -74,7 +74,7 @@ button.ghost{background:transparent;border:1px dashed var(--border);color:#6b728
 .kpi .item{background:var(--card);border:1px solid var(--border);
   border-radius:12px;padding:12px}
 .kpi .item h3{margin:0;color:#6b7280;font-size:12px}
-.kpi .item div{margin-top:6px;font-size:16px;font-weight:800} /* plus petite */
+.kpi .item div{margin-top:6px;font-size:16px;font-weight:800} /* police plus petite */
 .gift{display:inline-flex;align-items:center;gap:6px}
 .gift i{display:inline-block}
 @keyframes blink{0%,60%,100%{opacity:1}30%{opacity:.15}}
@@ -118,7 +118,7 @@ input:checked + .slider:before{transform:translateX(22px)}
 <header>
   <div class="logo"><img id="logoImg" alt="Logo"></div>
   <div class="brand">
-    <h1>PASSE TEMPS VEGA <span class="badge">v2.3.1</span>
+    <h1>PASSE TEMPS VEGA <span class="badge">v2.3.3</span>
       <a class="link" id="btnShowWhatsNew">Nouveautés</a>
     </h1>
   </div>
@@ -136,7 +136,7 @@ input:checked + .slider:before{transform:translateX(22px)}
   <section id="dash" class="card">
     <h2>Vue d’ensemble</h2>
     <div class="kpi">
-      <div class="item"><h3>Client actif (90j)</h3><div id="kpiActifs">0</div></div>
+      <div class="item"><h3>Client actif (90 j)</h3><div id="kpiActifs">0</div></div>
       <div class="item"><h3>Top produit (Qté)</h3><div id="kpiTopProd">—</div></div>
       <div class="item"><h3>Top client (Achats)</h3><div id="kpiTopCli">—</div></div>
     </div>
@@ -177,7 +177,7 @@ input:checked + .slider:before{transform:translateX(22px)}
             <input id="c_nom" placeholder="Nom Prénom (optionnel)">
           </div>
           <div>
-            <label>Téléphone (BE, optionnel)</label>
+            <label>Téléphone (optionnel)</label>
             <input id="c_tel" inputmode="numeric" maxlength="10" placeholder="0470123456">
           </div>
           <div>
@@ -193,7 +193,6 @@ input:checked + .slider:before{transform:translateX(22px)}
         <h3>Animaux</h3>
         <div id="petsContainer" class="grid" style="gap:10px"></div>
         <button class="secondary" id="btnAddPet">+ Ajouter un animal</button>
-
         <div class="grid cols-3" style="margin-top:10px">
           <button id="btnSaveClient">Enregistrer</button>
           <button class="secondary" id="btnNewClient">Nouveau</button>
@@ -256,13 +255,11 @@ input:checked + .slider:before{transform:translateX(22px)}
 
       <div>
         <h3>Catalogue</h3>
-        <div class="chips" id="alphaChips"></div>
-        <input id="searchProduit" placeholder="Recherche produit… (nom)">
+        <input id="searchProduit" placeholder="Recherche produit…">
         <table class="table" id="tblProduits">
           <thead><tr><th>Produit</th><th>Prix</th><th>Stock</th><th>Min</th><th>Statut</th></tr></thead>
           <tbody></tbody>
         </table>
-        <small class="muted">Tri A→Z. Filtre par lettre/chiffre via les puces.</small>
       </div>
     </div>
   </section>
@@ -362,9 +359,9 @@ input:checked + .slider:before{transform:translateX(22px)}
             <input type="file" id="logoFile" accept="image/*">
           </div>
           <button class="secondary" id="btnSaveLogo">Enregistrer le logo</button>
-          <button class="ghost" id="btnClearLogo">Supprimer logo</button>
+          <button class="ghost" id="btnClearLogo">Logo par défaut</button>
         </div>
-        <small class="muted">Logo stocké localement (confidentiel).</small>
+        <small class="muted">Logo stocké localement (confidentiel). Export/import .txt inclus.</small>
       </div>
 
       <div>
@@ -424,12 +421,12 @@ input:checked + .slider:before{transform:translateX(22px)}
       </div>
     </div>
     <hr class="sep">
-    <div>© PASSE TEMPS VEGA — v2.3.1 • © Pierre Charlier 2025 • Données locales (IndexedDB)</div>
+    <div>© PASSE TEMPS VEGA — v2.3.3 • © Pierre Charlier 2025 • Données locales (IndexedDB)</div>
   </section>
 </main>
 
 <footer>
-  <div>© PASSE TEMPS VEGA — v2.3.1 • © Pierre Charlier 2025</div>
+  <div>© PASSE TEMPS VEGA — v2.3.3 • © Pierre Charlier 2025</div>
   <div><small class="muted">IndexedDB persistant • Export/Import locaux (.txt)</small></div>
 </footer>
 
@@ -443,9 +440,20 @@ input:checked + .slider:before{transform:translateX(22px)}
 </div>
 <canvas id="confetti"></canvas>
 <script>
+// --- Capteur d'erreurs démarrage (debug visible) ---
+window.onerror = function(message, source, lineno, colno, error){
+  console.error('PTV error:', {message, source, lineno, colno, error});
+  alert("PTV a rencontré une erreur au démarrage :\n\n"+message+"\n("+(source||'')+":"+lineno+")\n\nVérifie que les 4 blocs sont bien collés et que la navigation privée est désactivée.");
+};
+
 /* ===== Version / Changelog ===== */
-const APP_VERSION="v2.3.1", SEEN="ptv_version_seen";
+const APP_VERSION="v2.3.3", SEEN="ptv_version_seen";
 const CHANGELOG={
+ "v2.3.3":[
+   "Démarrage robuste : propose l’import si base vide (anti-accident)",
+   "Dashboard : icône cadeau clignotante rétablie",
+   "Bilans : Top produits / Top clients remplis"
+ ],
  "v2.3.1":[
    "Clients triés A→Z (liste & sélecteur Ventes)",
    "Confettis plus gros",
@@ -557,22 +565,7 @@ let DB=null; // {clients, produits, ventes, lists}
 const embeddedLogo=()=> 'data:image/svg+xml;utf8,'+encodeURIComponent("<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 128 128'><rect rx='16' width='128' height='128' fill='#333'/><text x='50%' y='54%' text-anchor='middle' font-family='Inter,Arial' font-weight='800' font-size='40' fill='#fff'>PTV</text></svg>");
 const emptyDB=()=>({id:'main',clients:[],produits:[],ventes:[],lists:{breedsDog:[...DOGS],breedsCat:[...CATS]}});
 
-async function loadDB(){
-  await idbOpen();
-  const row=await idbGet('data','main');
-  if(row&&row.clients&&row.produits&&row.ventes&&row.lists){
-    row.produits.forEach(p=>{if(typeof p.price!=='number')p.price=0});
-    DB=row;
-  } else {
-    DB=emptyDB();
-    await idbPut('data',DB);
-  }
-  const logoRow=await idbGet('logo','current'); if(!logoRow) await idbPut('logo',{id:'current',data:embeddedLogo()});
-  const set=await idbGet('settings','confetti'); if(!set) await idbPut('settings',{id:'confetti',enabled:true,lastDateShown:''});
-}
-async function saveDB(){await idbPut('data',DB); renderAll()}
-
-/* ===== Snapshot Export/Import (TXT uniquement) ===== */
+/* ===== Snapshot JSON affichage (pour debug/export visuel) ===== */
 async function getSnap(){
   const row=await idbGet('data','main');
   const s=row?JSON.parse(JSON.stringify(row)):JSON.parse(JSON.stringify(DB||emptyDB()));
@@ -581,18 +574,6 @@ async function getSnap(){
   return s;
 }
 async function snapStr(){return JSON.stringify(await getSnap(),null,2)}
-function safeParse(text){
-  text=(text||"").replace(/^\uFEFF/,'').trim();
-  if(text.startsWith('data:')){
-    const m=text.match(/^data:.*?;base64,(.*)$/);
-    if(m){try{text=atob(m[1])}catch{}}
-    else {const i=text.indexOf(','); if(i>-1) text=text.slice(i+1)}
-  }
-  try{return JSON.parse(text)}catch{}
-  const a=text.indexOf('{'),b=text.lastIndexOf('}');
-  if(a!=-1&&b>a){try{return JSON.parse(text.slice(a,b+1))}catch{}}
-  throw Error('Fichier TXT invalide')
-}
 
 /* ===== UI Nav ===== */
 document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>{
@@ -723,12 +704,12 @@ document.getElementById('btnSaveClient').onclick=async()=>{
        <p>Mettre à jour ce client, ou enregistrer comme <b>nouveau</b> ?</p>`,[
       {label:'Mettre à jour ce client',className:'secondary',onClick:async()=>{
         const cli={id:editingClientId,...base};
-        DB.clients[idx]=cli; await saveDB(); clearClient();
+        DB.clients[idx]=cli; await idbPut('data',DB); renderAll(); clearClient();
         toast('Client mis à jour ✅');
       }},
       {label:'Enregistrer comme nouveau',className:'ghost',onClick:async()=>{
         const cli={id:Date.now(),...base};
-        DB.clients.push(cli); await saveDB(); clearClient();
+        DB.clients.push(cli); await idbPut('data',DB); renderAll(); clearClient();
         toast('Nouveau client enregistré ✅');
       }}
     ]);
@@ -745,11 +726,11 @@ document.getElementById('btnSaveClient').onclick=async()=>{
         const cli={id:similar.id,...base};
         const j=DB.clients.findIndex(x=>x.id===similar.id);
         if(j>=0) DB.clients[j]=cli; else DB.clients.push(cli);
-        await saveDB(); clearClient(); toast('Client existant mis à jour ✅');
+        await idbPut('data',DB); renderAll(); clearClient(); toast('Client existant mis à jour ✅');
       }},
       {label:'Créer un nouveau',className:'ghost',onClick:async()=>{
         const cli={id:Date.now(),...base};
-        DB.clients.push(cli); await saveDB(); clearClient();
+        DB.clients.push(cli); await idbPut('data',DB); renderAll(); clearClient();
         toast('Nouveau client enregistré ✅');
       }}
     ]);
@@ -757,7 +738,7 @@ document.getElementById('btnSaveClient').onclick=async()=>{
   }
 
   const cli={id:Date.now(),...base};
-  DB.clients.push(cli); await saveDB(); clearClient();
+  DB.clients.push(cli); await idbPut('data',DB); renderAll(); clearClient();
   toast('Nouveau client enregistré ✅');
 };
 document.getElementById('btnDeleteClient').onclick=async()=>{
@@ -765,7 +746,7 @@ document.getElementById('btnDeleteClient').onclick=async()=>{
   if(!confirm('Supprimer ce client et ses ventes ?'))return;
   DB.clients=DB.clients.filter(c=>c.id!==editingClientId);
   DB.ventes=DB.ventes.filter(v=>v.clientId!==editingClientId);
-  await saveDB(); clearClient();
+  await idbPut('data',DB); renderAll(); clearClient();
 };
 
 function renderClients(){
@@ -839,275 +820,512 @@ function renderCliPurch(id){
   document.getElementById('tblCliPurch').style.display='table';
 }
 /* ===== PRODUITS ===== */
-let editingProdId=null;
-document.getElementById('btnNewProduct').onclick=()=>clearProduct();
-function clearProduct(){
-  ['p_nom','p_price','p_stock','p_min','p_id'].forEach(id=>document.getElementById(id).value='');
-  editingProdId=null; document.getElementById('btnDeleteProduct').disabled=true;
+let editingProductId=null;
+function clearProd(){
+  document.getElementById('p_id').value='';
+  document.getElementById('p_nom').value='';
+  document.getElementById('p_price').value=0;
+  document.getElementById('p_stock').value=0;
+  document.getElementById('p_min').value=0;
+  editingProductId=null;
+  document.getElementById('btnDeleteProduct').disabled=true;
 }
+document.getElementById('btnNewProduct').onclick=clearProd;
+
 document.getElementById('btnSaveProduct').onclick=async()=>{
+  const id = document.getElementById('p_id').value ? +document.getElementById('p_id').value : Date.now();
   const nom=(document.getElementById('p_nom').value||'').trim();
-  if(!nom)return toast('Nom du produit requis');
-  const price=+document.getElementById('p_price').value||0;
-  const stock=+document.getElementById('p_stock').value||0;
-  const min=+document.getElementById('p_min').value||0;
-  if(editingProdId){
-    const p=DB.produits.find(x=>x.id===editingProdId);
-    if(p){Object.assign(p,{nom,price,stock,stockMin:min});}
-  } else {
-    DB.produits.push({id:Date.now(),nom,price,stock,stockMin:min});
-  }
-  await saveDB(); clearProduct();
+  if(!nom) return toast('Nom du produit requis');
+  const price=+((document.getElementById('p_price').value||'0').replace(',','.'));
+  const stock=+(document.getElementById('p_stock').value||0);
+  const min=+(document.getElementById('p_min').value||0);
+
+  const existingIndex=DB.produits.findIndex(p=>p.id===id);
+  const prod={id,nom,price:isFinite(price)?price:0,stock,stockMin:min};
+
+  if(existingIndex>=0) DB.produits[existingIndex]=prod;
+  else DB.produits.push(prod);
+
+  DB.produits.sort((a,b)=>a.nom.localeCompare(b.nom,'fr',{sensitivity:'base'}));
+  await idbPut('data',DB); renderProduits(); clearProd();
 };
 document.getElementById('btnDeleteProduct').onclick=async()=>{
-  if(!editingProdId)return;
-  if(!confirm('Supprimer ce produit ?'))return;
-  DB.produits=DB.produits.filter(p=>p.id!==editingProdId);
-  await saveDB(); clearProduct();
+  if(!editingProductId) return;
+  const used = DB.ventes.some(v=>(v.lignes||[]).some(L=>L.productId===editingProductId));
+  if(used) return toast('Produit déjà vendu : suppression interdite.');
+  if(!confirm('Supprimer ce produit ?')) return;
+  DB.produits = DB.produits.filter(p=>p.id!==editingProductId);
+  await idbPut('data',DB); renderProduits(); clearProd();
 };
+function fillProdForm(p){
+  editingProductId=p.id;
+  document.getElementById('p_id').value=p.id;
+  document.getElementById('p_nom').value=p.nom||'';
+  document.getElementById('p_price').value=p.price||0;
+  document.getElementById('p_stock').value=p.stock||0;
+  document.getElementById('p_min').value=p.stockMin||0;
+  document.getElementById('btnDeleteProduct').disabled=false;
+}
 function renderProduits(){
   const q=(document.getElementById('searchProduit').value||'').toLowerCase();
   const tb=document.querySelector('#tblProduits tbody'); tb.innerHTML='';
-  DB.produits.sort((a,b)=>a.nom.localeCompare(b.nom,'fr')).forEach(p=>{
-    if(q && !p.nom.toLowerCase().includes(q))return;
-    const tr=el('tr');
-    tr.innerHTML=`<td>${p.nom}</td><td>${euros(p.price)}</td><td>${p.stock}</td><td>${p.stockMin}</td><td>${p.stock<p.stockMin?'<span class="stock-low">Stock bas</span>':'OK'}</td>`;
-    tr.onclick=()=>fillProd(p);
-    tb.appendChild(tr);
-  });
-  // remplir liste produits (ventes)
+  DB.produits
+    .slice()
+    .sort((a,b)=>a.nom.localeCompare(b.nom,'fr',{sensitivity:'base'}))
+    .filter(p=>p.nom.toLowerCase().includes(q))
+    .forEach(p=>{
+      const low=(p.stock||0)<(p.stockMin||0);
+      const tr=el('tr');
+      tr.innerHTML=`<td>${p.nom}</td><td>${euros(p.price||0)}</td>
+                    <td>${p.stock||0}</td><td>${p.stockMin||0}</td>
+                    <td>${low?'<span class="stock-low">Stock bas</span>':'OK'}</td>`;
+      tr.onclick=()=>fillProdForm(p);
+      tb.appendChild(tr);
+    });
+
+  // remplir sélecteur de produits (ventes)
   const sel=document.getElementById('v_prod');
-  sel.innerHTML=''; DB.produits.slice().sort((a,b)=>a.nom.localeCompare(b.nom,'fr')).forEach(p=>sel.append(el('option',{value:p.id},[p.nom])));
+  sel.innerHTML='';
+  DB.produits.forEach(p=>sel.appendChild(el('option',{value:p.id},[p.nom])));
 }
-function fillProd(p){
-  editingProdId=p.id;
-  document.getElementById('p_nom').value=p.nom;
-  document.getElementById('p_price').value=p.price;
-  document.getElementById('p_stock').value=p.stock;
-  document.getElementById('p_min').value=p.stockMin||0;
-  document.getElementById('p_id').value=p.id;
-  document.getElementById('btnDeleteProduct').disabled=false;
-}
+document.getElementById('searchProduit').oninput=renderProduits;
 
 /* ===== VENTES ===== */
-document.getElementById('v_prod').addEventListener('change',()=>{
-  const p=DB.produits.find(x=>x.id==document.getElementById('v_prod').value);
-  document.getElementById('v_price').value=p?p.price:0;
-  calcLine();
-});
-document.getElementById('v_price').addEventListener('input',calcLine);
-document.getElementById('v_qty').addEventListener('input',calcLine);
+const vProd=document.getElementById('v_prod');
+const vPrice=document.getElementById('v_price');
+const vQty=document.getElementById('v_qty');
 function calcLine(){
-  const qty=+document.getElementById('v_qty').value||0;
-  const price=+document.getElementById('v_price').value||0;
-  const line=qty*price;
-  document.getElementById('v_line_total').textContent=euros(line);
-  document.getElementById('v_sale_total').textContent=euros(line);
+  const q=+(vQty.value||1);
+  const pr=+((vPrice.value||'0').replace(',','.'));
+  const L=(isFinite(q)?q:1)*(isFinite(pr)?pr:0);
+  document.getElementById('v_line_total').textContent=euros(L);
+  document.getElementById('v_sale_total').textContent=euros(L);
 }
+vProd.onchange=()=>{
+  const p=DB.produits.find(x=>x.id==+vProd.value);
+  vPrice.value=(p&&typeof p.price==='number')?p.price:0;
+  calcLine();
+};
+vPrice.oninput=calcLine;
+vQty.oninput=calcLine;
 
-/* Validation avec popup */
+document.getElementById('v_client').addEventListener('change',()=>{
+  const id=+document.getElementById('v_client').value||0;
+  const wrap=document.getElementById('v_client_info');
+  if(!id){wrap.style.display='none'; return;}
+  const c=DB.clients.find(x=>x.id===id);
+  const list=(c?.animaux||[]).map(a=>{
+    const i=nextBD(a.dob);
+    return i.within?`<span class="gift"><i class="icon"></i><span>${a.name||''}</span></span>`:(a.name||'');
+  }).filter(Boolean).join(', ');
+  document.getElementById('v_client_animals').innerHTML=list||'—';
+  wrap.style.display=list?'block':'none';
+});
+
+/* Validation + enregistrement */
 document.getElementById('btnSaveSale').onclick=async()=>{
   const pid=+document.getElementById('v_prod').value;
   const qty=+document.getElementById('v_qty').value||0;
-  const priceRaw=(document.getElementById('v_price').value||'').replace(',','.');
+  const priceRaw=(document.getElementById('v_price').value||'').toString().replace(',','.');
   const price=+priceRaw;
-  const errs=[];
-  if(!pid)errs.push('• Choisissez un <b>produit</b>');
-  if(priceRaw.trim()===''||Number.isNaN(price))errs.push('• Indiquez un <b>prix</b> valide');
-  if(price<0)errs.push('• Le <b>prix</b> ne peut être négatif');
-  if(!qty||qty<1)errs.push('• Indiquez une <b>quantité</b> ≥ 1');
-  if(errs.length){showPopup('Champs à compléter',`<ul>${errs.map(e=>'<li>'+e+'</li>').join('')}</ul>`);return;}
+
+  const errors=[];
+  if(!pid) errors.push('• Choisissez un <b>produit</b>.');
+  if(priceRaw.trim()===''||Number.isNaN(price)) errors.push('• Indiquez un <b>prix</b> (nombre).');
+  if(price<0) errors.push('• Le <b>prix</b> ne peut pas être négatif.');
+  if(!qty||qty<1) errors.push('• Indiquez une <b>quantité</b> (≥ 1).');
+
+  if(errors.length){
+    showPopup('Champs à compléter', `<ul>${errors.map(e=>`<li>${e}</li>`).join('')}</ul>`);
+    return;
+  }
+
   const p=DB.produits.find(x=>x.id==pid);
+  if(!p){ showPopup('Produit introuvable','<p>Le produit n’existe plus.</p>'); return; }
+
   const tot=price*qty;
   p.stock=(p.stock||0)-qty;
+
   const cid=+document.getElementById('v_client').value||null;
-  DB.ventes.push({id:Date.now(),date:Date.now(),clientId:cid||undefined,lignes:[{productId:pid,qty,price,total:tot}]});
-  await saveDB(); renderSales(); calcLine();
-  toast('Vente enregistrée ✅');
-};
-document.getElementById('tblSales').addEventListener('click',async e=>{
-  const b=e.target.closest('button[data-del]');
-  if(!b)return; const id=+b.dataset.del;
-  const v=DB.ventes.find(x=>x.id===id); if(!v)return;
-  if(!confirm('Supprimer cette vente ? Le stock sera restauré.'))return;
-  (v.lignes||[]).forEach(L=>{
-    const p=DB.produits.find(x=>x.id==L.productId);
-    if(p)p.stock=(p.stock||0)+(L.qty||1);
+  DB.ventes.push({
+    id:Date.now(), date:Date.now(),
+    clientId: cid||undefined,
+    lignes: [{productId:pid, qty, price, total:tot}]
   });
-  DB.ventes=DB.ventes.filter(x=>x.id!==id);
-  await saveDB(); renderSales();
-  toast('Vente supprimée et stock restauré ✅');
-});
+  await idbPut('data',DB);
+  toast('Vente enregistrée (stock mis à jour).');
+  document.getElementById('v_qty').value=1;
+  document.getElementById('v_prod').dispatchEvent(new Event('change'));
+  renderSales();
+  calcLine();
+};
+document.getElementById('btnCancelSale').onclick=()=>{document.getElementById('v_qty').value=1; calcLine()};
+document.getElementById('searchSales').oninput=renderSales;
+
 function renderSales(){
   const q=(document.getElementById('searchSales').value||'').toLowerCase();
   const tb=document.querySelector('#tblSales tbody'); tb.innerHTML='';
-  DB.ventes.slice().sort((a,b)=>b.date-a.date).forEach(v=>{
+  const rows=[];
+  DB.ventes.forEach(v=>{
+    const cn = (()=>{const c=DB.clients.find(x=>x.id===v.clientId); return c?(c.nom||('#'+v.clientId)):'—'})();
     (v.lignes||[]).forEach(L=>{
       const p=DB.produits.find(x=>x.id==L.productId);
-      const cli=DB.clients.find(c=>c.id===v.clientId);
-      const r={saleId:v.id,date:v.date,client:cli?cli.nom:'—',prod:p?p.nom:'?',qty:L.qty||1,price:L.price||0,total:L.total||0};
-      if(q && !(`${r.client} ${r.prod}`.toLowerCase().includes(q)))return;
-      const tr=el('tr');
-      tr.innerHTML=`<td>${fmt(r.date)}</td><td>${r.client}</td><td>${r.prod}</td><td>${r.qty}</td><td>${euros(r.price)}</td><td>${euros(r.total)}</td><td><button class="ghost" data-del="${r.saleId}">Supprimer</button></td>`;
-      tb.appendChild(tr);
+      const price=(typeof L.price==='number')?L.price:(p?p.price:0);
+      const total=(typeof L.total==='number')?L.total:price*(L.qty||1);
+      rows.push({saleId:v.id,date:v.date,client:cn,prod:p?p.nom:('Produit '+L.productId),qty:L.qty||1,price,total});
     });
   });
+  rows.sort((a,b)=>b.date-a.date)
+      .filter(r=>((fmt(r.date)+' '+r.client+' '+r.prod).toLowerCase().includes(q)))
+      .forEach(r=>{
+        const tr=el('tr');
+        tr.innerHTML=`<td>${fmt(r.date)}</td><td>${r.client}</td><td>${r.prod}</td><td>${r.qty}</td><td>${euros(r.price)}</td><td>${euros(r.total)}</td>
+                      <td><button class="ghost" data-del="${r.saleId}">Supprimer</button></td>`;
+        tb.appendChild(tr);
+      });
 }
+document.getElementById('tblSales').addEventListener('click',async e=>{
+  const btn=e.target.closest('button[data-del]'); if(!btn) return;
+  const id=+btn.dataset.del;
+  const sale=DB.ventes.find(v=>v.id===id); if(!sale) return;
+  if(!confirm('Supprimer cette vente ? Le stock sera restauré.')) return;
+  (sale.lignes||[]).forEach(L=>{
+    const p=DB.produits.find(x=>x.id==L.productId);
+    if(p) p.stock=(p.stock||0)+(L.qty||1);
+  });
+  DB.ventes=DB.ventes.filter(v=>v.id!==id);
+  await idbPut('data',DB); renderSales(); renderProduits();
+  toast('Vente supprimée et stock restauré.');
+});
 
-/* ===== BILANS ===== */
+/* ===== BILANS (avec Tops) ===== */
 function renderBilans(){
   const mode=document.getElementById('repPeriod').value;
+
+  // Fenêtre : 30j / ~12 sem / 12 mois
+  const now=Date.now();
+  const rangeStart = mode==='day'  ? now - 30*864e5
+                   : mode==='week' ? now - 84*864e5
+                                   : now - 365*864e5;
+
   const tb=document.querySelector('#tblSummary tbody'); tb.innerHTML='';
-  const agg=new Map();
+  const agg=new Map();      // période -> {CA,Qté,Count}
+  const prodAgg=new Map();  // produit -> {ca,qty}
+  const cliAgg=new Map();   // client -> {ca,ventes}
+
+  const keyOf=(ts)=>{
+    const d=new Date(ts);
+    if(mode==='day') return d.toISOString().slice(0,10);
+    if(mode==='week'){ const dd=new Date(d); const w=(dd.getDay()+6)%7; dd.setDate(dd.getDate()-w); return 'S'+dd.toISOString().slice(0,10); }
+    return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');
+  };
+
   DB.ventes.forEach(v=>{
-    const d=new Date(v.date);
-    let key=''; if(mode==='day')key=ymd(v.date);
-    else if(mode==='week'){const f=new Date(d-d.getDay()*dms(1)); key=ymd(f);}
-    else key=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');
-    let R=agg.get(key)||{CA:0,Qté:0,Count:0};
-    v.lignes.forEach(L=>{R.CA+=(L.total||0); R.Qté+=(L.qty||0)});
-    R.Count++; agg.set(key,R);
+    if(v.date < rangeStart) return;
+    const k=keyOf(v.date);
+    let R=agg.get(k)||{CA:0,Qté:0,Count:0};
+    let counted=false;
+
+    (v.lignes||[]).forEach(L=>{
+      const price=(typeof L.price==='number')?L.price:0;
+      const qty=L.qty||1;
+      const total=typeof L.total==='number' ? L.total : price*qty;
+
+      R.CA += total; R.Qté += qty;
+      if(!counted){ R.Count++; counted=true; }
+
+      const p=DB.produits.find(x=>x.id==L.productId);
+      const pn=p ? p.nom : ('Produit '+L.productId);
+      const P=prodAgg.get(pn)||{ca:0,qty:0};
+      P.ca += total; P.qty += qty;
+      prodAgg.set(pn,P);
+
+      const cli=DB.clients.find(c=>c.id===v.clientId);
+      const cn=cli ? (cli.nom||('#'+v.clientId)) : '—';
+      const C=cliAgg.get(cn)||{ca:0,ventes:0};
+      C.ca += total; C.ventes += 1;
+      cliAgg.set(cn,C);
+    });
+
+    agg.set(k,R);
   });
+
   const arr=[...agg.entries()].sort((a,b)=>a[0]>b[0]?1:-1);
   let ca=0,qt=0,ct=0;
   arr.forEach(([k,v])=>{
-    ca+=v.CA;qt+=v.Qté;ct+=v.Count;
+    ca+=v.CA; qt+=v.Qté; ct+=v.Count;
     const tr=el('tr'); tr.innerHTML=`<td>${k}</td><td>${euros(v.CA)}</td><td>${v.Qté}</td><td>${v.Count}</td>`;
     tb.appendChild(tr);
   });
   document.getElementById('repCA').textContent=euros(ca);
   document.getElementById('repQTY').textContent=qt;
   document.getElementById('repCOUNT').textContent=ct;
-}
 
-/* ===== CONFETTIS ===== */
-function confetti(duration=1e4){
-  const cv=document.getElementById('confetti'),ctx=cv.getContext('2d');
-  const W=cv.width=innerWidth,H=cv.height=innerHeight;
-  cv.style.display='block';
-  const N=160,parts=[];
-  for(let i=0;i<N;i++)parts.push({
-    x:Math.random()*W,y:Math.random()*-H,
-    r:8+Math.random()*10, // plus gros
-    c:`hsl(${Math.random()*360},90%,60%)`,
-    vy:1+Math.random()*1.8,vx:(Math.random()-.5)*0.8,rot:Math.random()*Math.PI
+  // Top produits
+  const tpp=document.querySelector('#tblTopProductsRep tbody'); tpp.innerHTML='';
+  [...prodAgg.entries()].sort((a,b)=>b[1].ca-a[1].ca).slice(0,10).forEach(([name,val])=>{
+    const tr=el('tr'); tr.innerHTML=`<td>${name}</td><td>${euros(val.ca)}</td><td>${val.qty}</td>`;
+    tpp.appendChild(tr);
   });
-  let start=null;
-  function step(ts){
-    if(!start)start=ts; const t=ts-start;
-    ctx.clearRect(0,0,W,H);
-    parts.forEach(p=>{
-      p.x+=p.vx; p.y+=p.vy; p.rot+=0.02;
-      ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.rot);
-      ctx.fillStyle=p.c; ctx.fillRect(-p.r/2,-p.r/2,p.r,p.r);
-      ctx.restore();
-      if(p.y>H)p.y=-10;
-    });
-    if(t<duration)requestAnimationFrame(step); else cv.style.display='none';
-  }
-  requestAnimationFrame(step);
-}
-document.getElementById('btnTestConfetti').onclick=()=>confetti();
 
-/* ===== SAUVEGARDE / IMPORT ===== */
-async function importFromText(txt){
-  const data=safeParse(txt);
-  if(!data)return toast('Données invalides');
-  DB=data; await idbPut('data',DB);
-  if(data._logo)await idbPut('logo',{id:'current',data:data._logo});
-  if(data._confetti)await idbPut('settings',data._confetti);
-  await renderAll();
-  toast('Import terminé ✅');
+  // Top clients
+  const tpc=document.querySelector('#tblTopClientsRep tbody'); tpc.innerHTML='';
+  [...cliAgg.entries()].sort((a,b)=>b[1].ca-a[1].ca).slice(0,10).forEach(([name,val])=>{
+    const tr=el('tr'); tr.innerHTML=`<td>${name}</td><td>${euros(val.ca)}</td><td>${val.ventes}</td>`;
+    tpc.appendChild(tr);
+  });
 }
-document.getElementById('btnImport').onclick=()=>document.getElementById('fileImport').click();
-document.getElementById('fileImport').addEventListener('change',async e=>{
-  const f=e.target.files?.[0]; if(!f)return;
-  const t=await f.text(); await importFromText(t);
-});
+document.getElementById('repPeriod').onchange=renderBilans;
+
+/* ===== ÉDITEUR DE RACES ===== */
+function renderBreedEditor(key,divId){
+  const c=document.getElementById(divId);
+  c.innerHTML='';
+  const arr=[...(DB.lists[key]||[])].sort((a,b)=>a.localeCompare(b,'fr',{sensitivity:'base'}));
+  DB.lists[key]=arr;
+  arr.forEach((v,i)=>{
+    const chip=el('div',{class:'chip'},[v]);
+    chip.title='Cliquer pour renommer';
+    chip.onclick=async()=>{
+      const nv=prompt('Renommer :',v); if(nv==null) return;
+      const t=(nv||'').trim(); if(!t) return;
+      DB.lists[key][i]=t;
+      DB.lists[key].sort((a,b)=>a.localeCompare(b,'fr',{sensitivity:'base'}));
+      await idbPut('data',DB); renderBreedEditor(key,divId); refreshPetRace();
+    };
+    const del=el('span',{style:'margin-left:6px;cursor:pointer;color:#B91C1C'},['×']);
+    del.onclick=async(e)=>{ e.stopPropagation(); if(confirm('Supprimer ?')){ DB.lists[key].splice(i,1); await idbPut('data',DB); renderBreedEditor(key,divId); refreshPetRace(); }};
+    chip.appendChild(del);
+    c.appendChild(chip);
+  });
+}
+document.querySelectorAll('button[data-add]').forEach(b=>b.addEventListener('click',async()=>{
+  const key=b.getAttribute('data-add');
+  const v=prompt('Nouvelle race :'); if(v==null) return;
+  DB.lists[key].push((v||'').trim());
+  DB.lists[key]=DB.lists[key].filter(Boolean).sort((a,b)=>a.localeCompare(b,'fr',{sensitivity:'base'}));
+  await idbPut('data',DB); renderBreedEditor(key,key==='breedsDog'?'editBreedsDog':'editBreedsCat'); refreshPetRace();
+}));
+function refreshPetRace(){
+  document.querySelectorAll('.pet-espece').forEach(sel=>{
+    const race=sel.closest('.card').querySelector('.pet-race');
+    const list=(sel.value==='Chien'?DB.lists.breedsDog:DB.lists.breedsCat)||[];
+    const cur=race.value;
+    race.innerHTML=''; list.forEach(r=>race.append(el('option',{value:r},[r])));
+    if(list.includes(cur)) race.value=cur;
+  });
+}
+
+/* ===== SAUVEGARDE / RESTAURATION (TXT) ===== */
+const fileName=()=>{const d=new Date(),y=d.getFullYear(),m=String(d.getMonth()+1).padStart(2,'0'),dd=String(d.getDate()).padStart(2,'0'); return `ptv_sauvegarde_${y}-${m}-${dd}.txt`};
+async function snapStr(){return JSON.stringify(await getSnap(),null,2)}
+
 async function exportChoose(){
-  const blob=new Blob([await snapStr()],{type:'text/plain'});
-  const a=document.createElement('a');
-  a.href=URL.createObjectURL(blob); a.download=fileName(); a.click();
-}
-function fileName(){return 'PTV_backup_'+new Date().toISOString().slice(0,10)+'.txt';}
-async function exportShare(){
-  const data=await snapStr(); const name=fileName();
-  const file=new File([data],name,{type:'text/plain'});
-  if(navigator.canShare && navigator.canShare({files:[file]})){
-    await navigator.share({files:[file],title:'Sauvegarde PASSE TEMPS VEGA'});
-    alert('Partage lancé ✅\nChoisissez “Enregistrer dans Fichiers” si besoin.'); return;
+  const data=await snapStr(), name=fileName();
+  if('showSaveFilePicker' in window){
+    try{
+      const h=await window.showSaveFilePicker({suggestedName:name,types:[{description:'Sauvegarde PTV',accept:{'text/plain':['.txt']}}]});
+      const w=await h.createWritable(); await w.write(data); await w.close();
+      alert('Sauvegarde enregistrée ✅'); return;
+    }catch(e){ if(e?.name!=='AbortError') alert('Échec sauvegarde: '+e) }
   }
-  const url='data:text/plain;charset=utf-8,'+encodeURIComponent(data);
-  window.open(url,'_blank'); alert('Sur iPhone : Partager → Enregistrer dans Fichiers.');
+  const blob=new Blob([data],{type:'text/plain;charset=utf-8'}), a=document.createElement('a');
+  a.href=URL.createObjectURL(blob); a.download=name; document.body.appendChild(a); a.click();
+  setTimeout(()=>{URL.revokeObjectURL(a.href); a.remove()},0);
+}
+async function exportShare(){
+  try{
+    const data=await snapStr(); const name=fileName();
+    const file=new File([data],name,{type:'text/plain'});
+    if(navigator.canShare && navigator.canShare({files:[file]})){
+      await navigator.share({files:[file],title:'Sauvegarde PASSE TEMPS VEGA'});
+      alert('Partage lancé ✅\nSi besoin, choisis “Enregistrer dans Fichiers”.');
+      return;
+    }
+    const url='data:text/plain;charset=utf-8,'+encodeURIComponent(data);
+    window.open(url,'_blank','noopener');
+    alert('Sur iPhone/iPad : Partager → “Enregistrer dans Fichiers”.');
+  }catch(e){ alert('Échec export iOS : '+(e?.message||e)) }
 }
 document.getElementById('btnExportChoose').onclick=exportChoose;
 document.getElementById('btnExportShare').onclick=exportShare;
 document.getElementById('btnExportJSON').onclick=async()=>{
   document.getElementById('exportArea').textContent=await snapStr();
 };
+document.getElementById('btnImport').onclick=()=>document.getElementById('fileImport').click();
+document.getElementById('fileImport').addEventListener('change',async e=>{
+  const f=e.target.files?.[0]; if(!f) return;
+  try{
+    let text=await f.text(); text=text.replace(/^\uFEFF/,'').trim();
+    if(text.startsWith('data:')){
+      const m=text.match(/^data:.*?;base64,(.*)$/);
+      if(m){ try{text=atob(m[1])}catch{} } else { const i=text.indexOf(','); if(i>-1) text=text.slice(i+1) }
+    }
+    let obj=null;
+    try{ obj=JSON.parse(text) }catch{ const a=text.indexOf('{'), b=text.lastIndexOf('}'); if(a!=-1&&b>a) try{ obj=JSON.parse(text.slice(a,b+1)) }catch{} }
+    if(!obj||!obj.clients||!obj.produits||!obj.ventes||!obj.lists) return alert('Fichier TXT invalide');
+
+    (obj.produits||[]).forEach(p=>{ if(typeof p.price!=='number') p.price=0; if(typeof p.stockMin!=='number' && typeof p.min==='number') p.stockMin=p.min; });
+    (obj.ventes||[]).forEach(v=>(v.lignes||[]).forEach(L=>{ if(typeof L.price!=='number') L.price=0; if(typeof L.total!=='number') L.total=(L.price||0)*(L.qty||1) }));
+
+    DB={id:'main',clients:obj.clients,produits:obj.produits,ventes:obj.ventes,lists:obj.lists};
+    await idbPut('data',DB);
+    if(obj._logo) await idbPut('logo',{id:'current',data:obj._logo});
+    if(obj._confetti) await idbPut('settings',{id:'confetti',...obj._confetti});
+    renderAll(); alert('Import réussi ✅');
+  }finally{
+    e.target.value='';
+  }
+});
+document.getElementById('btnResetAll').onclick=async()=>{
+  if(!confirm('Effacer toutes les données locales ? (Sauvegardez avant)'))return;
+  await idbDeleteDB(); try{localStorage.removeItem('ptv_db_main')}catch{}; location.reload();
+};
+
+/* ===== CONFETTIS (plus gros) ===== */
+const CONF_DAILY='ptv_confetti_last';
+const todayKey=()=>new Date().toISOString().slice(0,10);
+function confetti(duration=1e4){
+  const cv=document.getElementById('confetti'),ctx=cv.getContext('2d');
+  const W=cv.width=innerWidth,H=cv.height=innerHeight;
+  cv.style.display='block';
+  const N=160,parts=[];
+  for(let i=0;i<N;i++) parts.push({
+    x:Math.random()*W, y:Math.random()*-H,
+    r:6+Math.random()*8, c:`hsl(${Math.random()*360},90%,60%)`,
+    vy:1+Math.random()*1.8, vx:(Math.random()-.5)*0.8, rot:Math.random()*Math.PI
+  });
+  let start=null;
+  function step(ts){
+    if(!start) start=ts; const t=ts-start;
+    ctx.clearRect(0,0,W,H);
+    const breeze=Math.sin(t/1200)*0.4;
+    parts.forEach(p=>{
+      p.x+=p.vx+breeze; p.y+=p.vy*.9; p.rot+=0.06;
+      if(p.y>H){p.y=-10;p.x=Math.random()*W}
+      ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.rot);
+      ctx.fillStyle=p.c; ctx.fillRect(-p.r/2,-p.r/2,p.r,p.r); ctx.restore();
+    });
+    if(t<duration) requestAnimationFrame(step); else cv.style.display='none';
+  }
+  requestAnimationFrame(step);
+}
+document.getElementById('btnTestConfetti').onclick=()=>confetti(1e4);
+document.getElementById('confettiToggle').addEventListener('change',async e=>{
+  const s=await idbGet('settings','confetti')||{id:'confetti'};
+  s.enabled=!!e.target.checked; await idbPut('settings',s);
+  toast('Préférence confettis enregistrée.');
+});
 
 /* ===== DASHBOARD ===== */
 function renderDashboard(){
-  const t90=Date.now()-dms(90);
-  const actifs=new Set(DB.ventes.filter(v=>v.date>=t90).map(v=>v.clientId));
-  document.getElementById('kpiActifs').textContent=actifs.size;
-  const prodMap=new Map(),cliMap=new Map();
-  DB.ventes.forEach(v=>{
-    v.lignes.forEach(L=>{
-      const p=DB.produits.find(x=>x.id==L.productId);
-      if(p)prodMap.set(p.nom,(prodMap.get(p.nom)||0)+(L.qty||1));
-    });
-    if(v.clientId)cliMap.set(v.clientId,(cliMap.get(v.clientId)||0)+v.lignes.reduce((a,b)=>a+(b.total||0),0));
-  });
-  const topProd=[...prodMap.entries()].sort((a,b)=>b[1]-a[1])[0];
-  const topCli=[...cliMap.entries()].sort((a,b)=>b[1]-a[1])[0];
-  document.getElementById('kpiTopProd').textContent=topProd?`${topProd[0]} (${topProd[1]})`:'—';
-  const cli=topCli?DB.clients.find(c=>c.id==topCli[0]):null;
-  document.getElementById('kpiTopCli').textContent=cli?`${cli.nom} (${euros(topCli[1])})`:'—';
+  const t30=Date.now()-30*864e5, t90=Date.now()-90*864e5;
 
-  const tb=document.querySelector('#tblBirthSoon tbody'); tb.innerHTML='';
-  DB.clients.forEach(c=>{
-    (c.animaux||[]).forEach(a=>{
-      const i=nextBD(a.dob); if(i.within)
-        tb.append(el('tr',{},[el('td',{},[c.nom]),el('td',{},[a.name+' 🎁']),el('td',{},[i.days+' j'])]));
-    });
-  });
-}
+  // KPI
+  document.getElementById('kpiActifs').textContent=
+    new Set(DB.ventes.filter(v=>v.date>=t90&&!!v.clientId).map(v=>v.clientId)).size;
 
-/* ===== RACES ===== */
-function renderBreeds(){
-  ['breedsDog','breedsCat'].forEach(key=>{
-    const box=document.getElementById(key==='breedsDog'?'editBreedsDog':'editBreedsCat');
-    box.innerHTML='';
-    (DB.lists[key]||[]).slice().sort((a,b)=>a.localeCompare(b,'fr')).forEach(r=>{
-      const chip=el('div',{class:'chip'},[r]);
-      chip.onclick=()=>{
-        const nv=prompt('Modifier la race',r);
-        if(!nv)return;
-        DB.lists[key]=DB.lists[key].map(x=>x===r?nv:x).sort((a,b)=>a.localeCompare(b,'fr'));
-        saveDB(); renderBreeds();
-      };
-      box.append(chip);
-    });
+  const byProd={}; DB.ventes.filter(v=>v.date>=t30).forEach(v=>v.lignes.forEach(L=>{
+    const p=DB.produits.find(x=>x.id==L.productId);
+    const name=p?p.nom:('Produit '+L.productId);
+    byProd[name]=(byProd[name]||0)+(L.qty||1);
+  }));
+  const tp=Object.entries(byProd).sort((a,b)=>b[1]-a[1]).slice(0,10);
+  const tbp=document.querySelector('#tblTopProd tbody'); tbp.innerHTML='';
+  tp.forEach(([n,q])=>{const tr=el('tr'); tr.innerHTML=`<td>${n}</td><td>${q}</td>`; tbp.appendChild(tr)});
+  document.getElementById('kpiTopProd').textContent=tp.length?`${tp[0][0]} (${tp[0][1]})`:'—';
+
+  const byCli={}; DB.ventes.filter(v=>v.date>=t30&&!!v.clientId).forEach(v=>{
+    const c=DB.clients.find(x=>x.id===v.clientId),name=c?(c.nom||('#'+v.clientId)):'#'+v.clientId;
+    byCli[name]=(byCli[name]||0)+1
   });
+  const tc=Object.entries(byCli).sort((a,b)=>b[1]-a[1]).slice(0,10);
+  const tbc=document.querySelector('#tblTopCli tbody'); tbc.innerHTML='';
+  tc.forEach(([n,k])=>{const tr=el('tr'); tr.innerHTML=`<td>${n}</td><td>${k}</td>`; tbc.appendChild(tr)});
+  document.getElementById('kpiTopCli').textContent=tc.length?`${tc[0][0]} (${tc[0][1]})`:'—';
+
+  // Anniversaires (cadeau clignotant)
+  const tbb=document.querySelector('#tblBirthSoon tbody'); tbb.innerHTML='';
+  DB.clients.forEach(c=>(c.animaux||[]).forEach(a=>{
+    const i=nextBD(a.dob); if(i.within){
+      const tr=el('tr');
+      tr.innerHTML = `<td>${c.nom||'—'}</td>
+                      <td><span class="gift"><i class="icon"></i><span>${a.name||'—'}</span></span></td>
+                      <td>${i.days}</td>`;
+      tbb.appendChild(tr);
+    }
+  }));
 }
-document.querySelectorAll('[data-add]').forEach(b=>b.onclick=()=>{
-  const key=b.dataset.add;
-  const nv=prompt('Nouvelle race :'); if(!nv)return;
-  DB.lists[key].push(nv); DB.lists[key].sort((a,b)=>a.localeCompare(b,'fr'));
-  saveDB(); renderBreeds();
-});
 
 /* ===== RENDER GLOBAL ===== */
 function renderAll(){
-  renderChangelog(); renderClients(); renderProduits();
-  renderSales(); renderDashboard(); renderBreeds(); renderBilans(); loadLogoUI();
+  renderChangelog(); renderClients(); renderProduits(); renderSales();
+  renderBilans(); renderBreedEditor('breedsDog','editBreedsDog');
+  renderBreedEditor('breedsCat','editBreedsCat'); renderDashboard(); loadLogoUI();
 }
 
-/* ===== BOOT ===== */
-(async()=>{
-  await loadDB(); renderAll(); showWhatsNew(); calcLine();
-})();
+/* ===== BOOT avec protection (propose import si base vide) ===== */
+const RESCUE_KEY='ptv_rescue_snapshot';
+async function loadDB(){
+  await idbOpen();
+
+  let row=null;
+  try{ row = await idbGet('data','main'); }catch(e){
+    showPopup('Stockage indisponible', `<p>Impossible d’accéder aux données locales (IndexedDB).</p><p>Désactivez la navigation privée, libérez de l’espace disque et autorisez le stockage.</p>`);
+    throw e;
+  }
+
+  if(!row){
+    if(!localStorage.getItem(RESCUE_KEY)){
+      localStorage.setItem(RESCUE_KEY, JSON.stringify({ts: Date.now(), origin: location.origin+location.pathname}));
+    }
+    const wantImport = confirm("⚠️ Aucune donnée locale trouvée ici.\n\nVoulez-vous IMPORTER un fichier .txt maintenant ?\n\nOK = Choisir un fichier .txt\nAnnuler = Continuer avec une base vide");
+    if(wantImport){
+      document.querySelector('.tab.active')?.classList.remove('active');
+      document.querySelector('.tab[data-tab="param"]')?.classList.add('active');
+      document.querySelectorAll('main section').forEach(s=>s.hidden=true);
+      document.getElementById('param').hidden=false;
+      document.getElementById('fileImport').click();
+
+      DB = emptyDB(); await idbPut('data', DB);
+    } else {
+      DB = emptyDB(); await idbPut('data', DB);
+    }
+  } else {
+    row.produits?.forEach(p=>{ if(typeof p.price!=='number') p.price=0; if(typeof p.stockMin!=='number') p.stockMin=(p.min||0); });
+    DB=row;
+  }
+
+  const logoRow=await idbGet('logo','current'); if(!logoRow) await idbPut('logo',{id:'current',data:embeddedLogo()});
+  const set=await idbGet('settings','confetti'); if(!set) await idbPut('settings',{id:'confetti',enabled:true,lastDateShown:''});
+}
+
+document.addEventListener('DOMContentLoaded', async ()=>{
+  try{ if(navigator.storage && navigator.storage.persist) await navigator.storage.persist(); }catch{}
+  try{
+    renderChangelog();
+    await loadDB();
+    renderAll();
+    showWhatsNew();
+
+    // Confettis jour J (si activé)
+    try{
+      const set=await idbGet('settings','confetti');
+      const last=localStorage.getItem(CONF_DAILY);
+      if(set?.enabled && last!==todayKey()){
+        const isBirthdayToday=DB.clients.some(c=>(c.animaux||[]).some(a=>nextBD(a.dob).isToday));
+        if(isBirthdayToday){ confetti(6000); localStorage.setItem(CONF_DAILY,todayKey()); }
+      }
+    }catch(e){ console.warn('Confetti check fail', e); }
+
+    // Initialiser le calcul de la ligne de vente
+    try{ document.getElementById('v_prod').dispatchEvent(new Event('change')); }catch{}
+
+  }catch(err){
+    console.error('Boot error', err);
+    showPopup('Erreur de démarrage', `<p>Un problème empêche le lancement complet.</p><p><small>${(err && err.message) || err}</small></p><p>Vérifie que les <b>4 blocs</b> sont bien collés et que tu n'es pas en <b>navigation privée</b> (Safari).</p>`);
+  }
+});
 </script>
 </body>
 </html>
