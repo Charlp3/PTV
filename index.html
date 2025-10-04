@@ -957,27 +957,85 @@ function renderSales(){
 /* ===== BILANS ===== */
 function renderBilans(){
   const mode=document.getElementById('repPeriod').value;
+
+  // --- Fenêtre temporelle selon le mode ---
+  const now=Date.now();
+  const rangeStart = mode==='day'  ? now - 30*864e5  // 30 jours
+                   : mode==='week' ? now - 84*864e5  // ~12 semaines
+                                   : now - 365*864e5; // 12 mois (approx)
+
+  // --- Agrégats par période ---
   const tb=document.querySelector('#tblSummary tbody'); tb.innerHTML='';
-  const agg=new Map();
+  const agg=new Map();               // clé période -> {CA, Qté, Count}
+  const prodAgg=new Map();           // nom produit -> {ca, qty}
+  const clientAgg=new Map();         // nom client  -> {ca, ventes}
+
+  const keyOf=(ts)=>{
+    const d=new Date(ts);
+    if(mode==='day')   return d.toISOString().slice(0,10);
+    if(mode==='week'){ const dd=new Date(d); const w=(dd.getDay()+6)%7; dd.setDate(dd.getDate()-w); return 'S'+dd.toISOString().slice(0,10); }
+    return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0'); // month
+  };
+
   DB.ventes.forEach(v=>{
-    const d=new Date(v.date);
-    let key=''; if(mode==='day')key=ymd(v.date);
-    else if(mode==='week'){const f=new Date(d-d.getDay()*dms(1)); key=ymd(f);}
-    else key=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');
-    let R=agg.get(key)||{CA:0,Qté:0,Count:0};
-    v.lignes.forEach(L=>{R.CA+=(L.total||0); R.Qté+=(L.qty||0)});
-    R.Count++; agg.set(key,R);
+    if(v.date < rangeStart) return; // hors fenêtre
+    const k=keyOf(v.date);
+    let R=agg.get(k)||{CA:0,Qté:0,Count:0};
+    let counted=false;
+
+    (v.lignes||[]).forEach(L=>{
+      const price=(typeof L.price==='number')?L.price:0;
+      const qty=L.qty||1;
+      const total=typeof L.total==='number' ? L.total : price*qty;
+
+      R.CA += total; R.Qté += qty;
+      if(!counted){ R.Count++; counted=true; }
+
+      // Tops produits
+      const p=DB.produits.find(x=>x.id==L.productId);
+      const pn=p ? p.nom : ('Produit '+L.productId);
+      const P=prodAgg.get(pn)||{ca:0,qty:0};
+      P.ca += total; P.qty += qty;
+      prodAgg.set(pn,P);
+
+      // Tops clients
+      const cli=DB.clients.find(c=>c.id===v.clientId);
+      const cn=cli ? (cli.nom||('#'+v.clientId)) : '—';
+      const C=clientAgg.get(cn)||{ca:0,ventes:0};
+      C.ca += total; C.ventes += 1;
+      clientAgg.set(cn,C);
+    });
+
+    agg.set(k,R);
   });
+
+  // --- Remplir résumé + tuiles ---
   const arr=[...agg.entries()].sort((a,b)=>a[0]>b[0]?1:-1);
   let ca=0,qt=0,ct=0;
   arr.forEach(([k,v])=>{
-    ca+=v.CA;qt+=v.Qté;ct+=v.Count;
+    ca+=v.CA; qt+=v.Qté; ct+=v.Count;
     const tr=el('tr'); tr.innerHTML=`<td>${k}</td><td>${euros(v.CA)}</td><td>${v.Qté}</td><td>${v.Count}</td>`;
     tb.appendChild(tr);
   });
   document.getElementById('repCA').textContent=euros(ca);
   document.getElementById('repQTY').textContent=qt;
   document.getElementById('repCOUNT').textContent=ct;
+
+  // --- Remplir "Top produits" ---
+  const tpp=document.querySelector('#tblTopProductsRep tbody');
+  tpp.innerHTML='';
+  [...prodAgg.entries()].sort((a,b)=>b[1].ca-a[1].ca).slice(0,10).forEach(([name,val])=>{
+    const tr=el('tr'); tr.innerHTML=`<td>${name}</td><td>${euros(val.ca)}</td><td>${val.qty}</td>`;
+    tpp.appendChild(tr);
+  });
+
+  // --- Remplir "Top clients" ---
+  const tpc=document.querySelector('#tblTopClientsRep tbody');
+  tpc.innerHTML='';
+  [...clientAgg.entries()].sort((a,b)=>b[1].ca-a[1].ca).slice(0,10).forEach(([name,val])=>{
+    const tr=el('tr'); tr.innerHTML=`<td>${name}</td><td>${euros(val.ca)}</td><td>${val.ventes}</td>`;
+    tpc.appendChild(tr);
+  });
 }
 
 /* ===== CONFETTIS ===== */
