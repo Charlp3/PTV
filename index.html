@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>PASSE TEMPS VEGA — v2.3.2</title>
+<title>PASSE TEMPS VEGA — v2.3.1</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
 <style>
 :root{
@@ -118,7 +118,7 @@ input:checked + .slider:before{transform:translateX(22px)}
 <header>
   <div class="logo"><img id="logoImg" alt="Logo"></div>
   <div class="brand">
-    <h1>PASSE TEMPS VEGA <span class="badge">v2.3.2</span>
+    <h1>PASSE TEMPS VEGA <span class="badge">v2.3.1</span>
       <a class="link" id="btnShowWhatsNew">Nouveautés</a>
     </h1>
   </div>
@@ -136,7 +136,7 @@ input:checked + .slider:before{transform:translateX(22px)}
   <section id="dash" class="card">
     <h2>Vue d’ensemble</h2>
     <div class="kpi">
-      <div class="item"><h3>Client actif (90 j)</h3><div id="kpiActifs">0</div></div>
+      <div class="item"><h3>Client actif (90j)</h3><div id="kpiActifs">0</div></div>
       <div class="item"><h3>Top produit (Qté)</h3><div id="kpiTopProd">—</div></div>
       <div class="item"><h3>Top client (Achats)</h3><div id="kpiTopCli">—</div></div>
     </div>
@@ -177,7 +177,7 @@ input:checked + .slider:before{transform:translateX(22px)}
             <input id="c_nom" placeholder="Nom Prénom (optionnel)">
           </div>
           <div>
-            <label>Téléphone (optionnel)</label>
+            <label>Téléphone (BE, optionnel)</label>
             <input id="c_tel" inputmode="numeric" maxlength="10" placeholder="0470123456">
           </div>
           <div>
@@ -193,6 +193,7 @@ input:checked + .slider:before{transform:translateX(22px)}
         <h3>Animaux</h3>
         <div id="petsContainer" class="grid" style="gap:10px"></div>
         <button class="secondary" id="btnAddPet">+ Ajouter un animal</button>
+
         <div class="grid cols-3" style="margin-top:10px">
           <button id="btnSaveClient">Enregistrer</button>
           <button class="secondary" id="btnNewClient">Nouveau</button>
@@ -255,22 +256,196 @@ input:checked + .slider:before{transform:translateX(22px)}
 
       <div>
         <h3>Catalogue</h3>
-        <input id="searchProduit" placeholder="Recherche produit…">
+        <div class="chips" id="alphaChips"></div>
+        <input id="searchProduit" placeholder="Recherche produit… (nom)">
         <table class="table" id="tblProduits">
           <thead><tr><th>Produit</th><th>Prix</th><th>Stock</th><th>Min</th><th>Statut</th></tr></thead>
           <tbody></tbody>
         </table>
+        <small class="muted">Tri A→Z. Filtre par lettre/chiffre via les puces.</small>
       </div>
     </div>
   </section>
+
+  <!-- VENTES -->
+  <section id="ventes" class="card" hidden>
+    <h2>Enregistrer une vente</h2>
+    <div class="grid cols-3">
+      <div>
+        <label>Client (facultatif)</label>
+        <select id="v_client"></select>
+      </div>
+      <div style="grid-column:1/-1">
+        <div id="v_client_info" style="display:none"><span id="v_client_animals"></span></div>
+      </div>
+
+      <div style="grid-column:1/-1">
+        <label>Produit</label>
+        <select id="v_prod"></select>
+      </div>
+      <div>
+        <label>Prix (€)</label>
+        <input id="v_price" type="number" step="0.01" min="0" value="0">
+      </div>
+      <div>
+        <label>Quantité</label>
+        <input id="v_qty" type="number" value="1" min="1">
+      </div>
+      <div class="total-box">
+        <div>Ligne : <span id="v_line_total">0,00 €</span></div>
+        <div>Total vente : <span id="v_sale_total" class="total-ok">0,00 €</span></div>
+      </div>
+    </div>
+    <div class="grid cols-2" style="margin-top:10px">
+      <button id="btnSaveSale">Valider vente</button>
+      <button class="secondary" id="btnCancelSale">Annuler</button>
+    </div>
+    <hr class="sep">
+    <h3>Historique des ventes</h3>
+    <input id="searchSales" placeholder="Recherche date/produit/client…">
+    <table class="table" id="tblSales">
+      <thead><tr><th>Date</th><th>Client</th><th>Produit</th><th>Qté</th><th>Prix</th><th>Total</th><th>Actions</th></tr></thead>
+      <tbody></tbody>
+    </table>
+    <small class="muted">Ordre antéchronologique (vente la plus récente en haut).</small>
+  </section>
+
+  <!-- BILANS -->
+  <section id="bilans" class="card" hidden>
+    <h2>Bilans & Statistiques</h2>
+    <div class="grid cols-4">
+      <div>
+        <label>Période</label>
+        <select id="repPeriod">
+          <option value="day">Par jour (30 derniers jours)</option>
+          <option value="week">Par semaine (12 dernières)</option>
+          <option value="month">Par mois (12 derniers)</option>
+        </select>
+      </div>
+      <div class="total-box"><div>Chiffre d’affaires : <span id="repCA">0,00 €</span></div></div>
+      <div class="total-box"><div>Quantités vendues : <span id="repQTY">0</span></div></div>
+      <div class="total-box"><div>Nombre de ventes : <span id="repCOUNT">0</span></div></div>
+    </div>
+    <div class="grid cols-2" style="margin-top:10px">
+      <div>
+        <h3>Résumé</h3>
+        <table class="table" id="tblSummary">
+          <thead><tr><th>Période</th><th>CA</th><th>Qté</th><th>Ventes</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div>
+        <h3>Top produits / Top clients</h3>
+        <div class="grid cols-2">
+          <table class="table" id="tblTopProductsRep">
+            <thead><tr><th>Produit</th><th>CA</th><th>Qté</th></tr></thead>
+            <tbody></tbody>
+          </table>
+          <table class="table" id="tblTopClientsRep">
+            <thead><tr><th>Client</th><th>CA</th><th>Ventes</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PARAM -->
+  <section id="param" class="card" hidden>
+    <h2>Paramètres</h2>
+    <div class="grid cols-2">
+      <div>
+        <h3>Logo</h3>
+        <div class="grid cols-3">
+          <div style="grid-column:1/-1;display:flex;gap:10px;align-items:center">
+            <div class="logo" style="width:56px;height:56px"><img id="logoPreview" alt="Aperçu"></div>
+            <input type="file" id="logoFile" accept="image/*">
+          </div>
+          <button class="secondary" id="btnSaveLogo">Enregistrer le logo</button>
+          <button class="ghost" id="btnClearLogo">Supprimer logo</button>
+        </div>
+        <small class="muted">Logo stocké localement (confidentiel).</small>
+      </div>
+
+      <div>
+        <h3>Races</h3>
+        <div class="grid cols-2">
+          <div>
+            <label>Races de chiens</label>
+            <div id="editBreedsDog" class="chips"></div>
+            <button class="secondary" data-add="breedsDog">+ Ajouter</button>
+          </div>
+          <div>
+            <label>Races de chats</label>
+            <div id="editBreedsCat" class="chips"></div>
+            <button class="secondary" data-add="breedsCat">+ Ajouter</button>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <h3>Effets visuels</h3>
+        <label>Confettis anniversaires</label>
+        <label class="switch" style="vertical-align:middle;margin-left:8px">
+          <input type="checkbox" id="confettiToggle"><span class="slider"></span>
+        </label>
+        <div style="margin-top:8px">
+          <button id="btnTestConfetti" class="secondary">Tester les confettis (10s)</button>
+        </div>
+        <small class="muted">Si activé : pluie de confettis le jour J (1 fois/jour). Le test ignore cette limite.</small>
+      </div>
+
+      <div>
+        <h3>Sauvegarde / Restauration (local)</h3>
+        <div class="grid cols-3">
+          <button id="btnExportChoose" class="secondary">Sauvegarder (.txt — choisir dossier)</button>
+          <button id="btnExportShare" class="secondary">Sauvegarder (.txt — iPhone/iPad)</button>
+          <button id="btnImport" class="secondary">Importer (choisir un fichier .txt)</button>
+          <input type="file" id="fileImport" accept=".txt,text/plain" style="display:none">
+          <button id="btnExportJSON" class="ghost">Afficher JSON</button>
+          <button id="btnResetAll" class="ghost" style="color:#B91C1C;border-color:#B91C1C">Réinitialiser données locales</button>
+        </div>
+        <small class="muted">Tout reste sur cet appareil. Aucun envoi réseau.</small>
+        <pre id="exportArea" style="max-height:220px;overflow:auto;background:#fff;border:1px solid var(--border);padding:8px;border-radius:8px;margin-top:8px"></pre>
+
+        <div class="callout" style="margin-top:10px">
+          💡 <b>Astuce iPhone/iPad</b> : pour sauvegarder, choisissez <b>« Enregistrer dans Fichiers »</b>
+          ou envoyez-vous le fichier par <b>e-mail</b>. Pour restaurer, ouvrez le fichier depuis Fichiers
+          ou la pièce jointe du mail.
+          <span class="small">Si Safari n’enregistre pas directement le .txt, utilisez “Sauvegarder (.txt — iPhone/iPad)”
+          puis “Enregistrer dans Fichiers”.</span>
+        </div>
+      </div>
+
+      <div>
+        <h3>Historique des versions</h3>
+        <div id="changelog"></div>
+        <button id="btnShowPopup" class="secondary" style="margin-top:8px">Relire les nouveautés</button>
+      </div>
+    </div>
+    <hr class="sep">
+    <div>© PASSE TEMPS VEGA — v2.3.1 • © Pierre Charlier 2025 • Données locales (IndexedDB)</div>
+  </section>
+</main>
+
+<footer>
+  <div>© PASSE TEMPS VEGA — v2.3.1 • © Pierre Charlier 2025</div>
+  <div><small class="muted">IndexedDB persistant • Export/Import locaux (.txt)</small></div>
+</footer>
+
+<!-- Popup réutilisable + canvas confettis -->
+<div id="versionPopup">
+  <div class="box">
+    <h2 id="popupTitle"></h2>
+    <div id="popupContent"></div>
+    <button class="secondary" onclick="document.getElementById('versionPopup').style.display='none'">Fermer</button>
+  </div>
+</div>
+<canvas id="confetti"></canvas>
 <script>
 /* ===== Version / Changelog ===== */
-const APP_VERSION="v2.3.2", SEEN="ptv_version_seen";
+const APP_VERSION="v2.3.1", SEEN="ptv_version_seen";
 const CHANGELOG={
- "v2.3.2":[
-   "Dashboard : icône cadeau clignotante rétablie",
-   "Bilans : Top produits / Top clients remplis"
- ],
  "v2.3.1":[
    "Clients triés A→Z (liste & sélecteur Ventes)",
    "Confettis plus gros",
@@ -664,486 +839,275 @@ function renderCliPurch(id){
   document.getElementById('tblCliPurch').style.display='table';
 }
 /* ===== PRODUITS ===== */
-let editingProductId=null;
-function clearProd(){
-  document.getElementById('p_id').value='';
-  document.getElementById('p_nom').value='';
-  document.getElementById('p_price').value=0;
-  document.getElementById('p_stock').value=0;
-  document.getElementById('p_min').value=0;
-  editingProductId=null;
-  document.getElementById('btnDeleteProduct').disabled=true;
+let editingProdId=null;
+document.getElementById('btnNewProduct').onclick=()=>clearProduct();
+function clearProduct(){
+  ['p_nom','p_price','p_stock','p_min','p_id'].forEach(id=>document.getElementById(id).value='');
+  editingProdId=null; document.getElementById('btnDeleteProduct').disabled=true;
 }
-document.getElementById('btnNewProduct').onclick=clearProd;
-
 document.getElementById('btnSaveProduct').onclick=async()=>{
-  const id = document.getElementById('p_id').value ? +document.getElementById('p_id').value : Date.now();
   const nom=(document.getElementById('p_nom').value||'').trim();
-  if(!nom) return toast('Nom du produit requis');
-  const price=+((document.getElementById('p_price').value||'0').replace(',','.'));
-  const stock=+(document.getElementById('p_stock').value||0);
-  const min=+(document.getElementById('p_min').value||0);
-
-  const existingIndex=DB.produits.findIndex(p=>p.id===id);
-  const prod={id,nom,price:isFinite(price)?price:0,stock,stockMin:min};
-
-  if(existingIndex>=0) DB.produits[existingIndex]=prod;
-  else DB.produits.push(prod);
-
-  DB.produits.sort((a,b)=>a.nom.localeCompare(b.nom,'fr',{sensitivity:'base'}));
-  await saveDB(); clearProd();
+  if(!nom)return toast('Nom du produit requis');
+  const price=+document.getElementById('p_price').value||0;
+  const stock=+document.getElementById('p_stock').value||0;
+  const min=+document.getElementById('p_min').value||0;
+  if(editingProdId){
+    const p=DB.produits.find(x=>x.id===editingProdId);
+    if(p){Object.assign(p,{nom,price,stock,stockMin:min});}
+  } else {
+    DB.produits.push({id:Date.now(),nom,price,stock,stockMin:min});
+  }
+  await saveDB(); clearProduct();
 };
 document.getElementById('btnDeleteProduct').onclick=async()=>{
-  if(!editingProductId) return;
-  const used = DB.ventes.some(v=>(v.lignes||[]).some(L=>L.productId===editingProductId));
-  if(used) return toast('Produit déjà vendu : suppression interdite.');
-  if(!confirm('Supprimer ce produit ?')) return;
-  DB.produits = DB.produits.filter(p=>p.id!==editingProductId);
-  await saveDB(); clearProd();
+  if(!editingProdId)return;
+  if(!confirm('Supprimer ce produit ?'))return;
+  DB.produits=DB.produits.filter(p=>p.id!==editingProdId);
+  await saveDB(); clearProduct();
 };
-function fillProdForm(p){
-  editingProductId=p.id;
-  document.getElementById('p_id').value=p.id;
-  document.getElementById('p_nom').value=p.nom||'';
-  document.getElementById('p_price').value=p.price||0;
-  document.getElementById('p_stock').value=p.stock||0;
-  document.getElementById('p_min').value=p.stockMin||0;
-  document.getElementById('btnDeleteProduct').disabled=false;
-}
 function renderProduits(){
   const q=(document.getElementById('searchProduit').value||'').toLowerCase();
   const tb=document.querySelector('#tblProduits tbody'); tb.innerHTML='';
-  DB.produits
-    .slice()
-    .sort((a,b)=>a.nom.localeCompare(b.nom,'fr',{sensitivity:'base'}))
-    .filter(p=>p.nom.toLowerCase().includes(q))
-    .forEach(p=>{
-      const low=(p.stock||0)<(p.stockMin||0);
-      const tr=el('tr');
-      tr.innerHTML=`<td>${p.nom}</td><td>${euros(p.price||0)}</td>
-                    <td>${p.stock||0}</td><td>${p.stockMin||0}</td>
-                    <td>${low?'<span class="stock-low">Stock bas</span>':'OK'}</td>`;
-      tr.onclick=()=>fillProdForm(p);
-      tb.appendChild(tr);
-    });
-
-  // remplir sélecteur de produits (ventes)
+  DB.produits.sort((a,b)=>a.nom.localeCompare(b.nom,'fr')).forEach(p=>{
+    if(q && !p.nom.toLowerCase().includes(q))return;
+    const tr=el('tr');
+    tr.innerHTML=`<td>${p.nom}</td><td>${euros(p.price)}</td><td>${p.stock}</td><td>${p.stockMin}</td><td>${p.stock<p.stockMin?'<span class="stock-low">Stock bas</span>':'OK'}</td>`;
+    tr.onclick=()=>fillProd(p);
+    tb.appendChild(tr);
+  });
+  // remplir liste produits (ventes)
   const sel=document.getElementById('v_prod');
-  sel.innerHTML='';
-  DB.produits.forEach(p=>sel.appendChild(el('option',{value:p.id},[p.nom])));
+  sel.innerHTML=''; DB.produits.slice().sort((a,b)=>a.nom.localeCompare(b.nom,'fr')).forEach(p=>sel.append(el('option',{value:p.id},[p.nom])));
 }
-document.getElementById('searchProduit').oninput=renderProduits;
+function fillProd(p){
+  editingProdId=p.id;
+  document.getElementById('p_nom').value=p.nom;
+  document.getElementById('p_price').value=p.price;
+  document.getElementById('p_stock').value=p.stock;
+  document.getElementById('p_min').value=p.stockMin||0;
+  document.getElementById('p_id').value=p.id;
+  document.getElementById('btnDeleteProduct').disabled=false;
+}
 
 /* ===== VENTES ===== */
-const vProd=document.getElementById('v_prod');
-const vPrice=document.getElementById('v_price');
-const vQty=document.getElementById('v_qty');
-function calcLine(){
-  const q=+(vQty.value||1);
-  const pr=+((vPrice.value||'0').replace(',','.'));
-  const L=(isFinite(q)?q:1)*(isFinite(pr)?pr:0);
-  document.getElementById('v_line_total').textContent=euros(L);
-  document.getElementById('v_sale_total').textContent=euros(L);
-}
-vProd.onchange=()=>{
-  const p=DB.produits.find(x=>x.id==+vProd.value);
-  vPrice.value=(p&&typeof p.price==='number')?p.price:0;
+document.getElementById('v_prod').addEventListener('change',()=>{
+  const p=DB.produits.find(x=>x.id==document.getElementById('v_prod').value);
+  document.getElementById('v_price').value=p?p.price:0;
   calcLine();
-};
-vPrice.oninput=calcLine;
-vQty.oninput=calcLine;
-
-document.getElementById('v_client').addEventListener('change',()=>{
-  const id=+document.getElementById('v_client').value||0;
-  const wrap=document.getElementById('v_client_info');
-  if(!id){wrap.style.display='none'; return;}
-  const c=DB.clients.find(x=>x.id===id);
-  const list=(c?.animaux||[]).map(a=>{
-    const i=nextBD(a.dob);
-    return i.within?`<span class="gift"><i class="icon"></i><span>${a.name||''}</span></span>`:(a.name||'');
-  }).filter(Boolean).join(', ');
-  document.getElementById('v_client_animals').innerHTML=list||'—';
-  wrap.style.display=list?'block':'none';
 });
+document.getElementById('v_price').addEventListener('input',calcLine);
+document.getElementById('v_qty').addEventListener('input',calcLine);
+function calcLine(){
+  const qty=+document.getElementById('v_qty').value||0;
+  const price=+document.getElementById('v_price').value||0;
+  const line=qty*price;
+  document.getElementById('v_line_total').textContent=euros(line);
+  document.getElementById('v_sale_total').textContent=euros(line);
+}
 
-/* Validation + enregistrement */
+/* Validation avec popup */
 document.getElementById('btnSaveSale').onclick=async()=>{
   const pid=+document.getElementById('v_prod').value;
   const qty=+document.getElementById('v_qty').value||0;
-  const priceRaw=(document.getElementById('v_price').value||'').toString().replace(',','.');
+  const priceRaw=(document.getElementById('v_price').value||'').replace(',','.');
   const price=+priceRaw;
-
-  const errors=[];
-  if(!pid) errors.push('• Choisissez un <b>produit</b>.');
-  if(priceRaw.trim()===''||Number.isNaN(price)) errors.push('• Indiquez un <b>prix</b> (nombre).');
-  if(price<0) errors.push('• Le <b>prix</b> ne peut pas être négatif.');
-  if(!qty||qty<1) errors.push('• Indiquez une <b>quantité</b> (≥ 1).');
-
-  if(errors.length){
-    showPopup('Champs à compléter', `<ul>${errors.map(e=>`<li>${e}</li>`).join('')}</ul>`);
-    return;
-  }
-
+  const errs=[];
+  if(!pid)errs.push('• Choisissez un <b>produit</b>');
+  if(priceRaw.trim()===''||Number.isNaN(price))errs.push('• Indiquez un <b>prix</b> valide');
+  if(price<0)errs.push('• Le <b>prix</b> ne peut être négatif');
+  if(!qty||qty<1)errs.push('• Indiquez une <b>quantité</b> ≥ 1');
+  if(errs.length){showPopup('Champs à compléter',`<ul>${errs.map(e=>'<li>'+e+'</li>').join('')}</ul>`);return;}
   const p=DB.produits.find(x=>x.id==pid);
-  if(!p){ showPopup('Produit introuvable','<p>Le produit n’existe plus.</p>'); return; }
-
   const tot=price*qty;
   p.stock=(p.stock||0)-qty;
-
   const cid=+document.getElementById('v_client').value||null;
-  DB.ventes.push({
-    id:Date.now(), date:Date.now(),
-    clientId: cid||undefined,
-    lignes: [{productId:pid, qty, price, total:tot}]
-  });
-  await saveDB();
-  toast('Vente enregistrée (stock mis à jour).');
-  document.getElementById('v_qty').value=1;
-  document.getElementById('v_prod').dispatchEvent(new Event('change'));
-  renderSales();
-  calcLine();
+  DB.ventes.push({id:Date.now(),date:Date.now(),clientId:cid||undefined,lignes:[{productId:pid,qty,price,total:tot}]});
+  await saveDB(); renderSales(); calcLine();
+  toast('Vente enregistrée ✅');
 };
-document.getElementById('btnCancelSale').onclick=()=>{document.getElementById('v_qty').value=1; calcLine()};
-document.getElementById('searchSales').oninput=renderSales;
-
+document.getElementById('tblSales').addEventListener('click',async e=>{
+  const b=e.target.closest('button[data-del]');
+  if(!b)return; const id=+b.dataset.del;
+  const v=DB.ventes.find(x=>x.id===id); if(!v)return;
+  if(!confirm('Supprimer cette vente ? Le stock sera restauré.'))return;
+  (v.lignes||[]).forEach(L=>{
+    const p=DB.produits.find(x=>x.id==L.productId);
+    if(p)p.stock=(p.stock||0)+(L.qty||1);
+  });
+  DB.ventes=DB.ventes.filter(x=>x.id!==id);
+  await saveDB(); renderSales();
+  toast('Vente supprimée et stock restauré ✅');
+});
 function renderSales(){
   const q=(document.getElementById('searchSales').value||'').toLowerCase();
   const tb=document.querySelector('#tblSales tbody'); tb.innerHTML='';
-  const rows=[];
-  DB.ventes.forEach(v=>{
-    const cn = (()=>{const c=DB.clients.find(x=>x.id===v.clientId); return c?(c.nom||('#'+v.clientId)):'—'})();
+  DB.ventes.slice().sort((a,b)=>b.date-a.date).forEach(v=>{
     (v.lignes||[]).forEach(L=>{
       const p=DB.produits.find(x=>x.id==L.productId);
-      const price=(typeof L.price==='number')?L.price:(p?p.price:0);
-      const total=(typeof L.total==='number')?L.total:price*(L.qty||1);
-      rows.push({saleId:v.id,date:v.date,client:cn,prod:p?p.nom:('Produit '+L.productId),qty:L.qty||1,price,total});
+      const cli=DB.clients.find(c=>c.id===v.clientId);
+      const r={saleId:v.id,date:v.date,client:cli?cli.nom:'—',prod:p?p.nom:'?',qty:L.qty||1,price:L.price||0,total:L.total||0};
+      if(q && !(`${r.client} ${r.prod}`.toLowerCase().includes(q)))return;
+      const tr=el('tr');
+      tr.innerHTML=`<td>${fmt(r.date)}</td><td>${r.client}</td><td>${r.prod}</td><td>${r.qty}</td><td>${euros(r.price)}</td><td>${euros(r.total)}</td><td><button class="ghost" data-del="${r.saleId}">Supprimer</button></td>`;
+      tb.appendChild(tr);
     });
   });
-  rows.sort((a,b)=>b.date-a.date)
-      .filter(r=>((fmt(r.date)+' '+r.client+' '+r.prod).toLowerCase().includes(q)))
-      .forEach(r=>{
-        const tr=el('tr');
-        tr.innerHTML=`<td>${fmt(r.date)}</td><td>${r.client}</td><td>${r.prod}</td><td>${r.qty}</td><td>${euros(r.price)}</td><td>${euros(r.total)}</td>
-                      <td><button class="ghost" data-del="${r.saleId}">Supprimer</button></td>`;
-        tb.appendChild(tr);
-      });
 }
-document.getElementById('tblSales').addEventListener('click',async e=>{
-  const btn=e.target.closest('button[data-del]'); if(!btn) return;
-  const id=+btn.dataset.del;
-  const sale=DB.ventes.find(v=>v.id===id); if(!sale) return;
-  if(!confirm('Supprimer cette vente ? Le stock sera restauré.')) return;
-  (sale.lignes||[]).forEach(L=>{
-    const p=DB.produits.find(x=>x.id==L.productId);
-    if(p) p.stock=(p.stock||0)+(L.qty||1);
-  });
-  DB.ventes=DB.ventes.filter(v=>v.id!==id);
-  await saveDB(); toast('Vente supprimée et stock restauré.');
-});
 
-/* ===== BILANS (avec Tops) ===== */
+/* ===== BILANS ===== */
 function renderBilans(){
   const mode=document.getElementById('repPeriod').value;
-
-  // Fenêtre : 30j / ~12 sem / 12 mois
-  const now=Date.now();
-  const rangeStart = mode==='day'  ? now - 30*864e5
-                   : mode==='week' ? now - 84*864e5
-                                   : now - 365*864e5;
-
   const tb=document.querySelector('#tblSummary tbody'); tb.innerHTML='';
-  const agg=new Map();      // période -> {CA,Qté,Count}
-  const prodAgg=new Map();  // produit -> {ca,qty}
-  const cliAgg=new Map();   // client -> {ca,ventes}
-
-  const keyOf=(ts)=>{
-    const d=new Date(ts);
-    if(mode==='day') return d.toISOString().slice(0,10);
-    if(mode==='week'){ const dd=new Date(d); const w=(dd.getDay()+6)%7; dd.setDate(dd.getDate()-w); return 'S'+dd.toISOString().slice(0,10); }
-    return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');
-  };
-
+  const agg=new Map();
   DB.ventes.forEach(v=>{
-    if(v.date < rangeStart) return;
-    const k=keyOf(v.date);
-    let R=agg.get(k)||{CA:0,Qté:0,Count:0};
-    let counted=false;
-
-    (v.lignes||[]).forEach(L=>{
-      const price=(typeof L.price==='number')?L.price:0;
-      const qty=L.qty||1;
-      const total=typeof L.total==='number' ? L.total : price*qty;
-
-      R.CA += total; R.Qté += qty;
-      if(!counted){ R.Count++; counted=true; }
-
-      // Tops produits
-      const p=DB.produits.find(x=>x.id==L.productId);
-      const pn=p ? p.nom : ('Produit '+L.productId);
-      const P=prodAgg.get(pn)||{ca:0,qty:0};
-      P.ca += total; P.qty += qty;
-      prodAgg.set(pn,P);
-
-      // Tops clients
-      const cli=DB.clients.find(c=>c.id===v.clientId);
-      const cn=cli ? (cli.nom||('#'+v.clientId)) : '—';
-      const C=cliAgg.get(cn)||{ca:0,ventes:0};
-      C.ca += total; C.ventes += 1;
-      cliAgg.set(cn,C);
-    });
-
-    agg.set(k,R);
+    const d=new Date(v.date);
+    let key=''; if(mode==='day')key=ymd(v.date);
+    else if(mode==='week'){const f=new Date(d-d.getDay()*dms(1)); key=ymd(f);}
+    else key=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');
+    let R=agg.get(key)||{CA:0,Qté:0,Count:0};
+    v.lignes.forEach(L=>{R.CA+=(L.total||0); R.Qté+=(L.qty||0)});
+    R.Count++; agg.set(key,R);
   });
-
   const arr=[...agg.entries()].sort((a,b)=>a[0]>b[0]?1:-1);
   let ca=0,qt=0,ct=0;
   arr.forEach(([k,v])=>{
-    ca+=v.CA; qt+=v.Qté; ct+=v.Count;
+    ca+=v.CA;qt+=v.Qté;ct+=v.Count;
     const tr=el('tr'); tr.innerHTML=`<td>${k}</td><td>${euros(v.CA)}</td><td>${v.Qté}</td><td>${v.Count}</td>`;
     tb.appendChild(tr);
   });
   document.getElementById('repCA').textContent=euros(ca);
   document.getElementById('repQTY').textContent=qt;
   document.getElementById('repCOUNT').textContent=ct;
-
-  // Top produits
-  const tpp=document.querySelector('#tblTopProductsRep tbody'); tpp.innerHTML='';
-  [...prodAgg.entries()].sort((a,b)=>b[1].ca-a[1].ca).slice(0,10).forEach(([name,val])=>{
-    const tr=el('tr'); tr.innerHTML=`<td>${name}</td><td>${euros(val.ca)}</td><td>${val.qty}</td>`;
-    tpp.appendChild(tr);
-  });
-
-  // Top clients
-  const tpc=document.querySelector('#tblTopClientsRep tbody'); tpc.innerHTML='';
-  [...cliAgg.entries()].sort((a,b)=>b[1].ca-a[1].ca).slice(0,10).forEach(([name,val])=>{
-    const tr=el('tr'); tr.innerHTML=`<td>${name}</td><td>${euros(val.ca)}</td><td>${val.ventes}</td>`;
-    tpc.appendChild(tr);
-  });
-}
-document.getElementById('repPeriod').onchange=renderBilans;
-
-/* ===== ÉDITEUR DE RACES ===== */
-function renderBreedEditor(key,divId){
-  const c=document.getElementById(divId);
-  c.innerHTML='';
-  const arr=[...(DB.lists[key]||[])].sort((a,b)=>a.localeCompare(b,'fr',{sensitivity:'base'}));
-  DB.lists[key]=arr;
-  arr.forEach((v,i)=>{
-    const chip=el('div',{class:'chip'},[v]);
-    chip.title='Cliquer pour renommer';
-    chip.onclick=async()=>{
-      const nv=prompt('Renommer :',v); if(nv==null) return;
-      const t=(nv||'').trim(); if(!t) return;
-      DB.lists[key][i]=t;
-      DB.lists[key].sort((a,b)=>a.localeCompare(b,'fr',{sensitivity:'base'}));
-      await saveDB(); renderBreedEditor(key,divId); refreshPetRace();
-    };
-    const del=el('span',{style:'margin-left:6px;cursor:pointer;color:#B91C1C'},['×']);
-    del.onclick=async(e)=>{ e.stopPropagation(); if(confirm('Supprimer ?')){ DB.lists[key].splice(i,1); await saveDB(); renderBreedEditor(key,divId); refreshPetRace(); }};
-    chip.appendChild(del);
-    c.appendChild(chip);
-  });
-}
-document.querySelectorAll('button[data-add]').forEach(b=>b.addEventListener('click',async()=>{
-  const key=b.getAttribute('data-add');
-  const v=prompt('Nouvelle race :'); if(v==null) return;
-  DB.lists[key].push((v||'').trim());
-  DB.lists[key]=DB.lists[key].filter(Boolean).sort((a,b)=>a.localeCompare(b,'fr',{sensitivity:'base'}));
-  await saveDB(); renderBreedEditor(key,key==='breedsDog'?'editBreedsDog':'editBreedsCat'); refreshPetRace();
-}));
-function refreshPetRace(){
-  document.querySelectorAll('.pet-espece').forEach(sel=>{
-    const race=sel.closest('.card').querySelector('.pet-race');
-    const list=(sel.value==='Chien'?DB.lists.breedsDog:DB.lists.breedsCat)||[];
-    const cur=race.value;
-    race.innerHTML=''; list.forEach(r=>race.append(el('option',{value:r},[r])));
-    if(list.includes(cur)) race.value=cur;
-  });
 }
 
-/* ===== SAUVEGARDE / RESTAURATION (TXT) ===== */
-const fileName=()=>{const d=new Date(),y=d.getFullYear(),m=String(d.getMonth()+1).padStart(2,'0'),dd=String(d.getDate()).padStart(2,'0'); return `ptv_sauvegarde_${y}-${m}-${dd}.txt`};
-async function getSnap(){ // redéf protégée si minifié ailleurs
-  const row=await idbGet('data','main');
-  const s=row?JSON.parse(JSON.stringify(row)):JSON.parse(JSON.stringify(DB||{id:'main',clients:[],produits:[],ventes:[],lists:DB?.lists||{}}));
-  const lg=await idbGet('logo','current'); if(lg&&lg.data) s._logo=lg.data;
-  const st=await idbGet('settings','confetti'); if(st) s._confetti=st;
-  return s;
-}
-async function snapStr(){return JSON.stringify(await getSnap(),null,2)}
-
-async function exportChoose(){
-  const data=await snapStr(), name=fileName();
-  if('showSaveFilePicker' in window){
-    try{
-      const h=await window.showSaveFilePicker({suggestedName:name,types:[{description:'Sauvegarde PTV',accept:{'text/plain':['.txt']}}]});
-      const w=await h.createWritable(); await w.write(data); await w.close();
-      alert('Sauvegarde enregistrée ✅'); return;
-    }catch(e){ if(e?.name!=='AbortError') alert('Échec sauvegarde: '+e) }
+/* ===== CONFETTIS ===== */
+function confetti(duration=1e4){
+  const cv=document.getElementById('confetti'),ctx=cv.getContext('2d');
+  const W=cv.width=innerWidth,H=cv.height=innerHeight;
+  cv.style.display='block';
+  const N=160,parts=[];
+  for(let i=0;i<N;i++)parts.push({
+    x:Math.random()*W,y:Math.random()*-H,
+    r:8+Math.random()*10, // plus gros
+    c:`hsl(${Math.random()*360},90%,60%)`,
+    vy:1+Math.random()*1.8,vx:(Math.random()-.5)*0.8,rot:Math.random()*Math.PI
+  });
+  let start=null;
+  function step(ts){
+    if(!start)start=ts; const t=ts-start;
+    ctx.clearRect(0,0,W,H);
+    parts.forEach(p=>{
+      p.x+=p.vx; p.y+=p.vy; p.rot+=0.02;
+      ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.rot);
+      ctx.fillStyle=p.c; ctx.fillRect(-p.r/2,-p.r/2,p.r,p.r);
+      ctx.restore();
+      if(p.y>H)p.y=-10;
+    });
+    if(t<duration)requestAnimationFrame(step); else cv.style.display='none';
   }
-  const blob=new Blob([data],{type:'text/plain;charset=utf-8'}), a=document.createElement('a');
-  a.href=URL.createObjectURL(blob); a.download=name; document.body.appendChild(a); a.click();
-  setTimeout(()=>{URL.revokeObjectURL(a.href); a.remove()},0);
+  requestAnimationFrame(step);
 }
+document.getElementById('btnTestConfetti').onclick=()=>confetti();
+
+/* ===== SAUVEGARDE / IMPORT ===== */
+async function importFromText(txt){
+  const data=safeParse(txt);
+  if(!data)return toast('Données invalides');
+  DB=data; await idbPut('data',DB);
+  if(data._logo)await idbPut('logo',{id:'current',data:data._logo});
+  if(data._confetti)await idbPut('settings',data._confetti);
+  await renderAll();
+  toast('Import terminé ✅');
+}
+document.getElementById('btnImport').onclick=()=>document.getElementById('fileImport').click();
+document.getElementById('fileImport').addEventListener('change',async e=>{
+  const f=e.target.files?.[0]; if(!f)return;
+  const t=await f.text(); await importFromText(t);
+});
+async function exportChoose(){
+  const blob=new Blob([await snapStr()],{type:'text/plain'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob); a.download=fileName(); a.click();
+}
+function fileName(){return 'PTV_backup_'+new Date().toISOString().slice(0,10)+'.txt';}
 async function exportShare(){
-  try{
-    const data=await snapStr(); const name=fileName();
-    const file=new File([data],name,{type:'text/plain'});
-    if(navigator.canShare && navigator.canShare({files:[file]})){
-      await navigator.share({files:[file],title:'Sauvegarde PASSE TEMPS VEGA'});
-      alert('Partage lancé ✅\nSi besoin, choisis “Enregistrer dans Fichiers”.');
-      return;
-    }
-    const url='data:text/plain;charset=utf-8,'+encodeURIComponent(data);
-    window.open(url,'_blank','noopener');
-    alert('Sur iPhone/iPad : Partager → “Enregistrer dans Fichiers”.');
-  }catch(e){ alert('Échec export iOS : '+(e?.message||e)) }
+  const data=await snapStr(); const name=fileName();
+  const file=new File([data],name,{type:'text/plain'});
+  if(navigator.canShare && navigator.canShare({files:[file]})){
+    await navigator.share({files:[file],title:'Sauvegarde PASSE TEMPS VEGA'});
+    alert('Partage lancé ✅\nChoisissez “Enregistrer dans Fichiers” si besoin.'); return;
+  }
+  const url='data:text/plain;charset=utf-8,'+encodeURIComponent(data);
+  window.open(url,'_blank'); alert('Sur iPhone : Partager → Enregistrer dans Fichiers.');
 }
 document.getElementById('btnExportChoose').onclick=exportChoose;
 document.getElementById('btnExportShare').onclick=exportShare;
 document.getElementById('btnExportJSON').onclick=async()=>{
   document.getElementById('exportArea').textContent=await snapStr();
 };
-document.getElementById('btnImport').onclick=()=>document.getElementById('fileImport').click();
-document.getElementById('fileImport').addEventListener('change',async e=>{
-  const f=e.target.files?.[0]; if(!f) return;
-  try{
-    const text=await f.text(); // iOS-friendly
-    await importFromText(text);
-  }finally{
-    e.target.value='';
-  }
-});
-async function importFromText(text){
-  text=(text||"").replace(/^\uFEFF/,'').trim();
-  // data: fallback
-  if(text.startsWith('data:')){
-    const m=text.match(/^data:.*?;base64,(.*)$/);
-    if(m){ try{text=atob(m[1])}catch{} }
-    else { const i=text.indexOf(','); if(i>-1) text=text.slice(i+1) }
-  }
-  let obj=null;
-  try{ obj=JSON.parse(text) }catch{
-    const a=text.indexOf('{'), b=text.lastIndexOf('}');
-    if(a!=-1&&b>a) try{ obj=JSON.parse(text.slice(a,b+1)) }catch{}
-  }
-  if(!obj||!obj.clients||!obj.produits||!obj.ventes||!obj.lists) return alert('Fichier TXT invalide');
-
-  // Normalisation
-  (obj.produits||[]).forEach(p=>{ if(typeof p.price!=='number') p.price=0; if(typeof p.stockMin!=='number' && typeof p.min==='number') p.stockMin=p.min; });
-  (obj.ventes||[]).forEach(v=>(v.lignes||[]).forEach(L=>{ if(typeof L.price!=='number') L.price=0; if(typeof L.total!=='number') L.total=(L.price||0)*(L.qty||1) }));
-
-  DB={id:'main',clients:obj.clients,produits:obj.produits,ventes:obj.ventes,lists:obj.lists};
-  await idbPut('data',DB);
-  if(obj._logo) await idbPut('logo',{id:'current',data:obj._logo});
-  if(obj._confetti) await idbPut('settings',{id:'confetti',...obj._confetti});
-  renderAll(); alert('Import réussi ✅');
-}
-document.getElementById('btnResetAll').onclick=async()=>{
-  if(!confirm('Effacer toutes les données locales ? (Sauvegardez avant)'))return;
-  await idbDeleteDB(); try{localStorage.removeItem('ptv_db_main')}catch{}; location.reload();
-};
-
-/* ===== CONFETTIS (plus gros) ===== */
-const CONF_DAILY='ptv_confetti_last';
-const todayKey=()=>new Date().toISOString().slice(0,10);
-function confetti(duration=1e4){
-  const cv=document.getElementById('confetti'),ctx=cv.getContext('2d');
-  const W=cv.width=innerWidth,H=cv.height=innerHeight;
-  cv.style.display='block';
-  const N=160,parts=[];
-  for(let i=0;i<N;i++) parts.push({
-    x:Math.random()*W, y:Math.random()*-H,
-    r:6+Math.random()*8, c:`hsl(${Math.random()*360},90%,60%)`,
-    vy:1+Math.random()*1.8, vx:(Math.random()-.5)*0.8, rot:Math.random()*Math.PI
-  });
-  let start=null;
-  function step(ts){
-    if(!start) start=ts; const t=ts-start;
-    ctx.clearRect(0,0,W,H);
-    const breeze=Math.sin(t/1200)*0.4;
-    parts.forEach(p=>{
-      p.x+=p.vx+breeze; p.y+=p.vy*.9; p.rot+=0.06;
-      if(p.y>H){p.y=-10;p.x=Math.random()*W}
-      ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.rot);
-      ctx.fillStyle=p.c; ctx.fillRect(-p.r/2,-p.r/2,p.r,p.r); ctx.restore();
-    });
-    if(t<duration) requestAnimationFrame(step); else cv.style.display='none';
-  }
-  requestAnimationFrame(step);
-}
-document.getElementById('btnTestConfetti').onclick=()=>confetti(1e4);
-document.getElementById('confettiToggle').addEventListener('change',async e=>{
-  const s=await idbGet('settings','confetti')||{id:'confetti'};
-  s.enabled=!!e.target.checked; await idbPut('settings',s);
-  toast('Préférence confettis enregistrée.');
-});
 
 /* ===== DASHBOARD ===== */
 function renderDashboard(){
-  const t30=Date.now()-30*864e5, t90=Date.now()-90*864e5;
-
-  // KPI
-  document.getElementById('kpiActifs').textContent=
-    new Set(DB.ventes.filter(v=>v.date>=t90&&!!v.clientId).map(v=>v.clientId)).size;
-
-  const byProd={}; DB.ventes.filter(v=>v.date>=t30).forEach(v=>v.lignes.forEach(L=>{
-    const p=DB.produits.find(x=>x.id==L.productId);
-    const name=p?p.nom:('Produit '+L.productId);
-    byProd[name]=(byProd[name]||0)+(L.qty||1);
-  }));
-  const tp=Object.entries(byProd).sort((a,b)=>b[1]-a[1]).slice(0,10);
-  const tbp=document.querySelector('#tblTopProd tbody'); tbp.innerHTML='';
-  tp.forEach(([n,q])=>{const tr=el('tr'); tr.innerHTML=`<td>${n}</td><td>${q}</td>`; tbp.appendChild(tr)});
-  document.getElementById('kpiTopProd').textContent=tp.length?`${tp[0][0]} (${tp[0][1]})`:'—';
-
-  const byCli={}; DB.ventes.filter(v=>v.date>=t30&&!!v.clientId).forEach(v=>{
-    const c=DB.clients.find(x=>x.id===v.clientId),name=c?(c.nom||('#'+v.clientId)):'#'+v.clientId;
-    byCli[name]=(byCli[name]||0)+1
+  const t90=Date.now()-dms(90);
+  const actifs=new Set(DB.ventes.filter(v=>v.date>=t90).map(v=>v.clientId));
+  document.getElementById('kpiActifs').textContent=actifs.size;
+  const prodMap=new Map(),cliMap=new Map();
+  DB.ventes.forEach(v=>{
+    v.lignes.forEach(L=>{
+      const p=DB.produits.find(x=>x.id==L.productId);
+      if(p)prodMap.set(p.nom,(prodMap.get(p.nom)||0)+(L.qty||1));
+    });
+    if(v.clientId)cliMap.set(v.clientId,(cliMap.get(v.clientId)||0)+v.lignes.reduce((a,b)=>a+(b.total||0),0));
   });
-  const tc=Object.entries(byCli).sort((a,b)=>b[1]-a[1]).slice(0,10);
-  const tbc=document.querySelector('#tblTopCli tbody'); tbc.innerHTML='';
-  tc.forEach(([n,k])=>{const tr=el('tr'); tr.innerHTML=`<td>${n}</td><td>${k}</td>`; tbc.appendChild(tr)});
-  document.getElementById('kpiTopCli').textContent=tc.length?`${tc[0][0]} (${tc[0][1]})`:'—';
+  const topProd=[...prodMap.entries()].sort((a,b)=>b[1]-a[1])[0];
+  const topCli=[...cliMap.entries()].sort((a,b)=>b[1]-a[1])[0];
+  document.getElementById('kpiTopProd').textContent=topProd?`${topProd[0]} (${topProd[1]})`:'—';
+  const cli=topCli?DB.clients.find(c=>c.id==topCli[0]):null;
+  document.getElementById('kpiTopCli').textContent=cli?`${cli.nom} (${euros(topCli[1])})`:'—';
 
-  // Anniversaires (cadeau clignotant)
-  const tbb=document.querySelector('#tblBirthSoon tbody'); tbb.innerHTML='';
-  DB.clients.forEach(c=>(c.animaux||[]).forEach(a=>{
-    const i=nextBD(a.dob); if(i.within){
-      const tr=el('tr');
-      tr.innerHTML = `<td>${c.nom||'—'}</td>
-                      <td><span class="gift"><i class="icon"></i><span>${a.name||'—'}</span></span></td>
-                      <td>${i.days}</td>`;
-      tbb.appendChild(tr);
-    }
-  }));
+  const tb=document.querySelector('#tblBirthSoon tbody'); tb.innerHTML='';
+  DB.clients.forEach(c=>{
+    (c.animaux||[]).forEach(a=>{
+      const i=nextBD(a.dob); if(i.within)
+        tb.append(el('tr',{},[el('td',{},[c.nom]),el('td',{},[a.name+' 🎁']),el('td',{},[i.days+' j'])]));
+    });
+  });
 }
+
+/* ===== RACES ===== */
+function renderBreeds(){
+  ['breedsDog','breedsCat'].forEach(key=>{
+    const box=document.getElementById(key==='breedsDog'?'editBreedsDog':'editBreedsCat');
+    box.innerHTML='';
+    (DB.lists[key]||[]).slice().sort((a,b)=>a.localeCompare(b,'fr')).forEach(r=>{
+      const chip=el('div',{class:'chip'},[r]);
+      chip.onclick=()=>{
+        const nv=prompt('Modifier la race',r);
+        if(!nv)return;
+        DB.lists[key]=DB.lists[key].map(x=>x===r?nv:x).sort((a,b)=>a.localeCompare(b,'fr'));
+        saveDB(); renderBreeds();
+      };
+      box.append(chip);
+    });
+  });
+}
+document.querySelectorAll('[data-add]').forEach(b=>b.onclick=()=>{
+  const key=b.dataset.add;
+  const nv=prompt('Nouvelle race :'); if(!nv)return;
+  DB.lists[key].push(nv); DB.lists[key].sort((a,b)=>a.localeCompare(b,'fr'));
+  saveDB(); renderBreeds();
+});
 
 /* ===== RENDER GLOBAL ===== */
 function renderAll(){
-  renderClients(); renderProduits(); renderSales();
-  renderBilans(); renderBreedEditor('breedsDog','editBreedsDog');
-  renderBreedEditor('breedsCat','editBreedsCat'); renderDashboard();
-  loadLogoUI();
+  renderChangelog(); renderClients(); renderProduits();
+  renderSales(); renderDashboard(); renderBreeds(); renderBilans(); loadLogoUI();
 }
 
 /* ===== BOOT ===== */
-document.addEventListener('DOMContentLoaded',async()=>{
-  try{ if(navigator.storage&&navigator.storage.persist) await navigator.storage.persist() }catch{}
-  renderChangelog();
-  await loadDB();
-  renderAll();
-  showWhatsNew();
-  // confettis le jour J (1 fois/jour si activé)
-  const set=await idbGet('settings','confetti');
-  const last=localStorage.getItem(CONF_DAILY);
-  if(set?.enabled && last!==todayKey()){
-    const isBirthdayToday=DB.clients.some(c=>(c.animaux||[]).some(a=>nextBD(a.dob).isToday));
-    if(isBirthdayToday){ confetti(6000); localStorage.setItem(CONF_DAILY,todayKey()); }
-  }
-  // initialiser calcul ligne vente
-  document.getElementById('v_prod').dispatchEvent(new Event('change'));
-});
+(async()=>{
+  await loadDB(); renderAll(); showWhatsNew(); calcLine();
+})();
 </script>
 </body>
 </html>
